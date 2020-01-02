@@ -12,7 +12,7 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  Text,
+  // Text,
   StatusBar,
 } from 'react-native';
 
@@ -30,6 +30,10 @@ import { createStackNavigator } from "react-navigation-stack"
 import Reducer from './FriendReducer'
 import Login from './screens/Login'
 import Register from './screens/Register'
+import { ApplicationProvider, IconRegistry, Layout, Text } from '@ui-kitten/components';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import { mapping, light as lightTheme } from '@eva-design/eva';
+
 
 const store = createStore(Reducer)
 
@@ -69,8 +73,10 @@ export default class App extends React.Component {
   render() {
     return (
         <Provider store={store}>
+            <ApplicationProvider mapping={mapping} theme={lightTheme}>
           <AppContainer />
           {/*<Text style={{margin:100}}>Hello</Text>*/}
+            </ApplicationProvider>
         </Provider>
     )
   }

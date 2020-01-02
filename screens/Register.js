@@ -3,12 +3,12 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import RadioForm from 'react-native-simple-radio-button'
 import React from 'react'
 import { View, TextInput, Image, ImageBackground, ScrollView } from 'react-native'
-import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick'
+// import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick'
 import styles from './Register.style'
 import axios from 'axios'
 import Modal from 'react-native-modal'
 import { Button, Card } from 'react-native-elements'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default class Register extends React.Component {
@@ -118,7 +118,7 @@ export default class Register extends React.Component {
               source={require('../assets/logo.png')}
             />
             <View style={styles.inputContainer}>
-              <Icon style={styles.inputIcon} name="ios-person" size={30} color="#8BC34A" />
+              {/*<Icon style={styles.inputIcon} name="ios-person" size={30} color="#8BC34A" />*/}
               <TextInput
                 style={styles.inputs}
                 placeholder="Name"
@@ -127,12 +127,12 @@ export default class Register extends React.Component {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Icon
-                style={styles.inputIcon}
-                name="ios-mail"
-                size={30}
-                color={this.state.IconColor}
-              />
+              {/*<Icon*/}
+              {/*  style={styles.inputIcon}*/}
+              {/*  name="ios-mail"*/}
+              {/*  size={30}*/}
+              {/*  color={this.state.IconColor}*/}
+              {/*/>*/}
               <TextInput
                 style={styles.inputs}
                 placeholder="Email"
@@ -142,12 +142,12 @@ export default class Register extends React.Component {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Icon
-                style={styles.inputIcon}
-                name="ios-lock"
-                size={30}
-                color={this.state.IconColor}
-              />
+              {/*<Icon*/}
+              {/*  style={styles.inputIcon}*/}
+              {/*  name="ios-lock"*/}
+              {/*  size={30}*/}
+              {/*  color={this.state.IconColor}*/}
+              {/*/>*/}
               <TextInput
                 style={styles.inputs}
                 placeholder="Password"
@@ -157,12 +157,12 @@ export default class Register extends React.Component {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Icon
-                style={styles.inputIcon}
-                name="ios-lock"
-                size={30}
-                color={this.state.IconColor}
-              />
+              {/*<Icon*/}
+              {/*  style={styles.inputIcon}*/}
+              {/*  name="ios-lock"*/}
+              {/*  size={30}*/}
+              {/*  color={this.state.IconColor}*/}
+              {/*/>*/}
               <TextInput
                 style={styles.inputs}
                 placeholder="Repeat password"
@@ -172,7 +172,7 @@ export default class Register extends React.Component {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Icon style={styles.inputIcon} name="ios-home" size={30} color="#8BC34A" />
+              {/*<Icon style={styles.inputIcon} name="ios-home" size={30} color="#8BC34A" />*/}
               <TextInput
                 style={styles.inputs}
                 placeholder="Address"
@@ -181,7 +181,7 @@ export default class Register extends React.Component {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Icon style={styles.inputIcon} name="ios-images" size={30} color="#8BC34A" />
+              {/*<Icon style={styles.inputIcon} name="ios-images" size={30} color="#8BC34A" />*/}
               <TextInput
                 style={styles.inputs}
                 placeholder="Avatar URL"
@@ -190,7 +190,7 @@ export default class Register extends React.Component {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Icon style={styles.inputIcon} name="ios-pizza" size={30} color="#8BC34A" />
+              {/*<Icon style={styles.inputIcon} name="ios-pizza" size={30} color="#8BC34A" />*/}
               <TextInput
                 style={styles.inputs}
                 placeholder="About me..."
@@ -214,16 +214,16 @@ export default class Register extends React.Component {
                 }}
               />
             </View>
-            <AwesomeButtonRick
-              type="primary"
-              width={200}
-              style={styles.registerButton}
-              // onPress={this.toggleModal}
-              onPress={() => this.onClickListener('submit')}
-              // onPress={() => this.onClickListener('submit')}
-            >
-              Register
-            </AwesomeButtonRick>
+            {/*<AwesomeButtonRick*/}
+            {/*  type="primary"*/}
+            {/*  width={200}*/}
+            {/*  style={styles.registerButton}*/}
+            {/*  // onPress={this.toggleModal}*/}
+            {/*  onPress={() => this.onClickListener('submit')}*/}
+            {/*  // onPress={() => this.onClickListener('submit')}*/}
+            {/*>*/}
+            {/*  Register*/}
+            {/*</AwesomeButtonRick>*/}
             <Modal style={{ justifyContent: 'center' }} isVisible={this.state.isModalVisible}>
               <Card title={'Registered successfully'}>
                 <Button
@@ -248,6 +248,6 @@ export default class Register extends React.Component {
   }
 }
 
-Register.propTypes = {
-  navigation: PropTypes.any
-}
+// Register.propTypes = {
+//   navigation: PropTypes.any
+// }

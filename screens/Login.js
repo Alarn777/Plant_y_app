@@ -1,4 +1,4 @@
-import Icon from 'react-native-vector-icons/Ionicons'
+// import Icon from 'react-native-vector-icons/Ionicons'
 import React from 'react'
 import {
   StyleSheet,
@@ -11,9 +11,13 @@ import {
 } from 'react-native'
 import axios from 'axios'
 import Consts from '../ENV_VARS'
+import {
+  Button,
+  Layout,
+} from '@ui-kitten/components';
 
-import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick'
-import PropTypes from 'prop-types'
+// import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick'
+// import PropTypes from 'prop-types'
 
 import BackgroundImage from '../assets/Background.jpg'
 
@@ -201,9 +205,9 @@ export default class Login extends React.Component {
             style={{ height: 100, marginBottom: 20 }}
             source={require('../assets/logo.png')}
           />
-          <Text style={styles.headerText}>Faster and reliable cleaning process</Text>
+          <Text style={styles.headerText}>Your remote garden</Text>
           <View style={styles.inputContainer}>
-            <Icon style={styles.inputIcon} name="ios-mail" size={30} color={this.state.IconColor} />
+            {/*<Icon style={styles.inputIcon} name="ios-mail" size={30} color={this.state.IconColor} />*/}
             <TextInput
               style={styles.inputs}
               placeholder="Email"
@@ -213,7 +217,7 @@ export default class Login extends React.Component {
             />
           </View>
           <View style={styles.inputContainer}>
-            <Icon style={styles.inputIcon} name="ios-lock" size={30} color={this.state.IconColor} />
+            {/*<Icon style={styles.inputIcon} name="ios-lock" size={30} color={this.state.IconColor} />*/}
             <TextInput
               style={styles.inputs}
               placeholder="Password"
@@ -222,22 +226,24 @@ export default class Login extends React.Component {
               onChangeText={password => this.setState({ password })}
             />
           </View>
-          <AwesomeButtonRick
-            type="anchor"
-            width={200}
-            style={{ margin: 15 }}
-            onPress={() => this.onClickListener('login')}
-          >
-            Login
-          </AwesomeButtonRick>
-          <AwesomeButtonRick
-            type="primary"
-            width={200}
-            style={{ margin: 15 }}
-            onPress={() => this.onClickListener('register')}
-          >
-            Register
-          </AwesomeButtonRick>
+          <Button style={{margin: 8}} appearance='outline' status='primary' onPress={() => this.onClickListener('login')}>Login</Button>
+          <Button style={{margin: 8}} appearance='outline' status='primary' onPress={() => this.onClickListener('register')}>Register</Button>
+          {/*<AwesomeButtonRick*/}
+          {/*  type="anchor"*/}
+          {/*  width={200}*/}
+          {/*  style={{ margin: 15 }}*/}
+          {/*  onPress={() => this.onClickListener('login')}*/}
+          {/*>*/}
+          {/*  Login*/}
+          {/*</AwesomeButtonRick>*/}
+          {/*<AwesomeButtonRick*/}
+          {/*  type="primary"*/}
+          {/*  width={200}*/}
+          {/*  style={{ margin: 15 }}*/}
+          {/*  onPress={() => this.onClickListener('register')}*/}
+          {/*>*/}
+          {/*  Register*/}
+          {/*</AwesomeButtonRick>*/}
 
           <TouchableHighlight
             style={styles.buttonContainer}
@@ -250,8 +256,8 @@ export default class Login extends React.Component {
     )
   }
 }
-
-Login.propTypes = {
-  route: PropTypes.any,
-  navigation: PropTypes.any
-}
+//
+// Login.propTypes = {
+//   route: PropTypes.any,
+//   navigation: PropTypes.any
+// }
