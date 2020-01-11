@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { StyleSheet, Text, View, Image, ScrollView, ActivityIndicator } from 'react-native'
-import StarRating from 'react-native-star-rating'
+// import StarRating from 'react-native-star-rating'
 import axios from 'axios'
 import Consts from '../../ENV_VARS'
 import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick'
@@ -94,18 +94,18 @@ class Profile extends Component {
           <View style={styles.header} />
           <Image style={styles.avatar} source={{ uri: this.state.user.avatar }} />
           <View style={styles.bodyContent}>
-            <StarRating
-              style={{ marginTop: 100 }}
-              disabled
-              emptyStar={'ios-star-outline'}
-              fullStar={'ios-star'}
-              halfStar={'ios-star-half'}
-              iconSet={'Ionicons'}
-              maxStars={5}
-              rating={this.state.user.stars}
-              selectedStar={rating => this.onStarRatingPress(rating)}
-              fullStarColor={'gold'}
-            />
+            {/*<StarRating*/}
+            {/*  style={{ marginTop: 100 }}*/}
+            {/*  disabled*/}
+            {/*  emptyStar={'ios-star-outline'}*/}
+            {/*  fullStar={'ios-star'}*/}
+            {/*  halfStar={'ios-star-half'}*/}
+            {/*  iconSet={'Ionicons'}*/}
+            {/*  maxStars={5}*/}
+            {/*  rating={this.state.user.stars}*/}
+            {/*  selectedStar={rating => this.onStarRatingPress(rating)}*/}
+            {/*  fullStarColor={'gold'}*/}
+            {/*/>*/}
             <Text style={styles.name}>{this.state.user.name}</Text>
             <Text style={styles.info}>{this.state.user.description}</Text>
             <AwesomeButtonRick

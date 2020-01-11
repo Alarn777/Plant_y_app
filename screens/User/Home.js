@@ -15,10 +15,12 @@ import {
   ListItem,
   Divider,
   Button,
-  Icon,
+  // Icon,
   CheckBox,
   ThemeProvider
 } from 'react-native-elements'
+
+import Icon from "@ui-kitten/eva-icons"
 import AwesomeButton from 'react-native-really-awesome-button'
 import CleanerCard from './CleanerCard'
 import Consts from '../../ENV_VARS'
@@ -27,7 +29,7 @@ import { addCleaner, addEvent, removeCleaner, removeEvent, addSocket } from '../
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import DateTimePicker from 'react-native-modal-datetime-picker'
+// import DateTimePicker from 'react-native-modal-datetime-picker'
 import SocketIOClient from 'socket.io-client'
 const styles = StyleSheet.create({
   main: {
@@ -75,7 +77,7 @@ class Home extends React.Component {
     super(props)
     this.state = {
       cleaners: [],
-      userEmail: this.props.route.navigation.state.params.userEmail,
+      userEmail: "google.com",
       user: null,
       text: '',
       apSize: '',
@@ -255,221 +257,17 @@ class Home extends React.Component {
   }
 
   render() {
-    if (this.state.loadResults) {
-      return <ScrollView>{this.renderCleaners()}</ScrollView>
-    }
-    if (this.state.loadingCleanersTrigger) {
-      return (
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            flex: 1,
-            flexDirection: 'column'
-          }}
-        >
-          <Image
-            style={styles.image}
-            source={{
-              uri: 'http://www.animatedimages.org/data/media/1095/animated-cleaning-image-0048.gif'
-            }}
-          />
-          <Text style={styles.text}>Looking...</Text>
-        </View>
-      )
-    }
-    if (this.state.user) {
-      if (this.state.edit) {
-        return (
-          <KeyboardAwareScrollView extraScrollHeight={30}>
-            <ScrollView>
-              <ThemeProvider>
-                <Card title="My Home">
-                  <Input
-                    // containerStyle={{ margin: 10 }}
-                    label="Address"
-                    placeholder="City,street,house,apartment..."
-                    value={this.state.address}
-                    onChangeText={address => this.setState({ address })}
-                  />
-                  <Input
-                    // containerStyle={{ margin: 10 }}
-                    label="Size of the apartment"
-                    placeholder="Size in meters"
-                    onChangeText={apSize => this.setState({ apSize })}
-                    // errorMessage='Must be numerical value'
-                  />
-                  <Input
-                    containerStyle={{ marginBottom: 10 }}
-                    label="Floor"
-                    placeholder="#"
-                    value={this.state.floorNum}
-                    onChangeText={floorNum => this.setState({ floorNum })}
-                  />
-
-                  <Button
-                    title={this.state.dayTimeOfEvent}
-                    buttonStyle={{ backgroundColor: '#8BC34A' }}
-                    onPress={this.showDateTimePicker}
-                  />
-                  <DateTimePicker
-                    mode={'datetime'}
-                    isVisible={this.state.isDateTimePickerVisible}
-                    onConfirm={this.handleDatePicked}
-                    onCancel={this.hideDateTimePicker}
-                  />
-                  <Text style={{ fontSize: 20, margin: 10 }} h5>
-                    To clean:
-                  </Text>
-                  <CheckBox
-                    title="Floor"
-                    checked={this.state.floor}
-                    onPress={() => this.setState({ floor: !this.state.floor })}
-                  />
-                  <CheckBox
-                    title="Windows"
-                    checked={this.state.windows}
-                    onPress={() => this.setState({ windows: !this.state.windows })}
-                  />
-                  <CheckBox
-                    title="Bathroom"
-                    checked={this.state.bathroom}
-                    onPress={() => this.setState({ bathroom: !this.state.bathroom })}
-                  />
-                  <Button
-                    buttonStyle={{ backgroundColor: '#8BC34A' }}
-                    title="Save"
-                    onPress={this.editMode}
-                  />
-                </Card>
-              </ThemeProvider>
-            </ScrollView>
-          </KeyboardAwareScrollView>
-        )
-      }
-
-      let iconFloor = 'close'
-      let colorFloor = 'red'
-      let iconWindows = 'close'
-      let colorWindows = 'red'
-      let iconBathroom = 'close'
-      let colorBathroom = 'red'
-      if (this.state.floor) {
-        iconFloor = 'check'
-        colorFloor = '#8BC34A'
-      }
-      if (this.state.windows) {
-        iconWindows = 'check'
-        colorWindows = '#8BC34A'
-      }
-      if (this.state.bathroom) {
-        iconBathroom = 'check'
-        colorBathroom = '#8BC34A'
-      }
-
       return (
         <ThemeProvider style={styles.main}>
           <ScrollView>
-            <Card title="My Home">
-              <Input
-                containerStyle={{ marginBottom: 5 }}
-                label="Address"
-                placeholder="City,street,house,apartment..."
-                value={this.state.address}
-                onChangeText={address => this.setState({ address })}
-              />
-              <Input
-                containerStyle={{ marginBottom: 5 }}
-                label="Size of the apartment"
-                placeholder="Size in meters"
-                onChangeText={apSize => this.setState({ apSize })}
-                // errorMessage='Must be numerical value'
-              />
-              <Input
-                containerStyle={{ marginBottom: 5 }}
-                label="Floor"
-                placeholder="#"
-                value={this.state.floorNum}
-                onChangeText={floorNum => this.setState({ floorNum })}
-              />
-              <Button
-                title={this.state.dayTimeOfEvent}
-                buttonStyle={{ backgroundColor: '#8BC34A', marginTop: 5 }}
-                onPress={this.showDateTimePicker}
-              />
-              <DateTimePicker
-                mode={'datetime'}
-                isVisible={this.state.isDateTimePickerVisible}
-                onConfirm={this.handleDatePicked}
-                onCancel={this.hideDateTimePicker}
-              />
-              {/*<ListItem title={'Address: ' + this.state.user.address} />*/}
-              {/*<ListItem title={'Date and time: ' + this.state.dayTimeOfEvent} />*/}
-              {/*<ListItem title={'Size of the apartment: ' + this.state.apSize} />*/}
-              {/*<ListItem title={'Floor: ' + this.state.floorNum} />*/}
-              {/*<Divider style={{ backgroundColor: 'gray' }} />*/}
-              {/*<Button*/}
-              {/*  buttonStyle={{ backgroundColor: '#8BC34A', marginTop: 10 }}*/}
-              {/*  title="Edit"*/}
-              {/*  onPress={this.editMode}*/}
-              {/*/>*/}
-              <Card title="To Clean">
-                <View style={styles.inputContainer}>
-                  <Text style={styles.text}>Floor</Text>
-                  <TouchableOpacity onPress={() => this.setState({ floor: !this.state.floor })}>
-                    <Icon style={styles.inputIcon} name={iconFloor} size={30} color={colorFloor} />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.text}>Windows</Text>
-                  <TouchableOpacity onPress={() => this.setState({ windows: !this.state.windows })}>
-                    <Icon
-                      style={styles.inputIcon}
-                      name={iconWindows}
-                      size={30}
-                      color={colorWindows}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.text}>Bathroom</Text>
-                  <TouchableOpacity
-                    onPress={() => this.setState({ bathroom: !this.state.bathroom })}
-                  >
-                    <Icon
-                      style={styles.inputIcon}
-                      name={iconBathroom}
-                      size={30}
-                      color={colorBathroom}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </Card>
-            </Card>
-
-            <AwesomeButton
-              style={styles.mainButton}
-              activityColor="#8BC34A"
-              backgroundColor="#8BC34A"
-              backgroundDarker="#689F38"
-              progressLoadingTime={250}
-              progress
-              onPress={next => {
-                /** Do Something **/
-                //
-
-                next(this.loadingCleaners)
-              }}
-            >
-              Find me a cleaner
-            </AwesomeButton>
+            <Text>Hello here</Text>
           </ScrollView>
         </ThemeProvider>
       )
     }
 
-    return <ActivityIndicator style={{ flex: 1 }} size="large" color="#8BC34A" />
-  }
+    // return <ActivityIndicator style={{ flex: 1 }} size="large" color="#8BC34A" />
+
 }
 
 Home.propTypes = {

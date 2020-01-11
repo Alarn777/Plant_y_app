@@ -16,15 +16,6 @@ import {
   Layout,
 } from '@ui-kitten/components';
 
-// import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick'
-// import PropTypes from 'prop-types'
-
-import BackgroundImage from '../assets/Background.jpg'
-
-
-
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -78,9 +69,12 @@ const styles = StyleSheet.create({
 
 export default class Login extends React.Component {
   static navigationOptions = {
-    headerTitle: (
-      <Image resizeMode="contain" style={styles.topImage} source={require('../assets/logo.png')} />
-    ),
+    headerTitle: () =>
+        <Image
+            resizeMode="contain"
+            style={{height:"100%"}}
+            source={require('../assets/logo.png')}
+        />,
     headerTitleStyle: {
       flex: 1,
       textAlign: 'center',
@@ -195,10 +189,10 @@ export default class Login extends React.Component {
 
   render() {
     return (
-      <ImageBackground
-        source={require('../assets/Background.jpg')}
-        style={{ width: '100%', height: '100%' }}
-      >
+      // <ImageBackground
+      //   source={require('../assets/iphone11Wallpaper.jpg')}
+      //   style={{ width: '100%', height: '100%' }}
+      // >
         <View style={styles.container}>
           <Image
             resizeMode="contain"
@@ -226,8 +220,8 @@ export default class Login extends React.Component {
               onChangeText={password => this.setState({ password })}
             />
           </View>
-          <Button style={{margin: 8}} appearance='outline' status='primary' onPress={() => this.onClickListener('login')}>Login</Button>
-          <Button style={{margin: 8}} appearance='outline' status='primary' onPress={() => this.onClickListener('register')}>Register</Button>
+          <Button style={{margin: 8}} appearance='outline' status='control' onPress={() => this.onClickListener('login')}>Login</Button>
+          <Button style={{margin: 8,outlineColor: "white"}} appearance='outline'  status='control' onPress={() => this.onClickListener('register')}>Register</Button>
           {/*<AwesomeButtonRick*/}
           {/*  type="anchor"*/}
           {/*  width={200}*/}
@@ -252,7 +246,7 @@ export default class Login extends React.Component {
             <Text style={{ color: 'white' }}>Forgot your password?</Text>
           </TouchableHighlight>
         </View>
-      </ImageBackground>
+      // </ImageBackground>
     )
   }
 }

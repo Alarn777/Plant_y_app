@@ -3,7 +3,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    height:"100%"
     // backgroundColor: '#DCDCDC',
   },
   buttonOK: {
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
   radioSelect: { marginTop: 8, marginLeft: 10 },
   logo: { height: 70, margin: 10 },
   backgroundImage: { width: '100%', height: '100%' },
-  headerImage: { height: 40 },
+  headerImage: { height: 40,width:40 },
   inputContainer: {
     borderBottomColor: '#F5FCFF',
     backgroundColor: '#FFFFFF',

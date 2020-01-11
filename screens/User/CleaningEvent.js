@@ -1,9 +1,9 @@
 import React from 'react'
 
 import { ActivityIndicator, View } from 'react-native'
-import * as Progress from 'react-native-progress'
+// import * as Progress from 'react-native-progress'
 import { Button, Card, ListItem } from 'react-native-elements'
-import StarRating from 'react-native-star-rating'
+// import StarRating from 'react-native-star-rating'
 import Modal from 'react-native-modal'
 import axios from 'axios'
 import Consts from '../../ENV_VARS'
@@ -156,30 +156,30 @@ export default class CleaningEvent extends React.Component {
           <ListItem title={'Request status: ' + this.state.event.status} />
           <ListItem title={'Date and time: ' + this.state.event.dayTimeOfEvent} />
 
-          <Progress.Bar
-            progress={progressStyles.value}
-            width={cardWidth * 0.8}
-            style={{ alignSelf: 'center', width: '90%' }}
-            color={progressStyles.color}
-          />
+          {/*<Progress.Bar*/}
+          {/*  progress={progressStyles.value}*/}
+          {/*  width={cardWidth * 0.8}*/}
+          {/*  style={{ alignSelf: 'center', width: '90%' }}*/}
+          {/*  color={progressStyles.color}*/}
+          {/*/>*/}
 
           <ListItem title={'Agent notes: ' + this.state.event.notesByCleaner} />
           <ListItem title={'Rate the Clean'} />
           <View style={{ alignSelf: 'center', width: '50%' }}>
-            <StarRating
-              style={{ margin: 10 }}
-              disabled={this.eventStatus()}
-              emptyStar={'ios-star-outline'}
-              fullStar={'ios-star'}
-              halfStar={'ios-star-half'}
-              iconSet={'Ionicons'}
-              starSize={20}
-              maxStars={5}
-              // rating={this.state.starCount}
-              rating={this.props.event.rating}
-              selectedStar={rating => this.onStarRatingPress(rating)}
-              fullStarColor={'gold'}
-            />
+            {/*<StarRating*/}
+            {/*  style={{ margin: 10 }}*/}
+            {/*  disabled={this.eventStatus()}*/}
+            {/*  emptyStar={'ios-star-outline'}*/}
+            {/*  fullStar={'ios-star'}*/}
+            {/*  halfStar={'ios-star-half'}*/}
+            {/*  iconSet={'Ionicons'}*/}
+            {/*  starSize={20}*/}
+            {/*  maxStars={5}*/}
+            {/*  // rating={this.state.starCount}*/}
+            {/*  rating={this.props.event.rating}*/}
+            {/*  selectedStar={rating => this.onStarRatingPress(rating)}*/}
+            {/*  fullStarColor={'gold'}*/}
+            {/*/>*/}
           </View>
           {this.button()}
           <Button

@@ -2,30 +2,61 @@ import Consts from '../ENV_VARS'
 import Icon from 'react-native-vector-icons/Ionicons'
 import RadioForm from 'react-native-simple-radio-button'
 import React from 'react'
-import { View, TextInput, Image, ImageBackground, ScrollView } from 'react-native'
+import {View, TextInput, Image, ImageBackground, ScrollView, TouchableOpacity,TouchableHighlight} from 'react-native';
 // import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick'
 import styles from './Register.style'
 import axios from 'axios'
-import Modal from 'react-native-modal'
-import { Button, Card } from 'react-native-elements'
+// import Modal from 'react-native-modal'
+// import {Card } from 'react-native-elements'
 // import PropTypes from 'prop-types'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import {
+  Button,
+  Layout,
+  Card,
+  CardHeader,
+  Modal,
+  Text,
+} from '@ui-kitten/components';
+
+
+
+
 
 export default class Register extends React.Component {
-  static navigationOptions = {
-    headerTitle: (
-      <Image
-        resizeMode="contain"
-        style={styles.headerImage}
-        source={require('../assets/logo.png')}
-      />
-    ),
-    headerTitleStyle: {
-      flex: 1,
-      textAlign: 'center',
-      alignSelf: 'center'
-    }
-  }
+  static navigationOptions = ({ navigation, screenProps }) => ({
+    // title: 'Bla',
+    headerTitle: () =>
+        <Image
+            resizeMode="contain"
+            style={styles.headerImage}
+            source={require('../assets/logo.png')}
+        />
+    ,
+      headerTitleStyle: {
+        flex: 1,
+        textAlign: 'center',
+        alignSelf: 'center'
+      }
+  });
+
+
+
+  // static navigationOptions = {
+  //   headerTitle: () =>
+  //     <Image
+  //       resizeMode="contain"
+  //       style={styles.headerImage}
+  //       source={require('../assets/logo.png')}
+  //     />
+  //   ,
+  //   headerTitleStyle: {
+  //     flex: 1,
+  //     textAlign: 'center',
+  //     alignSelf: 'center'
+  //   }
+  // }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -108,10 +139,13 @@ export default class Register extends React.Component {
 
   render() {
     return (
-      <KeyboardAwareScrollView extraScrollHeight={30}>
-      <ImageBackground source={require('../assets/Background.jpg')} style={styles.backgroundImage}>
+      <KeyboardAwareScrollView extraScrollHeight={30} contentContainerStyle={styles.container}>
 
-          <ScrollView contentContainerStyle={styles.container}>
+      {/*<ImageBackground  source={require('../assets/iphone11Wallpaper.jpg')} style={styles.backgroundImage}>*/}
+
+          {/*<ScrollView contentContainerStyle={styles.container} >*/}
+            <ScrollView contentContainerStyle={[styles.container, this.state.isModalVisible ? {backgroundColor: 'rgba(0,0,0,10)'} : '']}>
+          {/*<div style={styles.container}>*/}
             <Image
               resizeMode="contain"
               style={styles.logo}
@@ -214,35 +248,34 @@ export default class Register extends React.Component {
                 }}
               />
             </View>
-            {/*<AwesomeButtonRick*/}
-            {/*  type="primary"*/}
-            {/*  width={200}*/}
-            {/*  style={styles.registerButton}*/}
-            {/*  // onPress={this.toggleModal}*/}
-            {/*  onPress={() => this.onClickListener('submit')}*/}
-            {/*  // onPress={() => this.onClickListener('submit')}*/}
-            {/*>*/}
-            {/*  Register*/}
-            {/*</AwesomeButtonRick>*/}
-            <Modal style={{ justifyContent: 'center' }} isVisible={this.state.isModalVisible}>
-              <Card title={'Registered successfully'}>
-                <Button
-                  backgroundColor="#03A9F4"
-                  buttonStyle={styles.buttonOK}
-                  // onPress={() => this.onClickListener('submit')}
-                  onPress={() => {
+            <Button style={{margin: 8}} appearance='outline' status='control' onPress={() => this.toggleModal()}>Register</Button>
+
+            <Modal
+                allowBackdrop={false}
+                visible={this.state.isModalVisible} style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: 16,
+                  width:400,
+                  height:250}}>
+              <Card footer={() => <Button
+                  style={{margin: 8}}
+                  appearance='outline'
+                  status='success'
+                  onPress= {()=> {
                     this.toggleModal()
-                    this.props.navigation.navigate('Login')
-                  }}
-                  //
-                  //   // this.addToStarredCleaner()
-                  // }}
-                  title={this.state.modalText}
-                />
+                    this.props.navigation.navigate('Login')}
+                  }>
+                OK
+              </Button>}>
+                <Text style={{margin:10}}>
+                  Thank you for registering with Plant'y
+                  Please proceed to login now
+                </Text>
               </Card>
             </Modal>
           </ScrollView>
-      </ImageBackground>
+      {/*</ImageBackground>*/}
       </KeyboardAwareScrollView>
     )
   }

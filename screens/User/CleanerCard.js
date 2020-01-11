@@ -1,7 +1,7 @@
 import React from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { Button, Card, Text } from 'react-native-elements'
-import StarRating from 'react-native-star-rating'
+// import StarRating from 'react-native-star-rating'
 import Modal from 'react-native-modal'
 import { bindActionCreators } from 'redux'
 import { addCleaner, addEvent, removeCleaner, removeEvent } from '../../FriendActions'
@@ -90,18 +90,18 @@ class CleanerCard extends React.Component {
         >
           <Text style={styles.about}>{this.state.cleaner.about}</Text>
           <View style={styles.aboutView}>
-            <StarRating
-              style={{ margin: 10 }}
-              disabled
-              emptyStar={'ios-star-outline'}
-              fullStar={'ios-star'}
-              halfStar={'ios-star-half'}
-              iconSet={'Ionicons'}
-              starSize={20}
-              maxStars={5}
-              rating={this.state.cleaner.rating}
-              fullStarColor={'gold'}
-            />
+            {/*<StarRating*/}
+            {/*  style={{ margin: 10 }}*/}
+            {/*  disabled*/}
+            {/*  emptyStar={'ios-star-outline'}*/}
+            {/*  fullStar={'ios-star'}*/}
+            {/*  halfStar={'ios-star-half'}*/}
+            {/*  iconSet={'Ionicons'}*/}
+            {/*  starSize={20}*/}
+            {/*  maxStars={5}*/}
+            {/*  rating={this.state.cleaner.rating}*/}
+            {/*  fullStarColor={'gold'}*/}
+            {/*/>*/}
           </View>
           <Button
             backgroundColor="#03A9F4"
