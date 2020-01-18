@@ -142,6 +142,7 @@ export default withAuthenticator(App, false, [
     <SignUp/>,
     <ConfirmSignUp/>,
     <ForgotPassword/>,
+    // <Greetings/>,
     <RequireNewPassword />
 ]);
 

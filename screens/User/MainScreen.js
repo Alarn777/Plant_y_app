@@ -17,7 +17,10 @@ import {
   //Greetings,
   Loading,
 } from 'aws-amplify-react-native';
-import {ConfirmSignIn, ConfirmSignUp, ForgotPassword, RequireNewPassword, SignIn, SignUp, VerifyContact} from '../Auth';
+import {ConfirmSignIn, ConfirmSignUp, ForgotPassword, RequireNewPassword, SignIn, SignUp, VerifyContact, Greetings} from '../Auth';
+import AmplifyTheme from '../AmplifyTheme';
+import axios from 'axios';
+import Consts from '../../ENV_VARS';
 
 
 
@@ -31,34 +34,42 @@ class MainScreen extends React.Component {
       index: 0,
       userLoggedIn:true,
       userEmail: "",
+      userName:"",
       width: 0,
       height: 0,
       plants: [
-        { "id":1, "name":"Bla", "models":[ "Fiesta", "Focus", "Mustang" ] },
-        { "id":2, "name":"Mla", "models":[ "320", "X3", "X5" ] },
-        { "id":3, "name":"Wua", "models":[ "500", "Panda" ] },
-        { "id":4, "name":"Kas", "models":[ "500", "Panda" ] },
-        { "id":5, "name":"Byu", "models":[ "500", "Panda" ] },
-        { "id":6, "name":"Lop", "models":[ "500", "Panda" ] },
-        { "id":7, "name":"Bth", "models":[ "500", "Panda" ] }
+        // { "id":1, "name":"Bla", "models":[ "Fiesta", "Focus", "Mustang" ] },
+        // { "id":2, "name":"Mla", "models":[ "320", "X3", "X5" ] },
+        // { "id":3, "name":"Wua", "models":[ "500", "Panda" ] },
+        // { "id":4, "name":"Kas", "models":[ "500", "Panda" ] },
+        // { "id":5, "name":"Byu", "models":[ "500", "Panda" ] },
+        // { "id":6, "name":"Lop", "models":[ "500", "Panda" ] },
+        // { "id":7, "name":"Bth", "models":[ "500", "Panda" ] }
         ],
       parties:[],
       change: false,
       user: null,
 
     }
+    this.loadPlants = this.loadPlants.bind(this)
+    this.dealWithPlantsData = this.dealWithPlantsData.bind(this)
     this.dealWithData = this.dealWithData.bind(this)
     this.fetchUser = this.fetchUser.bind(this)
     this.onLayout = this.onLayout.bind(this);
   }
 
   dealWithData = (user) => {
-    this.setState({
-      user
-    })
+    this.setState({user})
     if(this.state.user)
       this.setState({userLoggedIn:true})
 
+  }
+  dealWithPlantsData = (plants) => {
+    console.log(plants.Items)
+    this.setState({plants:plants.Items})
+    // plants.Items.map(plant => this.state.plants.push(plant))
+    //   // this.setState({plants})
+    // this.setState({change:false})
   }
 
    async fetchUser() {
@@ -68,17 +79,54 @@ class MainScreen extends React.Component {
         .catch(err => console.log(err));
   }
 
+  async loadPlants(){
+    console.log("loadPlants");
+    let USER_TOKEN = ""
+
+    USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    await axios.get(Consts.apigatewayRoute + '/plants', { headers: { Authorization: AuthStr } }).then(response => {
+      // If request is good...
+      console.log(response.data);
+      this.dealWithPlantsData(response.data)
+    })
+        .catch((error) => {
+          console.log('error 3 ' + error);
+        });
+
+
+
+    // await axios.get('https://i7maox5n5g.execute-api.eu-west-1.amazonaws.com/test').then(res => {
+    //   // this.dealWithUserData(res.data[0])
+    //   console.log(res);
+    // }).catch(error => console.log(error))
+  }
+
+
+
+
    componentWillMount() {
-
-
-
     this.fetchUser().then(() => {
       this.props.navigation.setParams({logOut: this.logOut})
       this.props.navigation.setParams({userLoggedIn: this.state.userLoggedIn})} )
   }
 
   componentDidMount(): void {
+    const { authState, authData } = this.props;
+    const user = authData;
+    if (user) {
+      const {usernameAttributes = []} = this.props;
+      if (usernameAttributes === 'email') {
+        // Email as Username
+        this.setState({userName:user.attributes ? user.attributes.email : user.username})
+      }
+    }
+    else this.setState({userName: "Guest"})
+    this.loadPlants().then()
+
   }
+
+
   static navigationOptions = ({ navigation }) => {
     const params = navigation.state.params || {};
     return {
@@ -113,15 +161,16 @@ class MainScreen extends React.Component {
   }
 
   logOut = () => {
-    const { onStateChange } = this.props;
+    // const { onStateChange } = this.props;
     Auth.signOut().then(() => {
-      onStateChange('signedOut');
+      this.props.onStateChange('signedOut');
+      // onStateChange('signedOut');
     });
     // this.setState({userLoggedIn:false})
 
-    this.state.userLoggedIn = !this.state.userLoggedIn
-    this.state.user = null
-    this.setState({userLoggedIn:false})
+    this.state.userLoggedIn = !this.state.userLoggedIn;
+    this.state.user = null;
+    this.setState({userLoggedIn:false});
     console.log(this.state)
 
   }
@@ -133,48 +182,53 @@ class MainScreen extends React.Component {
     });
   }
 
-  CustomHeader = () => (
-      <React.Fragment>
-        <Image
-            style={styles.headerImage}
-            source={{ uri: 'https://cdn.pixabay.com/photo/2017/01/20/00/30/maldives-1993704__340.jpg' }}
-        />
-      </React.Fragment>
-  );
 
   _keyExtractor = (item) => item.id;
 
-  _renderItem = ({item}) => (
+  _renderItem = ({item}) => {
 
+    console.log(item.pic)
+    return(
         <View>
           <Card
-              style={{width:this.state.width/3-5}}
-              index={ item.id }
+              header={() => {
+                return(<TouchableOpacity
+                                onPress={() => this.props.navigation.navigate('PlantScreen', {
+                                  item: item,
+                                })}
+                            >
+                          <Image
+                              style={styles.headerImage}
+                              source={{uri: item.pic}}
+                          />
+                        </TouchableOpacity>)
+              }}
+              style={{width: this.state.width / 3 - 5}}
+              index={item.id}
               key={item.id}
           >
             <TouchableOpacity
                 onPress={() => this.props.navigation.navigate('PlantScreen', {
-                  item:item,
+                  item: item,
                 })}
             >
-            <Image
-                style={styles.headerImage}
-                source={{ uri: 'https://cdn.pixabay.com/photo/2017/01/20/00/30/maldives-1993704__340.jpg' }}
-            />
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('PlantScreen', {
-                  item:item,
-                })}
-            >
-            <Text style={styles.partyText}>{ item.name }</Text>
+          {/*    <View>*/}
+          {/*    <Image*/}
+          {/*        style={styles.headerImage}*/}
+          {/*        source={{uri: item.pic}}*/}
+          {/*    />*/}
+          {/*  </TouchableOpacity>*/}
+          {/*  <TouchableOpacity*/}
+          {/*      onPress={() => this.props.navigation.navigate('PlantScreen', {*/}
+          {/*        item: item,*/}
+          {/*      })}*/}
+          {/*  >*/}
+              <Text style={styles.partyText}>{item.name}</Text>
             </TouchableOpacity>
           </Card>
-
         </View>
-
-
-  );
+    );
+  }
 
 
 
@@ -210,6 +264,7 @@ export default withAuthenticator(MainScreen, false, [
   <SignUp/>,
   <ConfirmSignUp/>,
   <ForgotPassword/>,
+    <Greetings/>,
   <RequireNewPassword />
 ]);
 

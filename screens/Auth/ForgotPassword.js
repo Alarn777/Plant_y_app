@@ -79,16 +79,16 @@ export default class ForgotPassword extends AuthPiece {
 	submitBody(theme) {
 		return (
 			<KeyboardAwareScrollView extraScrollHeight={30} contentContainerStyle={{
-				flex: 1,
+				// flex: 1,
 				justifyContent: 'center',
 				alignItems: 'center',
-				height:"100%",
+				// height:"100%",
 				width:"100%"}}>
 
-				<ImageBackground
-					source={require('../../assets/iphone11Wallpaper.jpg')}
-					style={{ width: '100%', height: '100%' }}
-				>
+				{/*<ImageBackground*/}
+				{/*	source={require('../../assets/iphone11Wallpaper.jpg')}*/}
+				{/*	style={{ width: '100%', height: '100%' }}*/}
+				{/*>*/}
 			<View style={theme.sectionBody}>
 				<FormField
 					theme={theme}
@@ -112,7 +112,7 @@ export default class ForgotPassword extends AuthPiece {
 					disabled={!(this.state.code && this.state.password)}
 				/>
 			</View>
-				</ImageBackground>
+				{/*</ImageBackground>*/}
 			</KeyboardAwareScrollView>
 		);
 	}
@@ -137,6 +137,11 @@ export default class ForgotPassword extends AuthPiece {
 					<View style={theme.sectionBody}>
 						{!this.state.delivery && this.forgotBody(theme)}
 						{this.state.delivery && this.submitBody(theme)}
+						<View style={theme.sectionFooter}>
+							{/*<LinkCell theme={theme} onPress={() => this.changeState('signIn')}>*/}
+							{/*	{I18n.get('Back to Sign In')}*/}
+							{/*</LinkCell>*/}
+						</View>
 					</View>
 					<View style={theme.sectionFooter}>
 						<LinkCell theme={theme} onPress={() => this.changeState('signIn')}>
