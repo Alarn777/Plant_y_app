@@ -68,7 +68,8 @@ export default class ForgotPassword extends AuthPiece {
 				{this.renderUsernameField(theme)}
 				<AmplifyButton
 					text={I18n.get('Send').toUpperCase()}
-					theme={theme}
+					// theme={theme}
+					style={{"color":"#6f9e04"}}
 					onPress={this.send}
 					disabled={!this.getUsernameFromInput()}
 				/>

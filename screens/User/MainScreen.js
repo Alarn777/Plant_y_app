@@ -89,9 +89,8 @@ class MainScreen extends React.Component {
       // If request is good...
       console.log(response.data);
       this.dealWithPlantsData(response.data)
-    })
-        .catch((error) => {
-          console.log('error 3 ' + error);
+    }).catch((error) => {
+          console.log('error ' + error);
         });
 
 
@@ -108,7 +107,8 @@ class MainScreen extends React.Component {
    componentWillMount() {
     this.fetchUser().then(() => {
       this.props.navigation.setParams({logOut: this.logOut})
-      this.props.navigation.setParams({userLoggedIn: this.state.userLoggedIn})} )
+      this.props.navigation.setParams({userLoggedIn: this.state.userLoggedIn})}
+      ).catch(e => console.log(e))
   }
 
   componentDidMount(): void {
@@ -122,7 +122,7 @@ class MainScreen extends React.Component {
       }
     }
     else this.setState({userName: "Guest"})
-    this.loadPlants().then()
+    this.loadPlants().then().catch(e => console.log(e))
 
   }
 
@@ -165,7 +165,7 @@ class MainScreen extends React.Component {
     Auth.signOut().then(() => {
       this.props.onStateChange('signedOut');
       // onStateChange('signedOut');
-    });
+    }).catch(e => console.log(e));
     // this.setState({userLoggedIn:false})
 
     this.state.userLoggedIn = !this.state.userLoggedIn;

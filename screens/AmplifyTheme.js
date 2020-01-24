@@ -53,7 +53,7 @@ export default StyleSheet.create({
 	},
 	sectionFooterLink: {
 		fontSize: 14,
-		color: '#ff9900',
+		color: '#6f9e04',
 		alignItems: 'baseline',
 		textAlign: 'center',
 	},
@@ -86,12 +86,12 @@ export default StyleSheet.create({
 		width: '100%',
 	},
 	button: {
-		backgroundColor: '#ff9900',
+		backgroundColor: '#6f9e04',
 		alignItems: 'center',
 		padding: 16,
 	},
 	buttonDisabled: {
-		backgroundColor: '#ff990080',
+		backgroundColor: '#6f9e04',
 		alignItems: 'center',
 		padding: 16,
 	},

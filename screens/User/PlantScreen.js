@@ -60,7 +60,9 @@ class PlantScreen extends React.Component {
                     // flexWrap: 'wrap',
                     justifyContent:"center",
                     padding: 8}}>
-                    <Button>Up</Button>
+                    <Button  icon={(style) => {
+                        return <Icon {...style} name='log-out-outline'/>
+                    }}>Up</Button>
                     <View style={{
                         // flex:
                         flexDirection: 'row',
@@ -70,7 +72,7 @@ class PlantScreen extends React.Component {
                         <Button>Left</Button>
                         <Button>Right</Button>
                     </View>
-                    <Button>Down</Button>
+                    <Button  style={styles.button} status='primary'>Down</Button>
                 </View>
 
 
@@ -101,5 +103,10 @@ let styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign:'center',
         fontSize:16
+    },
+    button: {
+        // borderColor:'#6f9e04',
+        backgroundColor: '#6f9e04',
+        color:'#6f9e04'
     }
 });

@@ -241,7 +241,7 @@ export default class Register extends React.Component {
                 ]}
                 formHorizontal
                 labelHorizontal
-                buttonColor={'#8BC34A'}
+                buttonColor={'#6f9e04'}
                 animation
                 onPress={value => {
                   this.setState({ cleaner: value })

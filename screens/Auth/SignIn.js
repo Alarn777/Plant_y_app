@@ -43,6 +43,7 @@ export default class SignIn extends AuthPiece {
 
 	signIn() {
 		const username = this.getUsernameFromInput() || '';
+		if(username === '') return
 		const { password } = this.state;
 		logger.debug('Sign In for ' + username);
 		Auth.signIn(username, password)
@@ -119,8 +120,6 @@ export default class SignIn extends AuthPiece {
 				</View>
 			{/*</TouchableWithoutFeedback>*/}
 			</ImageBackground>
-
-
 			</KeyboardAwareScrollView>
 		);
 	}

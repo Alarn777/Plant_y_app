@@ -276,7 +276,8 @@ export default class SignUp extends AuthPiece {
 						})}
 						<AmplifyButton
 							text={I18n.get('Sign Up').toUpperCase()}
-							theme={theme}
+							// theme={theme}
+							style={() => { if(!(this.state.username && this.state.password))return {"color":"#6f9e04"}; else return {"color":"#93a272"}}}
 							onPress={this.signUp}
 							// disabled={!this.isValid}
 							disabled={!(this.state.username && this.state.password)}
@@ -284,12 +285,12 @@ export default class SignUp extends AuthPiece {
 					</View>
 					<View style={theme.sectionFooter}>
 						<LinkCell
-							theme={theme}
+							theme={theme.button}
 							onPress={() => this.changeState('confirmSignUp')}
 						>
 							{/*{I18n.get('Confirm a Code')}*/}
 						</LinkCell>
-						<LinkCell theme={theme} onPress={() => this.changeState('signIn')}>
+						<LinkCell style={{"color":"#6f9e04",alignContent:'center'}}  onPress={() => this.changeState('signIn')}>
 							{I18n.get('Sign In')}
 						</LinkCell>
 					</View>
