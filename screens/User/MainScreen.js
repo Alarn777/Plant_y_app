@@ -38,6 +38,9 @@ import AmplifyTheme from '../AmplifyTheme';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import Video from 'react-native-video';
+import connect from 'react-redux/lib/connect/connect';
+import {addCleaner, addUser} from '../../FriendActions';
+import {bindActionCreators} from 'redux';
 
 const plantyColor = '#6f9e04';
 
@@ -48,7 +51,7 @@ class MainScreen extends React.Component {
       index: 0,
       userLoggedIn: true,
       userEmail: '',
-      userName: '',
+      username: '',
       width: 0,
       height: 0,
       plants: [
@@ -61,10 +64,13 @@ class MainScreen extends React.Component {
         // { "id":7, "name":"Bth", "models":[ "500", "Panda" ] }
       ],
       parties: [],
+      places: null,
       change: false,
       user: null,
       USER_TOKEN: '',
       userAvatar: '',
+
+      myCognitoUser: null,
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -106,12 +112,15 @@ class MainScreen extends React.Component {
   };
 
   dealWithData = user => {
+    //add to redux
+
     this.setState({user});
     if (this.state.user) this.setState({userLoggedIn: true});
   };
   dealWithPlantsData = plants => {
-    console.log(plants.Items);
-    this.setState({plants: plants.Items});
+    if (plants.Items) {
+      this.setState({plants: plants.Items});
+    } else this.setState({plants: []});
     // plants.Items.map(plant => this.state.plants.push(plant))
     //   // this.setState({plants})
     // this.setState({change:false})
@@ -128,7 +137,6 @@ class MainScreen extends React.Component {
   }
 
   async loadPlants() {
-    console.log('loadPlants');
     let USER_TOKEN = '';
 
     USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
@@ -160,7 +168,7 @@ class MainScreen extends React.Component {
       )
       .then(response => {
         // If request is good...
-        console.log(response.data);
+        // console.log(response.data);
         this.dealWithPlantsData(response.data);
       })
       .catch(error => {
@@ -172,6 +180,12 @@ class MainScreen extends React.Component {
     //   console.log(res);
     // }).catch(error => console.log(error))
   }
+
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {}
 
   componentWillMount() {
     this.fetchUser()
@@ -193,13 +207,18 @@ class MainScreen extends React.Component {
       if (usernameAttributes === 'email') {
         // Email as Username
         this.setState({
-          userName: user.attributes ? user.attributes.email : user.username,
+          username: user.attributes ? user.attributes.email : user.username,
         });
       }
-    } else this.setState({userName: 'Guest'});
+
+      this.setState({username: user.username});
+    } else this.setState({username: 'Guest'});
     this.loadPlants()
       .then()
       .catch(e => console.log(e));
+
+    this.props.addUser(user);
+    console.log(this); //check reducer
   }
 
   logOut = () => {
@@ -210,12 +229,10 @@ class MainScreen extends React.Component {
         // onStateChange('signedOut');
       })
       .catch(e => console.log(e));
-    // this.setState({userLoggedIn:false})
 
     this.state.userLoggedIn = !this.state.userLoggedIn;
     this.state.user = null;
     this.setState({userLoggedIn: false});
-    console.log(this.state);
   };
 
   onLayout(e) {
@@ -228,7 +245,6 @@ class MainScreen extends React.Component {
   _keyExtractor = item => item.id;
 
   _renderItem = ({item}) => {
-    console.log(item.pic);
     return (
       <View>
         <Card
@@ -275,7 +291,7 @@ class MainScreen extends React.Component {
 
   render() {
     let height = this.state.height;
-
+    console.log(this.props);
     if (this.state.plants.length > 0) {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
@@ -287,7 +303,7 @@ class MainScreen extends React.Component {
                 })
               }>
               <PaperCard.Title
-                title={'Welcome home,' + this.state.user.username}
+                title={'Welcome home,' + this.state.username}
                 // subtitle="Card Subtitle"
                 left={props => (
                   <Avatar.Icon
@@ -350,11 +366,85 @@ class MainScreen extends React.Component {
       );
     } else {
       return (
-        <ActivityIndicator
-          style={{flex: 1}}
-          animating={true}
-          color={'#6f9e04'}
-        />
+        <View style={styles.container} onLayout={this.onLayout}>
+          <PaperCard>
+            <TouchableOpacity
+              onPress={() =>
+                this.props.navigation.navigate('UserPage', {
+                  user: this.state.user,
+                })
+              }>
+              <PaperCard.Title
+                title={'Welcome home,' + this.state.username}
+                // subtitle="Card Subtitle"
+                left={props => (
+                  <Avatar.Icon
+                    {...props}
+                    style={{backgroundColor: plantyColor}}
+                    icon="account"
+                  />
+                )}
+              />
+            </TouchableOpacity>
+            <PaperCard.Content />
+            <PaperCard.Cover
+              source={{
+                uri:
+                  'https://lh3.googleusercontent.com/proxy/PoGeIblQn392nWEhprouNyYclQo5K1D7FzmTiiEqes1iTpOgvurxMyVV1xxu1yWw7qTqUQP-pS8XxSPsx3g9uIkM_3CM1HxVcoUJUy7NnmAK31FF8w',
+              }}
+            />
+            <PaperCard.Actions>
+              {/*<Button>Cancel</Button>*/}
+              {/*<Button>Ok</Button>*/}
+            </PaperCard.Actions>
+          </PaperCard>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>My garden</Text>
+          </View>
+          <ScrollView style={styles.data}>
+            {/*<FlatList*/}
+            {/*  vertical={true}*/}
+            {/*  scrollEnabled={false}*/}
+            {/*  numColumns={3}*/}
+            {/*  style={{width: this.state.width, margin: 5}}*/}
+            {/*  data={this.state.plants}*/}
+            {/*  keyExtractor={this._keyExtractor}*/}
+            {/*  renderItem={this._renderItem}*/}
+            {/*/>*/}
+            <Text style={{alignSelf: 'center', flex: 1}}>
+              No Plants in your garden
+            </Text>
+          </ScrollView>
+          <FAB
+            style={
+              //styles.fab
+              {
+                position: 'absolute',
+                margin: 16,
+                // width: 50,
+
+                backgroundColor: '#6f9e04',
+                color: '#6f9e04',
+                right: 0,
+                top: height - 200,
+              }
+            }
+            large
+            icon="plus"
+            onPress={() =>
+              this.props.navigation.navigate('AllAvailablePlants', {
+                user_token: this.state.USER_TOKEN,
+              })
+            }
+          />
+        </View>
+
+        // <Text style={{flex: 1}}>No Plants in your garden</Text>
+        // <ActivityIndicator
+        //   style={{flex: 1}}
+        //   animating={true}
+        //   color={'#6f9e04'}
+        // />
       );
     }
   }
@@ -365,16 +455,46 @@ MainScreen.propTypes = {
   addEvent: PropTypes.func,
 };
 
-export default withAuthenticator(MainScreen, false, [
-  <SignIn />,
-  <ConfirmSignIn />,
-  <VerifyContact />,
-  <SignUp />,
-  <ConfirmSignUp />,
-  <ForgotPassword />,
-  <Greetings />,
-  <RequireNewPassword />,
-]);
+// export default withAuthenticator(MainScreen, false, [
+//   <SignIn />,
+//   <ConfirmSignIn />,
+//   <VerifyContact />,
+//   <SignUp />,
+//   <ConfirmSignUp />,
+//   <ForgotPassword />,
+//   <Greetings />,
+//   <RequireNewPassword />,
+// ]);
+
+const mapStateToProps = state => {
+  const {plantyData, cleaners, events, socket, myCognitoUsers} = state;
+
+  return {plantyData, cleaners, events, socket, myCognitoUsers};
+};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      addUser,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(
+  withAuthenticator(MainScreen, false, [
+    <SignIn />,
+    <ConfirmSignIn />,
+    <VerifyContact />,
+    <SignUp />,
+    <ConfirmSignUp />,
+    <ForgotPassword />,
+    <Greetings />,
+    <RequireNewPassword />,
+  ]),
+);
 
 const styles = StyleSheet.create({
   container: {

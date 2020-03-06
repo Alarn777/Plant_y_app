@@ -29,6 +29,7 @@ import {
   ErrorRow,
 } from '../AmplifyUI';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import {Button} from 'react-native-paper';
 
@@ -74,84 +75,88 @@ export default class SignIn extends AuthPiece {
 
   showComponent(theme) {
     return (
-      <KeyboardAwareScrollView
-        extraScrollHeight={30}
-        contentContainerStyle={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          width: '100%',
-        }}>
-        <ImageBackground
-          source={require('../../assets/iphone11Wallpaper.jpg')}
-          style={{width: '100%', height: '100%'}}>
-          <View style={theme.section}>
-            <Image
-              // resizeMode="contain"
-              resizeMode="stretch"
-              style={{
-                alignSelf: 'center',
-                flex: 1,
-                height: 50,
-                width: 350,
-                marginBottom: 20,
-              }}
-              source={require('../../assets/logo.png')}
-            />
-            <Header theme={theme}>{I18n.get("Welcome to Plant'y")}</Header>
+      <SafeAreaView style={{flex: 1}}>
+        <KeyboardAwareScrollView
+          extraScrollHeight={30}
+          contentContainerStyle={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+            width: '100%',
+          }}>
+          <SafeAreaView style={{flex: 1}}>
+            <ImageBackground
+              source={require('../../assets/iphone11Wallpaper.jpg')}
+              style={{width: '100%', height: '100%'}}>
+              <View style={theme.section}>
+                <Image
+                  // resizeMode="contain"
+                  resizeMode="stretch"
+                  style={{
+                    alignSelf: 'center',
+                    flex: 1,
+                    height: 50,
+                    width: 350,
+                    marginBottom: 20,
+                  }}
+                  source={require('../../assets/logo.png')}
+                />
+                <Header theme={theme}>{I18n.get("Welcome to Plant'y")}</Header>
 
-            <View style={theme.sectionBody}>
-              {this.renderUsernameField(theme)}
-              <FormField
-                // theme={theme}
-                onChangeText={text => this.setState({password: text})}
-                label={I18n.get('Password')}
-                placeholder={I18n.get('Enter your password')}
-                secureTextEntry={true}
-                required={true}
-              />
-              {/*<AmplifyButton*/}
-              {/*  text={I18n.get('Sign In').toUpperCase()}*/}
-              {/*  // theme={theme}*/}
-              {/*  onPress={this.signIn}*/}
-              {/*  disabled={!this.getUsernameFromInput() && this.state.password}*/}
-              {/*/>*/}
-              <Button
-                icon={this.state.addingPlanticon}
-                // style={{margin: 10}}
-                loading={this.state.loginigIn}
-                disabled={
-                  !this.getUsernameFromInput() ||
-                  // !this.state.username ||
-                  !this.state.password
-                }
-                mode="contained"
-                style={{padding: 10}}
-                backgroundColor="#6f9e04"
-                color="#6f9e04"
-                onPress={this.signIn}>
-                {I18n.get('Sign In').toUpperCase()}
-              </Button>
-            </View>
-            <View style={theme.sectionFooter}>
-              <LinkCell
-                // theme={theme}
-                style={{with: '100%'}}
-                onPress={() => this.changeState('forgotPassword')}>
-                {I18n.get('Forgot Password')}
-              </LinkCell>
-              <LinkCell
-                theme={theme}
-                onPress={() => this.changeState('signUp')}>
-                {I18n.get('Sign Up')}
-              </LinkCell>
-            </View>
-            <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
-          </View>
-          {/*</TouchableWithoutFeedback>*/}
-        </ImageBackground>
-      </KeyboardAwareScrollView>
+                <View style={theme.sectionBody}>
+                  {this.renderUsernameField(theme)}
+                  <FormField
+                    // theme={theme}
+                    onChangeText={text => this.setState({password: text})}
+                    label={I18n.get('Password')}
+                    placeholder={I18n.get('Enter your password')}
+                    secureTextEntry={true}
+                    required={true}
+                  />
+                  {/*<AmplifyButton*/}
+                  {/*  text={I18n.get('Sign In').toUpperCase()}*/}
+                  {/*  // theme={theme}*/}
+                  {/*  onPress={this.signIn}*/}
+                  {/*  disabled={!this.getUsernameFromInput() && this.state.password}*/}
+                  {/*/>*/}
+                  <Button
+                    icon={this.state.addingPlanticon}
+                    // style={{margin: 10}}
+                    loading={this.state.loginigIn}
+                    disabled={
+                      !this.getUsernameFromInput() ||
+                      // !this.state.username ||
+                      !this.state.password
+                    }
+                    mode="contained"
+                    style={{padding: 10}}
+                    backgroundColor="#6f9e04"
+                    color="#6f9e04"
+                    onPress={this.signIn}>
+                    {I18n.get('Sign In').toUpperCase()}
+                  </Button>
+                </View>
+                <View style={theme.sectionFooter}>
+                  <LinkCell
+                    // theme={theme}
+                    style={{with: '100%'}}
+                    onPress={() => this.changeState('forgotPassword')}>
+                    {I18n.get('Forgot Password')}
+                  </LinkCell>
+                  <LinkCell
+                    theme={theme}
+                    onPress={() => this.changeState('signUp')}>
+                    {I18n.get('Sign Up')}
+                  </LinkCell>
+                </View>
+                <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
+              </View>
+              {/*</TouchableWithoutFeedback>*/}
+            </ImageBackground>
+          </SafeAreaView>
+        </KeyboardAwareScrollView>
+      </SafeAreaView>
     );
   }
 }

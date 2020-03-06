@@ -31,6 +31,7 @@
     "react-native-really-awesome-button": "^1.5.1",
     "react-native-reanimated": "^1.4.0",
     "react-native-safe-area-context": "^0.6.2",
+    "react-native-safe-area-view": "^1.0.0",
     "react-native-screens": "^2.0.0-alpha.22",
     "react-native-scripts": "^2.0.1",
     "react-native-simple-radio-button": "^2.7.4",

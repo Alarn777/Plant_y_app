@@ -1,13 +1,13 @@
-import React from 'react'
+import React from 'react';
 import {
   View,
   Image,
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-  TouchableOpacity
-} from 'react-native'
-import axios from 'axios'
+  TouchableOpacity,
+} from 'react-native';
+import axios from 'axios';
 import {
   Card,
   Input,
@@ -17,45 +17,45 @@ import {
   Button,
   Icon,
   CheckBox,
-  ThemeProvider
-} from 'react-native-elements'
-import AwesomeButton from 'react-native-really-awesome-button'
-import Consts from '../../ENV_VARS'
-import { bindActionCreators } from 'redux'
+  ThemeProvider,
+} from 'react-native-elements';
+import AwesomeButton from 'react-native-really-awesome-button';
+import Consts from '../../ENV_VARS';
+import {bindActionCreators} from 'redux';
 import {
   addCleaner,
   addEvent,
   addSocket,
   removeCleaner,
   removeEvent,
-  reloadEvents
-} from '../../FriendActions'
-import { connect } from 'react-redux'
-import CleaningEventForCleaner from './CleaningEventForCleaner'
-import RadioForm from 'react-native-simple-radio-button'
-import SocketIOClient from 'socket.io-client'
-import PropTypes from 'prop-types'
+  reloadEvents,
+} from '../../FriendActions';
+import {connect} from 'react-redux';
+import CleaningEventForCleaner from './CleaningEventForCleaner';
+import RadioForm from 'react-native-simple-radio-button';
+import SocketIOClient from 'socket.io-client';
+import PropTypes from 'prop-types';
 
 const styles = StyleSheet.create({
   main: {
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   text: {
     fontSize: 20,
-    margin: 5
+    margin: 5,
   },
   mainButton: {
     alignSelf: 'center',
     margin: 50,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   inputIcon: {
     width: 30,
-    height: 30
+    height: 30,
     // justifyContent: 'center'
   },
   inputContainer: {
@@ -68,13 +68,13 @@ const styles = StyleSheet.create({
     // margin:15,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
-  }
-})
+    alignItems: 'center',
+  },
+});
 
 class Home extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       events: [],
       userEmail: this.props.route.navigation.state.params.userEmail,
@@ -89,41 +89,41 @@ class Home extends React.Component {
       windows: false,
       bathroom: false,
       loadingEventsTrigger: false,
-      loadResults: false
-    }
+      loadResults: false,
+    };
 
-    this.renderEvents = this.renderEvents.bind(this)
-    this.editMode = this.editMode.bind(this)
-    this.returnToMainScreen = this.returnToMainScreen.bind(this)
-    this.loadingEvents = this.loadingEvents.bind(this)
-    this.dealWithData = this.dealWithData.bind(this)
-    this.fetchData = this.fetchData.bind(this)
-    this.fetchUser = this.fetchUser.bind(this)
-    this.dealWithUserData = this.dealWithUserData.bind(this)
+    this.renderEvents = this.renderEvents.bind(this);
+    this.editMode = this.editMode.bind(this);
+    this.returnToMainScreen = this.returnToMainScreen.bind(this);
+    this.loadingEvents = this.loadingEvents.bind(this);
+    this.dealWithData = this.dealWithData.bind(this);
+    this.fetchData = this.fetchData.bind(this);
+    this.fetchUser = this.fetchUser.bind(this);
+    this.dealWithUserData = this.dealWithUserData.bind(this);
 
     try {
-      this.socket = SocketIOClient(Consts.host)
+      this.socket = SocketIOClient(Consts.host);
     } catch (e) {}
   }
 
   componentDidMount(): void {
-    this.props.addSocket(this.socket)
+    this.props.addSocket(this.socket);
     this.props.cleaners.socket[0].on('changedStatus', () => {
-      this.props.reloadEvents()
-      this.fetchData({ email: this.state.userEmail })
-    })
+      this.props.reloadEvents();
+      this.fetchData({email: this.state.userEmail});
+    });
 
-    this.fetchUser({ email: this.state.userEmail })
+    this.fetchUser({email: this.state.userEmail});
   }
 
   editMode() {
-    this.setState({ edit: !this.state.edit })
+    this.setState({edit: !this.state.edit});
   }
 
   async fetchUser(data) {
     axios.post(Consts.host + '/getCleanerByEmail', data).then(res => {
-      this.dealWithUserData(res.data[0])
-    })
+      this.dealWithUserData(res.data[0]);
+    });
   }
 
   dealWithUserData(data) {
@@ -134,25 +134,25 @@ class Home extends React.Component {
       floor: data.floor,
       windows: data.windows,
       bathroom: data.bathroom,
-      available: data.available
-    }
+      available: data.available,
+    };
     this.setState({
       about: user.about,
       user,
       floor: data.floor,
       windows: data.windows,
       bathroom: data.bathroom,
-      available: data.available
-    })
+      available: data.available,
+    });
   }
 
   loadingEvents() {
-    this.setState({ loadingEventsTrigger: true })
+    this.setState({loadingEventsTrigger: true});
     // this.fetchData()
-    this.enterQueue()
+    this.enterQueue();
     setTimeout(() => {
-      this.ToggleBackEventsTrigger()
-    }, 2000)
+      this.ToggleBackEventsTrigger();
+    }, 2000);
 
     //now load results
   }
@@ -164,59 +164,62 @@ class Home extends React.Component {
         floor: this.state.floor,
         bathroom: this.state.bathroom,
         windows: this.state.windows,
-        available: this.state.available
-      })
-      this.fetchData()
+        available: this.state.available,
+      });
+      this.fetchData();
     } catch (err) {}
   }
 
   async fetchData() {
     try {
-      const response = await axios.post(Consts.host + '/findEventsByCleanerEmail', {
-        email: this.state.userEmail
-      })
-      this.dealWithData(response.data)
+      const response = await axios.post(
+        Consts.host + '/findEventsByCleanerEmail',
+        {
+          email: this.state.userEmail,
+        },
+      );
+      this.dealWithData(response.data);
     } catch (err) {}
   }
 
   dealWithData(data) {
-    const goodEvents = []
+    const goodEvents = [];
     for (const i in data) {
       if (data[i].status === 'Requested') {
-        goodEvents.push(data[i])
+        goodEvents.push(data[i]);
       } else {
-        this.props.addEvent(data[i])
+        this.props.addEvent(data[i]);
       }
     }
-    this.setState({ events: goodEvents })
+    this.setState({events: goodEvents});
   }
 
   ToggleBackEventsTrigger() {
-    this.setState({ loadingEventsTrigger: false })
-    this.setState({ loadResults: true })
+    this.setState({loadingEventsTrigger: false});
+    this.setState({loadResults: true});
   }
 
   returnToMainScreen() {
-    this.setState({ loadResults: !this.state.loadResults })
+    this.setState({loadResults: !this.state.loadResults});
   }
 
   cancelCleaner(event, need_delete) {
-    const arrEvents = []
-    this.setState({ events: [] })
+    const arrEvents = [];
+    this.setState({events: []});
     if (!event) {
-      return
+      return;
     }
     for (const i in this.state.events) {
       if (this.state.events[i]._id !== event._id) {
-        arrEvents.push(this.state.events[i])
+        arrEvents.push(this.state.events[i]);
       }
     }
     // console.log(arrCleaners)
     if (arrEvents === []) {
-      this.setState({ events: [] })
+      this.setState({events: []});
     }
-    this.setState({ events: arrEvents })
-    if (need_delete) this.deleteEvent(event._id)
+    this.setState({events: arrEvents});
+    if (need_delete) this.deleteEvent(event._id);
   }
 
   async deleteEvent(id) {
@@ -224,41 +227,41 @@ class Home extends React.Component {
     try {
       await axios
         .post(Consts.host + '/deleteEvent', {
-          id
+          id,
         })
-        .then(() => {})
+        .then(() => {});
     } catch (err) {}
   }
 
   editEventByCleaner(event, data) {
     //console.log(event)
     //console.log(data)
-    data.email = this.state.userEmail
-    event.status = data.newStatus
+    data.email = this.state.userEmail;
+    event.status = data.newStatus;
     // this.props.addEvent(event)
     // this.editEvent(event)
-    this.editEvent(data)
-    this.props.addEvent(event)
+    this.editEvent(data);
+    this.props.addEvent(event);
   }
 
   async editEvent(event) {
-    axios.post(Consts.host + '/editEventByCleaner', event).then(res => {})
+    axios.post(Consts.host + '/editEventByCleaner', event).then(res => {});
   }
 
   renderEvents() {
     if (this.state.events.length === 0) {
       return (
-        <View style={{ width: '80%', alignSelf: 'center' }}>
+        <View style={{width: '80%', alignSelf: 'center'}}>
           <Text style={styles.text}>
             We have found no events waiting for you... Please try again later.
           </Text>
           <Button
-            buttonStyle={{ backgroundColor: '#8BC34A' }}
+            buttonStyle={{backgroundColor: '#8BC34A'}}
             title="Back to Main"
             onPress={this.returnToMainScreen}
           />
         </View>
-      )
+      );
     }
 
     //map on the results
@@ -273,25 +276,25 @@ class Home extends React.Component {
               cancelCleaner={this.cancelCleaner}
               editEventByCleaner={this.editEventByCleaner}
             />
-          )
+          );
         })}
         <Button
           buttonStyle={{
             alignSelf: 'center',
             width: '75%',
             margin: 20,
-            backgroundColor: '#8BC34A'
+            backgroundColor: '#8BC34A',
           }}
           title="Back to Main"
           onPress={this.returnToMainScreen}
         />
       </View>
-    )
+    );
   }
 
   render() {
     if (this.state.loadResults) {
-      return <ScrollView>{this.renderEvents()}</ScrollView>
+      return <ScrollView>{this.renderEvents()}</ScrollView>;
     }
     if (this.state.loadingEventsTrigger) {
       return (
@@ -300,18 +303,18 @@ class Home extends React.Component {
             justifyContent: 'center',
             alignItems: 'center',
             flex: 1,
-            flexDirection: 'column'
-          }}
-        >
+            flexDirection: 'column',
+          }}>
           <Image
-            style={{ height: 200, width: 200 }}
+            style={{height: 200, width: 200}}
             source={{
-              uri: 'http://www.animatedimages.org/data/media/1095/animated-cleaning-image-0048.gif'
+              uri:
+                'http://www.animatedimages.org/data/media/1095/animated-cleaning-image-0048.gif',
             }}
           />
           <Text style={styles.text}>Finding best jobs...</Text>
         </View>
-      )
+      );
     }
     if (this.state.user) {
       if (this.state.edit) {
@@ -320,85 +323,87 @@ class Home extends React.Component {
             <ScrollView>
               <Card title="My Home">
                 <Input
-                  containerStyle={{ margin: 10 }}
+                  containerStyle={{margin: 10}}
                   label="About me"
                   placeholder="City,street,house,apartment..."
                   value={this.state.about}
-                  onChangeText={about => this.setState({ about })}
+                  onChangeText={about => this.setState({about})}
                 />
                 <View style={styles.inputContainer}>
                   <RadioForm
                     initial={this.state.available}
-                    style={{ marginTop: 8, marginLeft: 10 }}
+                    style={{marginTop: 8, marginLeft: 10}}
                     radio_props={[
-                      { label: 'Available      ', value: true },
-                      { label: 'Not Available', value: false }
+                      {label: 'Available      ', value: true},
+                      {label: 'Not Available', value: false},
                     ]}
                     formHorizontal
                     labelHorizontal
                     buttonColor={'#8BC34A'}
                     animation
                     onPress={value => {
-                      this.setState({ available: value })
+                      this.setState({available: value});
                     }}
                   />
                 </View>
-                <Text style={{ fontSize: 20, margin: 10 }} h5>
+                <Text style={{fontSize: 20, margin: 10}} h5>
                   I can clean:
                 </Text>
                 <CheckBox
                   title="Floor"
                   checked={this.state.floor}
-                  onPress={() => this.setState({ floor: !this.state.floor })}
+                  onPress={() => this.setState({floor: !this.state.floor})}
                 />
                 <CheckBox
                   title="Windows"
                   checked={this.state.windows}
-                  onPress={() => this.setState({ windows: !this.state.windows })}
+                  onPress={() => this.setState({windows: !this.state.windows})}
                 />
                 <CheckBox
                   title="Bathroom"
                   checked={this.state.bathroom}
-                  onPress={() => this.setState({ bathroom: !this.state.bathroom })}
+                  onPress={() =>
+                    this.setState({bathroom: !this.state.bathroom})
+                  }
                 />
                 <Button
-                  buttonStyle={{ backgroundColor: '#8BC34A' }}
+                  buttonStyle={{backgroundColor: '#8BC34A'}}
                   title="Save"
                   onPress={this.editMode}
                 />
               </Card>
             </ScrollView>
           </ThemeProvider>
-        )
+        );
       }
 
-      let iconFloor = 'close'
-      let colorFloor = 'red'
-      let iconWindows = 'close'
-      let colorWindows = 'red'
-      let iconBathroom = 'close'
-      let colorBathroom = 'red'
-      let available = ''
-      let availableColor = 'red'
+      let iconFloor = 'close';
+      let colorFloor = 'red';
+      let iconWindows = 'close';
+      let colorWindows = 'red';
+      let iconBathroom = 'close';
+      let colorBathroom = 'red';
+      let available = '';
+      let availableColor = 'red';
       if (this.state.floor) {
-        iconFloor = 'check'
-        colorFloor = '#8BC34A'
+        iconFloor = 'check';
+        colorFloor = '#8BC34A';
       }
       if (this.state.windows) {
-        iconWindows = 'check'
-        colorWindows = '#8BC34A'
+        iconWindows = 'check';
+        colorWindows = '#8BC34A';
       }
       if (this.state.bathroom) {
-        iconBathroom = 'check'
-        colorBathroom = '#8BC34A'
+        iconBathroom = 'check';
+        colorBathroom = '#8BC34A';
       }
 
       if (this.state.available) {
-        available = 'Yes'
-        availableColor = '#8BC34A'
+        available = 'Yes';
+        availableColor = '#8BC34A';
       } else {
-        available = 'No'
-        availableColor = 'red'
+        available = 'No';
+        availableColor = 'red';
       }
 
       return (
@@ -406,31 +411,29 @@ class Home extends React.Component {
           <ScrollView>
             <Card title="My Home">
               <Input
-                containerStyle={{ margin: 10 }}
+                containerStyle={{margin: 10}}
                 label="About me"
                 placeholder="City,street,house,apartment..."
                 value={this.state.about}
-                onChangeText={about => this.setState({ about })}
+                onChangeText={about => this.setState({about})}
               />
-              <View style={{marginBottom:10}}>
+              <View style={{marginBottom: 10}}>
                 <RadioForm
                   initial={this.state.available}
-                  style={{ marginTop: 8, marginLeft: 10 }}
+                  style={{marginTop: 8, marginLeft: 10}}
                   radio_props={[
-                    { label: 'Available      ', value: true },
-                    { label: 'Not Available', value: false }
+                    {label: 'Available      ', value: true},
+                    {label: 'Not Available', value: false},
                   ]}
                   formHorizontal
                   labelHorizontal
                   buttonColor={'#8BC34A'}
                   animation
                   onPress={value => {
-                    this.setState({ available: value })
+                    this.setState({available: value});
                   }}
                 />
               </View>
-
-
 
               {/*<ListItem title={'About me: ' + this.state.user.about} />*/}
               {/*<ListItem*/}
@@ -441,13 +444,22 @@ class Home extends React.Component {
               <Card title="I can Clean">
                 <View style={styles.inputContainer}>
                   <Text style={styles.text}>Floor</Text>
-                  <TouchableOpacity onPress={() => this.setState({ floor: !this.state.floor })}>
-                    <Icon style={styles.inputIcon} name={iconFloor} size={30} color={colorFloor} />
+                  <TouchableOpacity
+                    onPress={() => this.setState({floor: !this.state.floor})}>
+                    <Icon
+                      style={styles.inputIcon}
+                      name={iconFloor}
+                      size={30}
+                      color={colorFloor}
+                    />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.inputContainer}>
                   <Text style={styles.text}>Windows</Text>
-                  <TouchableOpacity onPress={() => this.setState({ windows: !this.state.windows })}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({windows: !this.state.windows})
+                    }>
                     <Icon
                       style={styles.inputIcon}
                       name={iconWindows}
@@ -459,8 +471,9 @@ class Home extends React.Component {
                 <View style={styles.inputContainer}>
                   <Text style={styles.text}>Bathroom</Text>
                   <TouchableOpacity
-                    onPress={() => this.setState({ bathroom: !this.state.bathroom })}
-                  >
+                    onPress={() =>
+                      this.setState({bathroom: !this.state.bathroom})
+                    }>
                     <Icon
                       style={styles.inputIcon}
                       name={iconBathroom}
@@ -488,24 +501,23 @@ class Home extends React.Component {
                 /** Do Something **/
                 //
 
-                next(this.loadingEvents)
-              }}
-            >
+                next(this.loadingEvents);
+              }}>
               Find work
             </AwesomeButton>
           </ScrollView>
         </ThemeProvider>
-      )
+      );
     }
 
-    return <ActivityIndicator style={{ flex: 1 }} size="large" color="#8BC34A" />
+    return <ActivityIndicator style={{flex: 1}} size="large" color="#8BC34A" />;
   }
 }
 
 const mapStateToProps = state => {
-  const { friends, cleaners } = state
-  return { friends, cleaners }
-}
+  const {friends, cleaners} = state;
+  return {friends, cleaners};
+};
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
@@ -515,20 +527,20 @@ const mapDispatchToProps = dispatch =>
       addEvent,
       removeEvent,
       addSocket,
-      reloadEvents
+      reloadEvents,
     },
-    dispatch
-  )
+    dispatch,
+  );
 
 Home.propTypes = {
   addSocket: PropTypes.any,
   cleaners: PropTypes.any,
   route: PropTypes.any,
   reloadEvents: PropTypes.func,
-  addEvent: PropTypes.func
-}
+  addEvent: PropTypes.func,
+};
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
-)(Home)
+  mapDispatchToProps,
+)(Home);

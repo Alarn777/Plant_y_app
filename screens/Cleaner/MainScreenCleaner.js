@@ -1,17 +1,17 @@
-import React from 'react'
-import { BottomNavigation } from 'react-native-paper'
-import { Image } from 'react-native'
-import { NavigationActions } from 'react-navigation'
+import React from 'react';
+import {BottomNavigation} from 'react-native-paper';
+import {Image} from 'react-native';
+import {NavigationActions} from 'react-navigation';
 
-import Starred from './StarredCleaner'
-import HomeClean from './Home'
-import HistoryClean from './History'
-import CleanerProfile from './CleanerProfile'
-import PropTypes from 'prop-types'
+import Starred from './StarredCleaner';
+import HomeClean from './Home';
+import HistoryClean from './History';
+import CleanerProfile from './CleanerProfile';
+import PropTypes from 'prop-types';
 
 export default class MainScreenCleaner extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       index: 0,
       userEmail: this.props.navigation.state.params.userEmail,
@@ -26,7 +26,7 @@ export default class MainScreenCleaner extends React.Component {
           // activeColor: '#8BC34A',
           icon: 'home',
           color: '#8BC34A',
-          navigation: this.props.navigation
+          navigation: this.props.navigation,
         },
         {
           key: 'HistoryClean',
@@ -34,7 +34,7 @@ export default class MainScreenCleaner extends React.Component {
           icon: 'history',
           color: 'green',
           navigation: this.props.navigation,
-          father: this
+          father: this,
         },
         {
           key: 'Starred',
@@ -42,7 +42,7 @@ export default class MainScreenCleaner extends React.Component {
           icon: 'star',
           color: '#ffc107',
           // activeColor: '#F44336',
-          navigation: this.props.navigation
+          navigation: this.props.navigation,
         },
         {
           key: 'CleanerProfile',
@@ -50,11 +50,11 @@ export default class MainScreenCleaner extends React.Component {
           icon: 'person',
           color: '#00baff',
           // activeColor: '#F44336',
-          navigation: this.props.navigation
-        }
-      ]
-    }
-    this.resetNavigation = this.resetNavigation.bind(this)
+          navigation: this.props.navigation,
+        },
+      ],
+    };
+    this.resetNavigation = this.resetNavigation.bind(this);
   }
 
   static navigationOptions = {
@@ -62,16 +62,16 @@ export default class MainScreenCleaner extends React.Component {
     headerTitle: (
       <Image
         resizeMode="contain"
-        style={{ height: 40 }}
+        style={{height: 40}}
         source={require('../../assets/logo.png')}
       />
     ),
     headerTitleStyle: {
       flex: 1,
       textAlign: 'center',
-      alignSelf: 'center'
-    }
-  }
+      alignSelf: 'center',
+    },
+  };
   // check(){
   //   return this.state.change
   // }
@@ -90,22 +90,22 @@ export default class MainScreenCleaner extends React.Component {
       routeName: targetRoute,
       index: 0,
       params: {},
-      action: NavigationActions.navigate({ routeName: targetRoute })
-    })
+      action: NavigationActions.navigate({routeName: targetRoute}),
+    });
 
-    this.props.navigation.dispatch(navigateAction)
+    this.props.navigation.dispatch(navigateAction);
   }
 
   _handleIndexChange = index => {
-    this.setState({ index })
-  }
+    this.setState({index});
+  };
 
   _renderScene = BottomNavigation.SceneMap({
     HomeClean,
     HistoryClean,
     CleanerProfile,
-    Starred
-  })
+    Starred,
+  });
 
   render() {
     return (
@@ -115,10 +115,10 @@ export default class MainScreenCleaner extends React.Component {
         renderScene={this._renderScene}
         resetNavigation={this.resetNavigation}
       />
-    )
+    );
   }
 }
 
 MainScreenCleaner.propTypes = {
-  navigation: PropTypes.any
-}
+  navigation: PropTypes.any,
+};

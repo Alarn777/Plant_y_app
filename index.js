@@ -20,6 +20,7 @@ import {AppRegistry} from 'react-native';
 import App from './App';
 
 import configureStore from './store';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 const store = configureStore();
 
@@ -27,7 +28,9 @@ export default function Main() {
   return (
     // <StoreProvider store={store}>
     <PaperProvider>
-      <App />
+      <SafeAreaProvider>
+        <App />
+      </SafeAreaProvider>
     </PaperProvider>
     // </StoreProvider>
   );

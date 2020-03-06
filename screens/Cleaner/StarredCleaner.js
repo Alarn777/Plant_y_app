@@ -1,55 +1,61 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
-import Consts from '../../ENV_VARS'
-import CleaningEventForCleaner from './CleaningEventForCleaner'
-import axios from 'axios'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { addEvent, removeEvent, addCleaner, addSocket, reloadEvents } from '../../FriendActions'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
+import Consts from '../../ENV_VARS';
+import CleaningEventForCleaner from './CleaningEventForCleaner';
+import axios from 'axios';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {
+  addEvent,
+  removeEvent,
+  addCleaner,
+  addSocket,
+  reloadEvents,
+} from '../../FriendActions';
 
 const styles = StyleSheet.create({
-  eventContainer: { flex: 1 },
+  eventContainer: {flex: 1},
   MyEvents: {
     alignSelf: 'center',
-    fontSize: 30
+    fontSize: 30,
   },
-  error: { width: '80%', alignSelf: 'center' }
-})
+  error: {width: '80%', alignSelf: 'center'},
+});
 
 class History extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       cleaner: null,
       cleanEvents: [],
       navigation: this.props.navigation,
       userEmail: this.props.route.navigation.state.params.userEmail,
       isModalVisible: false,
-      date: ''
-    }
-    this.fetchEvents = this.fetchEvents.bind(this)
-    this.dealWithUserData = this.dealWithUserData.bind(this)
+      date: '',
+    };
+    this.fetchEvents = this.fetchEvents.bind(this);
+    this.dealWithUserData = this.dealWithUserData.bind(this);
   }
 
   componentDidMount() {
     this.props.cleaners.socket[0].on('changedStatus', () => {
-      this.setState({ cleanEvents: [] })
-      this.fetchEvents({ email: this.state.userEmail })
-    })
-    this.fetchEvents({ email: this.state.userEmail })
+      this.setState({cleanEvents: []});
+      this.fetchEvents({email: this.state.userEmail});
+    });
+    this.fetchEvents({email: this.state.userEmail});
   }
 
   async fetchEvents(data) {
     axios.post(Consts.host + '/findEventsByCleanerEmail', data).then(res => {
-      this.dealWithUserData(res.data)
-    })
+      this.dealWithUserData(res.data);
+    });
   }
 
   dealWithUserData(data) {
     for (const i in data) {
       if (data[i].status === 'Finished' && data[i].rating === 5) {
-        this.setState({ cleanEvents: [...this.state.cleanEvents, data[i]] })
+        this.setState({cleanEvents: [...this.state.cleanEvents, data[i]]});
         // this.props.addEvent(data[i])
       }
     }
@@ -61,7 +67,7 @@ class History extends React.Component {
         <View style={styles.error}>
           <Text>We have found no events for you...</Text>
         </View>
-      )
+      );
     }
 
     return (
@@ -78,11 +84,11 @@ class History extends React.Component {
                 cancelCleaner={null}
                 addToStarredCleaner={null}
               />
-            )
+            );
           })}
         </ScrollView>
       </View>
-    )
+    );
   }
 }
 
@@ -90,13 +96,13 @@ History.propTypes = {
   navigation: PropTypes.object.isRequired,
   route: PropTypes.object.isRequired,
   cleaners: PropTypes.object.isRequired,
-  addEvent: PropTypes.object.isRequired
-}
+  addEvent: PropTypes.object.isRequired,
+};
 
 const mapStateToProps = state => {
-  const { cleaners, events, socket } = state
-  return { cleaners, events, socket }
-}
+  const {cleaners, events, socket} = state;
+  return {cleaners, events, socket};
+};
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
@@ -105,12 +111,12 @@ const mapDispatchToProps = dispatch =>
       removeEvent,
       addCleaner,
       addSocket,
-      reloadEvents
+      reloadEvents,
     },
-    dispatch
-  )
+    dispatch,
+  );
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
-)(History)
+  mapDispatchToProps,
+)(History);

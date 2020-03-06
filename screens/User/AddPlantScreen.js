@@ -39,8 +39,13 @@ class AddPlantScreen extends React.Component {
     this.addPlantToMyGarden = this.addPlantToMyGarden.bind(this);
   }
 
+  componentDidMount(): void {
+    this.setState({plant: this.props.navigation.getParam('item')});
+  }
+
   dealWithUrlData = url => {
-    this.setState({URL: url.HLSStreamingSessionURL});
+    // this.setState({URL: url.HLSStreamingSessionURL});
+    this.successAdding();
     this.forceUpdate();
   };
 
@@ -48,6 +53,29 @@ class AddPlantScreen extends React.Component {
     console.log('pressed');
 
     this.setState({addingPlant: true});
+
+    // console.log(this.state.USER_TOKEN);
+
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/plants',
+        {
+          username: this.props.authData.username,
+          plantName: this.state.plant.name,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        // If request is good...
+        // console.log(response.data);
+        this.dealWithUrlData(response.data);
+      })
+      .catch(error => {
+        console.log('error ' + error);
+      });
+
     setTimeout(this.successAdding, 1000);
     // this.props.navigation.goBack();
   }
@@ -61,44 +89,7 @@ class AddPlantScreen extends React.Component {
     });
   };
 
-  async loadUrl() {
-    console.log('loadUrl');
-    let USER_TOKEN = '';
-
-    // USER_TOKEN = this.props.navigation.state
-    // console.log( this.props.navigation.state.params)
-
-    USER_TOKEN = this.props.navigation.state.params.user_token;
-
-    this.state.USER_TOKEN = USER_TOKEN;
-
-    const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
-    await axios
-      .get(Consts.apigatewayRoute + '/streams', {
-        headers: {Authorization: AuthStr},
-      })
-      .then(response => {
-        // If request is good...
-        console.log(response.data);
-        this.dealWithUrlData(response.data);
-      })
-      .catch(error => {
-        console.log('error ' + error);
-      });
-
-    // await axios.get('https://i7maox5n5g.execute-api.eu-west-1.amazonaws.com/test').then(res => {
-    //   // this.dealWithUserData(res.data[0])
-    //   console.log(res);
-    // }).catch(error => console.log(error))
-  }
-  componentWillMount(): void {
-    this.loadUrl().then(r => console.log());
-  }
-
-  componentDidMount(): void {}
-
   render() {
-    console.log(this.state.URL);
     const {navigation} = this.props;
     let item = navigation.getParam('item');
     let loading = this.state.addingPlant;

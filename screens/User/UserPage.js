@@ -108,9 +108,9 @@ class UserPage extends React.Component {
             yAxisSuffix="k"
             yAxisInterval={1} // optional, defaults to 1
             chartConfig={{
-              backgroundColor: '#e26a00',
-              backgroundGradientFrom: '#fb8c00',
-              backgroundGradientTo: '#ffa726',
+              // backgroundColor: '#e26a00',
+              // backgroundGradientFrom: '#fb8c00',
+              // backgroundGradientTo: '#ffa726',
               decimalPlaces: 2, // optional, defaults to 2dp
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -120,7 +120,7 @@ class UserPage extends React.Component {
               propsForDots: {
                 r: '6',
                 strokeWidth: '2',
-                stroke: '#ffa726',
+                // stroke: '#ffa726',
               },
             }}
             bezier
