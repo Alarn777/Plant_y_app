@@ -12,18 +12,14 @@ import {Auth} from 'aws-amplify';
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
 import {Icon, Text, Card, Button} from '@ui-kitten/components';
-import {
-  FAB,
-  Title,
-  Card as PaperCard,
-  Paragraph,
-  Avatar,
-  ActivityIndicator,
-  Colors,
-  Chip,
-} from 'react-native-paper';
+import {FAB} from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
 
-import {withAuthenticator} from 'aws-amplify-react-native';
+import {
+  withAuthenticator,
+  //Greetings,
+  Loading,
+} from 'aws-amplify-react-native';
 import {
   ConfirmSignIn,
   ConfirmSignUp,
@@ -37,11 +33,9 @@ import {
 import AmplifyTheme from '../AmplifyTheme';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-import Video from 'react-native-video';
+import {HeaderBackButton} from 'react-navigation-stack';
 
-const plantyColor = '#6f9e04';
-
-class MainScreen extends React.Component {
+class AllAvailablePlants extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -51,20 +45,11 @@ class MainScreen extends React.Component {
       userName: '',
       width: 0,
       height: 0,
-      plants: [
-        // { "id":1, "name":"Bla", "models":[ "Fiesta", "Focus", "Mustang" ] },
-        // { "id":2, "name":"Mla", "models":[ "320", "X3", "X5" ] },
-        // { "id":3, "name":"Wua", "models":[ "500", "Panda" ] },
-        // { "id":4, "name":"Kas", "models":[ "500", "Panda" ] },
-        // { "id":5, "name":"Byu", "models":[ "500", "Panda" ] },
-        // { "id":6, "name":"Lop", "models":[ "500", "Panda" ] },
-        // { "id":7, "name":"Bth", "models":[ "500", "Panda" ] }
-      ],
+      plants: [],
       parties: [],
       change: false,
       user: null,
       USER_TOKEN: '',
-      userAvatar: '',
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -72,38 +57,6 @@ class MainScreen extends React.Component {
     this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
   }
-
-  static navigationOptions = ({navigation}) => {
-    const params = navigation.state.params || {};
-    return {
-      headerShown: navigation.getParam('userLoggedIn'),
-      headerTitle: (
-        <Image
-          resizeMode="contain"
-          style={{height: 40, width: 40}}
-          source={require('../../assets/logo.png')}
-        />
-      ),
-      headerTitleStyle: {
-        flex: 1,
-        textAlign: 'center',
-        alignSelf: 'center',
-      },
-      headerRight: () => (
-        <Button
-          onPress={navigation.getParam('logOut')}
-          title="Info"
-          // color="#fff"
-          appearance="ghost"
-          style={{color: plantyColor}}
-          icon={style => {
-            return <Icon {...style} name="log-out-outline" />;
-          }}
-          status="basic"
-        />
-      ),
-    };
-  };
 
   dealWithData = user => {
     this.setState({user});
@@ -134,30 +87,11 @@ class MainScreen extends React.Component {
     USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
 
     this.state.USER_TOKEN = USER_TOKEN;
-
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
-    // await axios
-    //   .get(Consts.apigatewayRoute + '/plants', {
-    //     headers: {Authorization: AuthStr},
-    //   })
-    //   .then(response => {
-    //     // If request is good...
-    //     console.log(response.data);
-    //     this.dealWithPlantsData(response.data);
-    //   })
-    //   .catch(error => {
-    //     console.log('error ' + error);
-    //   });
     await axios
-      .post(
-        Consts.apigatewayRoute + '/plants',
-        {
-          username: this.props.authData.username,
-        },
-        {
-          headers: {Authorization: AuthStr},
-        },
-      )
+      .get(Consts.apigatewayRoute + '/getAllAvailablePlants', {
+        headers: {Authorization: AuthStr},
+      })
       .then(response => {
         // If request is good...
         console.log(response.data);
@@ -202,20 +136,31 @@ class MainScreen extends React.Component {
       .catch(e => console.log(e));
   }
 
-  logOut = () => {
-    // const { onStateChange } = this.props;
-    Auth.signOut()
-      .then(() => {
-        this.props.onStateChange('signedOut');
-        // onStateChange('signedOut');
-      })
-      .catch(e => console.log(e));
-    // this.setState({userLoggedIn:false})
+  static navigationOptions = ({navigation, screenProps}) => {
+    const params = navigation.state.params || {};
+    return {
+      // headerShown: navigation.getParam('userLoggedIn'),
+      headerTitle: (
+        <Image
+          resizeMode="contain"
+          style={{height: 40, width: 40}}
+          source={require('../../assets/logo.png')}
+        />
+      ),
+      headerLeft: (
+        <HeaderBackButton
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+      ),
 
-    this.state.userLoggedIn = !this.state.userLoggedIn;
-    this.state.user = null;
-    this.setState({userLoggedIn: false});
-    console.log(this.state);
+      headerTitleStyle: {
+        flex: 1,
+        textAlign: 'center',
+        alignSelf: 'center',
+      },
+    };
   };
 
   onLayout(e) {
@@ -228,7 +173,6 @@ class MainScreen extends React.Component {
   _keyExtractor = item => item.id;
 
   _renderItem = ({item}) => {
-    console.log(item.pic);
     return (
       <View>
         <Card
@@ -236,7 +180,7 @@ class MainScreen extends React.Component {
             return (
               <TouchableOpacity
                 onPress={() =>
-                  this.props.navigation.navigate('PlantScreen', {
+                  this.props.navigation.navigate('AddPlantScreen', {
                     item: item,
                     user_token: this.state.USER_TOKEN,
                   })
@@ -250,7 +194,7 @@ class MainScreen extends React.Component {
           key={item.id}>
           <TouchableOpacity
             onPress={() =>
-              this.props.navigation.navigate('PlantScreen', {
+              this.props.navigation.navigate('AddPlantScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
               })
@@ -275,97 +219,31 @@ class MainScreen extends React.Component {
 
   render() {
     let height = this.state.height;
-
-    if (this.state.plants.length > 0) {
-      return (
-        <View style={styles.container} onLayout={this.onLayout}>
-          <PaperCard>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate('UserPage', {
-                  user: this.state.user,
-                })
-              }>
-              <PaperCard.Title
-                title={'Welcome home,' + this.state.user.username}
-                // subtitle="Card Subtitle"
-                left={props => (
-                  <Avatar.Icon
-                    {...props}
-                    style={{backgroundColor: plantyColor}}
-                    icon="account"
-                  />
-                )}
-              />
-            </TouchableOpacity>
-            <PaperCard.Content />
-            <PaperCard.Cover
-              source={{
-                uri:
-                  'https://lh3.googleusercontent.com/proxy/PoGeIblQn392nWEhprouNyYclQo5K1D7FzmTiiEqes1iTpOgvurxMyVV1xxu1yWw7qTqUQP-pS8XxSPsx3g9uIkM_3CM1HxVcoUJUy7NnmAK31FF8w',
-              }}
-            />
-            <PaperCard.Actions>
-              {/*<Button>Cancel</Button>*/}
-              {/*<Button>Ok</Button>*/}
-            </PaperCard.Actions>
-          </PaperCard>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>My garden</Text>
-          </View>
-          <ScrollView style={styles.data}>
-            <FlatList
-              vertical={true}
-              scrollEnabled={false}
-              numColumns={3}
-              style={{width: this.state.width, margin: 5}}
-              data={this.state.plants}
-              keyExtractor={this._keyExtractor}
-              renderItem={this._renderItem}
-            />
-          </ScrollView>
-          <FAB
-            style={
-              //styles.fab
-              {
-                position: 'absolute',
-                margin: 16,
-                // width: 50,
-
-                backgroundColor: '#6f9e04',
-                color: '#6f9e04',
-                right: 0,
-                top: height - 200,
-              }
-            }
-            large
-            icon="plus"
-            onPress={() =>
-              this.props.navigation.navigate('AllAvailablePlants', {
-                user_token: this.state.USER_TOKEN,
-              })
-            }
-          />
+    return (
+      <View style={styles.container} onLayout={this.onLayout}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>All Available Plants</Text>
         </View>
-      );
-    } else {
-      return (
-        <ActivityIndicator
-          style={{flex: 1}}
-          animating={true}
-          color={'#6f9e04'}
-        />
-      );
-    }
+        <ScrollView style={styles.data}>
+          <FlatList
+            numColumns={3}
+            style={{width: this.state.width, margin: 5}}
+            data={this.state.plants}
+            keyExtractor={this._keyExtractor}
+            renderItem={this._renderItem}
+          />
+        </ScrollView>
+      </View>
+    );
   }
 }
 
-MainScreen.propTypes = {
+AllAvailablePlants.propTypes = {
   navigation: PropTypes.any,
   addEvent: PropTypes.func,
 };
 
-export default withAuthenticator(MainScreen, false, [
+export default withAuthenticator(AllAvailablePlants, false, [
   <SignIn />,
   <ConfirmSignIn />,
   <VerifyContact />,
@@ -388,9 +266,13 @@ const styles = StyleSheet.create({
   header: {
     justifyContent: 'center',
     alignItems: 'center',
+    // margin: 5,
     height: 20,
     marginTop: 10,
     flexDirection: 'row',
+    // backgroundColor: '#66ffcc',
+    // height: '10%',
+    // borderRadius:5
   },
   partyText: {
     fontWeight: 'bold',
@@ -415,4 +297,12 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 100,
   },
+  // fab: {
+  //   position: 'absolute',
+  //   margin: 16,
+  //   right: 0,
+  //   top: this.state.height,
+  //   bottom: 0,
+  //   alignSelf: 'flex-end',
+  // },
 });

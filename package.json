@@ -21,10 +21,13 @@
     "prop-types": "latest",
     "react": "16.9.0",
     "react-native": "0.61.5",
+    "react-native-chart-kit": "^5.1.1",
+    "react-native-eject": "^0.1.2",
     "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "^1.5.3",
+    "react-native-live-stream": "^1.0.1",
     "react-native-modal": "^11.5.3",
-    "react-native-paper": "^3.4.0",
+    "react-native-paper": "^3.6.0",
     "react-native-really-awesome-button": "^1.5.1",
     "react-native-reanimated": "^1.4.0",
     "react-native-safe-area-context": "^0.6.2",
@@ -49,6 +52,7 @@
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.57.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
+    "react-native-video-streaming": "0.0.2",
     "react-test-renderer": "16.9.0"
   },
   "jest": {
