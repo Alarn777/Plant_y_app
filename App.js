@@ -26,6 +26,7 @@ import HomeScreenUser from './screens/User/MainScreen';
 import PlantScreen from './screens/User/PlantScreen';
 import AllAvailablePlants from './screens/User/AllAvailablePlants';
 import AddPlantScreen from './screens/User/AddPlantScreen';
+import planterScreen from './screens/User/planterScreen';
 
 import UserPage from './screens/User/UserPage';
 
@@ -50,6 +51,7 @@ import {
   VerifyContact,
 } from './screens/Auth';
 import {Image} from 'react-native';
+import AdjustPlantConditions from './screens/User/AdjustPlantConditions';
 
 const store = createStore(Reducer);
 
@@ -86,6 +88,20 @@ const AppNavigator = createStackNavigator(
     UserPage: {
       name: 'User Page',
       screen: UserPage,
+      navigationOptions: {
+        gesturesEnabled: true,
+      },
+    },
+    planterScreen: {
+      name: 'Planter Screen',
+      screen: planterScreen,
+      navigationOptions: {
+        gesturesEnabled: true,
+      },
+    },
+    AdjustPlantConditions: {
+      name: 'Adjust Plant Conditions Screen',
+      screen: AdjustPlantConditions,
       navigationOptions: {
         gesturesEnabled: true,
       },

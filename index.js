@@ -14,25 +14,30 @@
 // AppRegistry.registerComponent("Plant_y_app", () => App);
 
 import * as React from 'react';
-import {Provider as PaperProvider} from 'react-native-paper';
-import {Provider as StoreProvider} from 'react-redux';
+import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {AppRegistry} from 'react-native';
 import App from './App';
 
 import configureStore from './store';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-const store = configureStore();
+const theme = {
+  ...DefaultTheme,
+  roundness: 2,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#6f9e04',
+    accent: '#6f9d00',
+  },
+};
 
 export default function Main() {
   return (
-    // <StoreProvider store={store}>
-    <PaperProvider>
+    <PaperProvider theme={theme}>
       <SafeAreaProvider>
         <App />
       </SafeAreaProvider>
     </PaperProvider>
-    // </StoreProvider>
   );
 }
 

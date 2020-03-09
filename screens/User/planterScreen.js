@@ -11,7 +11,7 @@ import {Auth} from 'aws-amplify';
 
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
-import {Icon, Text, Card, Button} from '@ui-kitten/components';
+import {Icon, Text, Card} from '@ui-kitten/components';
 import {
   FAB,
   Title,
@@ -34,16 +34,19 @@ import {
   VerifyContact,
   Greetings,
 } from '../Auth';
+import AmplifyTheme from '../AmplifyTheme';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
+import Video from 'react-native-video';
 import connect from 'react-redux/lib/connect/connect';
 import {addCleaner, addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
-// import {idPattern} from 'react-native-svg/\lib/typescript/lib/util';
+import {HeaderBackButton} from 'react-navigation-stack';
+import {Button} from 'react-native-paper';
 
 const plantyColor = '#6f9e04';
 
-class MainScreen extends React.Component {
+class planterScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -53,16 +56,19 @@ class MainScreen extends React.Component {
       username: '',
       width: 0,
       height: 0,
-      plants: [],
+      // plants: [
+      // ],
+      plants: this.props.navigation.getParam('item').plants,
       parties: [],
       places: null,
       change: false,
       user: null,
       USER_TOKEN: '',
       userAvatar: '',
+
       myCognitoUser: null,
     };
-    this.loadPlanters = this.loadPlanters.bind(this);
+    this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
     this.dealWithData = this.dealWithData.bind(this);
     this.fetchUser = this.fetchUser.bind(this);
@@ -72,7 +78,7 @@ class MainScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
+      headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -85,17 +91,12 @@ class MainScreen extends React.Component {
         textAlign: 'center',
         alignSelf: 'center',
       },
-      headerRight: () => (
-        <Button
-          onPress={navigation.getParam('logOut')}
-          title="Info"
-          // color="#fff"
-          appearance="ghost"
-          style={{color: plantyColor}}
-          icon={style => {
-            return <Icon {...style} name="log-out-outline" />;
+      headerLeft: (
+        <HeaderBackButton
+          title="My Garden"
+          onPress={() => {
+            navigation.goBack();
           }}
-          status="basic"
         />
       ),
     };
@@ -111,6 +112,9 @@ class MainScreen extends React.Component {
     if (plants.Items) {
       this.setState({plants: plants.Items});
     } else this.setState({plants: []});
+    // plants.Items.map(plant => this.state.plants.push(plant))
+    //   // this.setState({plants})
+    // this.setState({change:false})
   };
 
   async fetchUser() {
@@ -123,16 +127,29 @@ class MainScreen extends React.Component {
       .catch(err => console.log(err));
   }
 
-  async loadPlanters() {
+  async loadPlants() {
     let USER_TOKEN = '';
 
     USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
 
     this.state.USER_TOKEN = USER_TOKEN;
+
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    // await axios
+    //   .get(Consts.apigatewayRoute + '/plants', {
+    //     headers: {Authorization: AuthStr},
+    //   })
+    //   .then(response => {
+    //     // If request is good...
+    //     console.log(response.data);
+    //     this.dealWithPlantsData(response.data);
+    //   })
+    //   .catch(error => {
+    //     console.log('error ' + error);
+    //   });
     await axios
       .post(
-        Consts.apigatewayRoute + '/getuserplanters',
+        Consts.apigatewayRoute + '/plants',
         {
           username: this.props.authData.username,
         },
@@ -141,12 +158,18 @@ class MainScreen extends React.Component {
         },
       )
       .then(response => {
-        console.log(response.data);
+        // If request is good...
+        // console.log(response.data);
         this.dealWithPlantsData(response.data);
       })
       .catch(error => {
         console.log('error ' + error);
       });
+
+    // await axios.get('https://i7maox5n5g.execute-api.eu-west-1.amazonaws.com/test').then(res => {
+    //   // this.dealWithUserData(res.data[0])
+    //   console.log(res);
+    // }).catch(error => console.log(error))
   }
 
   componentDidUpdate(
@@ -181,7 +204,7 @@ class MainScreen extends React.Component {
 
       this.setState({username: user.username});
     } else this.setState({username: 'Guest'});
-    this.loadPlanters()
+    this.loadPlants()
       .then()
       .catch(e => console.log(e));
 
@@ -220,28 +243,36 @@ class MainScreen extends React.Component {
             return (
               <TouchableOpacity
                 onPress={() =>
-                  this.props.navigation.navigate('planterScreen', {
+                  this.props.navigation.navigate('PlantScreen', {
                     item: item,
                     user_token: this.state.USER_TOKEN,
                   })
                 }>
-                <Image
-                  style={styles.headerImage}
-                  source={require('../../assets/pot.png')}
-                />
+                <Image style={styles.headerImage} source={{uri: item.pic}} />
               </TouchableOpacity>
             );
           }}
           style={{width: this.state.width / 3 - 5}}
-          index={item.UUID}
-          key={item.UUID}>
+          index={item.id}
+          key={item.id}>
           <TouchableOpacity
             onPress={() =>
-              this.props.navigation.navigate('planterScreen', {
+              this.props.navigation.navigate('PlantScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
               })
             }>
+            {/*    <View>*/}
+            {/*    <Image*/}
+            {/*        style={styles.headerImage}*/}
+            {/*        source={{uri: item.pic}}*/}
+            {/*    />*/}
+            {/*  </TouchableOpacity>*/}
+            {/*  <TouchableOpacity*/}
+            {/*      onPress={() => this.props.navigation.navigate('PlantScreen', {*/}
+            {/*        item: item,*/}
+            {/*      })}*/}
+            {/*  >*/}
             <Text style={styles.partyText}>{item.name}</Text>
           </TouchableOpacity>
         </Card>
@@ -255,40 +286,24 @@ class MainScreen extends React.Component {
     if (this.state.plants.length > 0) {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
-          <PaperCard>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate('UserPage', {
-                  user: this.state.user,
-                })
-              }>
-              <PaperCard.Title
-                title={'Welcome home,' + this.state.username}
-                // subtitle="Card Subtitle"
-                left={props => (
-                  <Avatar.Icon
-                    {...props}
-                    style={{backgroundColor: plantyColor}}
-                    icon="account"
-                  />
-                )}
-              />
-            </TouchableOpacity>
-            <PaperCard.Content />
-            <PaperCard.Cover
-              source={{
-                uri:
-                  'https://lh3.googleusercontent.com/proxy/PoGeIblQn392nWEhprouNyYclQo5K1D7FzmTiiEqes1iTpOgvurxMyVV1xxu1yWw7qTqUQP-pS8XxSPsx3g9uIkM_3CM1HxVcoUJUy7NnmAK31FF8w',
-              }}
-            />
-            <PaperCard.Actions>
-              {/*<Button>Cancel</Button>*/}
-              {/*<Button>Ok</Button>*/}
-            </PaperCard.Actions>
-          </PaperCard>
           <View style={styles.header}>
-            <Text style={styles.headerText}>My garden</Text>
+            <Text style={styles.headerText}>
+              Planter: {this.props.navigation.getParam('item').name}
+            </Text>
           </View>
+          {/*<Button*/}
+          {/*  style={{margin: 5}}*/}
+          {/*  mode="outlined"*/}
+          {/*  backgroundColor="#6f9e04"*/}
+          {/*  color="#6f9e04"*/}
+          {/*  onPress={() =>*/}
+          {/*    this.props.navigation.navigate('AdjustPlantConditions', {*/}
+          {/*      user_token: this.state.USER_TOKEN,*/}
+          {/*      item: this.props.navigation.getParam('item'),*/}
+          {/*    })*/}
+          {/*  }>*/}
+          {/*  Adjust Conditions*/}
+          {/*</Button>*/}
           <ScrollView style={styles.data}>
             <FlatList
               vertical={true}
@@ -304,6 +319,8 @@ class MainScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
+              // width: 50,
+
               backgroundColor: '#6f9e04',
               color: '#6f9e04',
               right: 0,
@@ -317,45 +334,32 @@ class MainScreen extends React.Component {
               })
             }
           />
+          <FAB
+            style={{
+              position: 'absolute',
+              margin: 16,
+              // width: 50,
+
+              backgroundColor: '#6f9e04',
+              color: '#6f9e04',
+              left: 0,
+              top: height - 193,
+            }}
+            label="Adjust Conditions"
+            lage
+            icon="pencil"
+            onPress={() =>
+              this.props.navigation.navigate('AdjustPlantConditions', {
+                user_token: this.state.USER_TOKEN,
+                item: this.props.navigation.getParam('item'),
+              })
+            }
+          />
         </View>
       );
     } else {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
-          <PaperCard>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate('UserPage', {
-                  user: this.state.user,
-                })
-              }>
-              <PaperCard.Title
-                title={'Welcome home,' + this.state.username}
-                // subtitle="Card Subtitle"
-                left={props => (
-                  <Avatar.Icon
-                    {...props}
-                    style={{backgroundColor: plantyColor}}
-                    icon="account"
-                  />
-                )}
-              />
-            </TouchableOpacity>
-            <PaperCard.Content />
-            <PaperCard.Cover
-              source={{
-                uri:
-                  'https://lh3.googleusercontent.com/proxy/PoGeIblQn392nWEhprouNyYclQo5K1D7FzmTiiEqes1iTpOgvurxMyVV1xxu1yWw7qTqUQP-pS8XxSPsx3g9uIkM_3CM1HxVcoUJUy7NnmAK31FF8w',
-              }}
-            />
-            <PaperCard.Actions>
-              {/*<Button>Cancel</Button>*/}
-              {/*<Button>Ok</Button>*/}
-            </PaperCard.Actions>
-          </PaperCard>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>My garden</Text>
-          </View>
           <ScrollView style={styles.data}>
             {/*<FlatList*/}
             {/*  vertical={true}*/}
@@ -378,8 +382,8 @@ class MainScreen extends React.Component {
                 margin: 16,
                 // width: 50,
 
-                backgroundColor: '#6f9e04',
-                color: '#6f9e04',
+                backgroundColor: plantyColor,
+                color: plantyColor,
                 right: 0,
                 top: height - 200,
               }
@@ -405,10 +409,21 @@ class MainScreen extends React.Component {
   }
 }
 
-MainScreen.propTypes = {
+planterScreen.propTypes = {
   navigation: PropTypes.any,
   addEvent: PropTypes.func,
 };
+
+// export default withAuthenticator(MainScreen, false, [
+//   <SignIn />,
+//   <ConfirmSignIn />,
+//   <VerifyContact />,
+//   <SignUp />,
+//   <ConfirmSignUp />,
+//   <ForgotPassword />,
+//   <Greetings />,
+//   <RequireNewPassword />,
+// ]);
 
 const mapStateToProps = state => {
   const {plantyData, cleaners, events, socket, myCognitoUsers} = state;
@@ -428,7 +443,7 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(
-  withAuthenticator(MainScreen, false, [
+  withAuthenticator(planterScreen, false, [
     <SignIn />,
     <ConfirmSignIn />,
     <VerifyContact />,
@@ -477,9 +492,6 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     flex: 1,
-    width: 100,
-    margin: 5,
-    alignSelf: 'center',
     height: 100,
   },
 });

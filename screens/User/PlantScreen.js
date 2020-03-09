@@ -1,18 +1,20 @@
 import React from 'react';
 import {Image, View, FlatList, StyleSheet} from 'react-native';
 import Video from 'react-native-video';
-import {Icon, Text, Card, Button} from '@ui-kitten/components';
+import {Icon, Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-
+import {Button, FAB} from 'react-native-paper';
 //redusx
 import {connect} from 'react-redux';
 import {addPlace} from '../../actions/place';
 import {HeaderBackButton} from 'react-navigation-stack';
+import {IconButton} from 'react-native-paper';
 
 // import RNAmazonKinesis from 'react-native-amazon-kinesis';
 
 // import {LivePlayer} from "react-native-live-stream";
+const plantyColor = '#6f9e04';
 
 class PlantScreen extends React.Component {
   constructor(props) {
@@ -22,6 +24,8 @@ class PlantScreen extends React.Component {
       USER_TOKEN: '',
       URL: '',
       loadBuffering: false,
+
+      adjustments: false,
     };
 
     this.dealWithUrlData = this.dealWithUrlData.bind(this);
@@ -90,7 +94,8 @@ class PlantScreen extends React.Component {
     //   console.log(res);
     // }).catch(error => console.log(error))
   }
-  componentWillMount(): void {
+
+  UNSAFE_componentWillMount(): void {
     this.loadUrl().then(r => console.log());
   }
 
@@ -107,6 +112,7 @@ class PlantScreen extends React.Component {
     // else
     //     return <View/>
   };
+
   render() {
     console.log(this.state.URL);
     const {navigation} = this.props;
@@ -115,7 +121,7 @@ class PlantScreen extends React.Component {
     return (
       <View style={styles.container}>
         <Card
-          style={{margin: 5, width: '95%'}}
+          // style={{margin: 5, width: '95%'}}
           header={() => {
             return <Text style={styles.mainText}>{item.name}</Text>;
           }}
@@ -128,17 +134,7 @@ class PlantScreen extends React.Component {
                     textAlign: 'center',
                     fontSize: 16,
                   }}>
-                  {' '}
-                  is simply dummy text of the printing and typesetting industry.
-                  Lorem Ipsum has been the industry's standard dummy text ever
-                  since the 1500s, when an unknown printer took a galley of type
-                  and scrambled it to make a type specimen book. It has survived
-                  not only five centuries, but also the leap into electronic
-                  typesetting, remaining essentially unchanged. It was
-                  popularised in the 1960s with the release of Letraset sheets
-                  containing Lorem Ipsum passages, and more recently with
-                  desktop publishing software like Aldus PageMaker including
-                  versions of Lorem Ipsum.
+                  {this.props.navigation.getParam('item').description}
                 </Text>
               </View>
             );
@@ -161,19 +157,13 @@ class PlantScreen extends React.Component {
             paused={true}
           />
           {this.loadBuffering()}
-          <Text style={styles.mainText}>Camera Controller</Text>
+          <Text style={styles.mainText}>Camera Controllers</Text>
           <View
             style={{
               flexDirection: 'column',
               justifyContent: 'center',
               padding: 8,
             }}>
-            <Button
-              icon={style => {
-                return <Icon {...style} name="log-out-outline" />;
-              }}>
-              Up
-            </Button>
             <View
               style={{
                 // flex:
@@ -182,12 +172,21 @@ class PlantScreen extends React.Component {
                 justifyContent: 'space-between',
                 padding: 8,
               }}>
-              <Button>Left</Button>
-              <Button>Right</Button>
+              <IconButton
+                icon="arrow-left"
+                color={plantyColor}
+                size={40}
+                onPress={() => console.log('Pressed left')}
+              />
+              <IconButton
+                icon="arrow-right"
+                color={plantyColor}
+                size={40}
+                onPress={() => console.log('Pressed right')}
+              />
+              {/*<Button>Left</Button>*/}
+              {/*<Button>Right</Button>*/}
             </View>
-            <Button style={styles.button} status="primary">
-              Down
-            </Button>
           </View>
         </Card>
       </View>
@@ -209,6 +208,8 @@ let styles = StyleSheet.create({
   },
   container: {
     // flex:1,
+    margin: '1%',
+    width: '98%',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -219,8 +220,9 @@ let styles = StyleSheet.create({
   },
   button: {
     // borderColor:'#6f9e04',
-    backgroundColor: '#6f9e04',
-    color: '#6f9e04',
+    backgroundColor: plantyColor,
+    color: plantyColor,
+    borderColor: plantyColor,
   },
   headerImage: {
     flex: 1,
