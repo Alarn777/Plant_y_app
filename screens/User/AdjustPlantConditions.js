@@ -32,8 +32,11 @@ import {
   Provider,
   Button,
   TextInput,
+  Switch,
 } from 'react-native-paper';
 import {Layout, Modal} from '@ui-kitten/components';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import SafeAreaView from 'react-native-safe-area-view';
 
 const plantyColor = '#6f9e04';
 
@@ -48,6 +51,7 @@ class AdjustPlantConditions extends React.Component {
       temperature: '24',
       uv: '1000',
       humidity: '50',
+      isSwitchOn: false,
     };
     // this.dealWithData = this.dealWithData.bind(this);
     // this.fetchUser = this.fetchUser.bind(this);
@@ -257,84 +261,118 @@ class AdjustPlantConditions extends React.Component {
     }
   }
 
+  renderAutomation = () => {
+    return (
+      <View
+        style={{
+          // flex:
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          padding: 8,
+        }}>
+        <Text style={styles.actionsText}>Enable partial Automation</Text>
+        <Switch
+          value={this.state.isSwitchOn}
+          onValueChange={() => {
+            this.setState({isSwitchOn: !this.state.isSwitchOn});
+          }}
+        />
+      </View>
+    );
+  };
+
   render() {
     return (
       <View style={{margin: '1%', width: '98%'}}>
-        <Card>
-          <PaperCard.Title
-            title={this.state.item.name}
-            // subtitle="Card Subtitle"
-          />
-          <PaperCard.Content>
-            <Text>{this.state.item.description}</Text>
-          </PaperCard.Content>
-        </Card>
-        <Card style={{marginTop: 5}}>
-          <PaperCard.Content>
-            <LineChart
-              data={{
-                labels: [
-                  'January',
-                  'February',
-                  'March',
-                  'April',
-                  'May',
-                  'June',
-                ],
-                datasets: [
-                  {
-                    data: [
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                    ],
-                  },
-                ],
-              }}
-              width={Dimensions.get('window').width - 50} // from react-native
-              height={210}
-              yAxisLabel="$"
-              yAxisSuffix="k"
-              yAxisInterval={1} // optional, defaults to 1
-              chartConfig={{
-                // backgroundColor: '#e26a00',
-                // backgroundGradientFrom: '#fb8c00',
-                // backgroundGradientTo: '#ffa726',
-                decimalPlaces: 2, // optional, defaults to 2dp
-                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-                propsForDots: {
-                  r: '6',
-                  strokeWidth: '2',
-                  // stroke: '#ffa726',
-                },
-              }}
-              bezier
-              style={{
-                margin: 5,
-                marginVertical: 8,
-                borderRadius: 16,
-              }}
+        <KeyboardAwareScrollView
+          extraScrollHeight={30}
+          // contentContainerStyle={{
+          //   flex: 1,
+          //   justifyContent: 'center',
+          //   alignItems: 'center',
+          //   height: '100%',
+          //   width: '100%',
+          // }}>
+        >
+          <Card>
+            <PaperCard.Title
+              title={this.state.item.name}
+              // subtitle="Card Subtitle"
             />
-          </PaperCard.Content>
-        </Card>
-        <Card>
-          <PaperCard.Title
-            title={'Actions'}
-            // subtitle="Card Subtitle"
-          />
-          <PaperCard.Content>
-            {this.renderTemperatureInput()}
-            {this.renderHumidityInput()}
-            {this.renderUVInput()}
-          </PaperCard.Content>
-        </Card>
+            <PaperCard.Content>
+              <Text>{this.state.item.description}</Text>
+            </PaperCard.Content>
+          </Card>
+          <Card style={{marginTop: 5}}>
+            <PaperCard.Content>
+              <LineChart
+                data={{
+                  labels: [
+                    'January',
+                    'February',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                  ],
+                  datasets: [
+                    {
+                      data: [
+                        Math.random() * 100,
+                        Math.random() * 100,
+                        Math.random() * 100,
+                        Math.random() * 100,
+                        Math.random() * 100,
+                        Math.random() * 100,
+                      ],
+                    },
+                  ],
+                }}
+                width={Dimensions.get('window').width - 50} // from react-native
+                height={210}
+                yAxisLabel="$"
+                yAxisSuffix="k"
+                yAxisInterval={1} // optional, defaults to 1
+                chartConfig={{
+                  // backgroundColor: '#e26a00',
+                  // backgroundGradientFrom: '#fb8c00',
+                  // backgroundGradientTo: '#ffa726',
+                  decimalPlaces: 2, // optional, defaults to 2dp
+                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  labelColor: (opacity = 1) =>
+                    `rgba(255, 255, 255, ${opacity})`,
+                  style: {
+                    borderRadius: 16,
+                  },
+                  propsForDots: {
+                    r: '6',
+                    strokeWidth: '2',
+                    // stroke: '#ffa726',
+                  },
+                }}
+                bezier
+                style={{
+                  margin: 5,
+                  marginVertical: 8,
+                  borderRadius: 16,
+                }}
+              />
+            </PaperCard.Content>
+          </Card>
+          <Card>
+            <PaperCard.Title
+              title={'Actions'}
+              // subtitle="Card Subtitle"
+            />
+            <PaperCard.Content>
+              {this.renderTemperatureInput()}
+              {this.renderHumidityInput()}
+              {this.renderUVInput()}
+              {this.renderAutomation()}
+            </PaperCard.Content>
+          </Card>
+        </KeyboardAwareScrollView>
       </View>
     );
   }

@@ -11,11 +11,13 @@ import {Icon, Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 
-import {Button} from 'react-native-paper';
+import {Button, Divider} from 'react-native-paper';
 
 //redusx
 import {connect} from 'react-redux';
 import {addPlace} from '../../actions/place';
+import {bindActionCreators} from 'redux';
+import {addSocket, addUser, loadPlanters} from '../../FriendActions';
 
 // import RNAmazonKinesis from 'react-native-amazon-kinesis';
 
@@ -26,13 +28,15 @@ class AddPlantScreen extends React.Component {
     super(props);
     this.state = {
       plant: null,
-      USER_TOKEN: '',
+      USER_TOKEN: this.props.navigation.getParam('user_token'),
       URL: '',
       loadBuffering: false,
       addingPlant: false,
       addingPlanticon: '',
       addingPlantText: 'Add to my garden',
       addingPlantDisabled: false,
+      planterName: this.props.navigation.getParam('planterName'),
+      // planterToAddTo: this.props.navigation.getParam('planterToAddTo'),
     };
 
     this.dealWithUrlData = this.dealWithUrlData.bind(this);
@@ -41,6 +45,8 @@ class AddPlantScreen extends React.Component {
 
   componentDidMount(): void {
     this.setState({plant: this.props.navigation.getParam('item')});
+
+    // console.log(this.props);
   }
 
   dealWithUrlData = url => {
@@ -51,18 +57,29 @@ class AddPlantScreen extends React.Component {
 
   async addPlantToMyGarden() {
     console.log('pressed');
-
     this.setState({addingPlant: true});
 
+    // console.log(this.props.plantyData.myCognitoUser.username);
+    // console.log(this.props.navigation.getParam('item').name);
+    // console.log(this.props.navigation.getParam('planterName'));
     // console.log(this.state.USER_TOKEN);
+    // console.log(this.state.plant.description);
+
+    const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
+    console.log(this.state.plant);
 
     await axios
       .post(
-        Consts.apigatewayRoute + '/plants',
+        Consts.apigatewayRoute + '/addPlantsToPlanter',
         {
-          username: this.props.authData.username,
+          username: this.props.plantyData.myCognitoUser.username,
           plantName: this.state.plant.name,
+          planterName: this.state.planterName,
+          plantDescription: this.state.plant.description,
+          plantGrowthPlanGroup: this.state.plant.growthPlanGroup,
+          plantSoil: this.state.plant.soil,
         },
+
         {
           headers: {Authorization: AuthStr},
         },
@@ -70,13 +87,15 @@ class AddPlantScreen extends React.Component {
       .then(response => {
         // If request is good...
         // console.log(response.data);
-        this.dealWithUrlData(response.data);
+        this.successAdding();
+        // this.dealWithUrlData(response.data);
       })
       .catch(error => {
         console.log('error ' + error);
+        this.failureAdding();
       });
 
-    setTimeout(this.successAdding, 1000);
+    // setTimeout(this.successAdding, 1000);
     // this.props.navigation.goBack();
   }
 
@@ -85,6 +104,24 @@ class AddPlantScreen extends React.Component {
       addingPlant: false,
       addingPlanticon: 'check',
       addingPlantText: 'Added',
+      addingPlantDisabled: true,
+    });
+    setTimeout(this.goBack, 3);
+
+    // this.props.navigation.getParam('loadPlanters')();
+  };
+
+  goBack = () => {
+    this.props.navigation.navigate('planterScreen', {
+      plantWasAdded: true,
+    });
+  };
+
+  failureAdding = () => {
+    this.setState({
+      addingPlant: false,
+      addingPlanticon: 'alert-circle-outline',
+      addingPlantText: 'Failed to add',
       addingPlantDisabled: true,
     });
   };
@@ -133,13 +170,38 @@ class AddPlantScreen extends React.Component {
             }}>
             {item.description}
           </Text>
+          <Divider />
+          <Text style={{marginTop: 10, fontWeight: 'bold'}}>
+            Appropriate soils: {item.soil.type}
+          </Text>
         </Card>
       </View>
     );
   }
 }
 
-export default AddPlantScreen;
+// export default AddPlantScreen;
+
+const mapStateToProps = state => {
+  const {plantyData} = state;
+
+  return {plantyData};
+};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      addUser,
+      loadPlanters,
+      addSocket,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AddPlantScreen);
 
 let styles = StyleSheet.create({
   backgroundVideo: {

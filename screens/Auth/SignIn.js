@@ -30,12 +30,18 @@ import {
 } from '../AmplifyUI';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import SafeAreaView from 'react-native-safe-area-view';
+import SocketIOClient from 'socket.io-client';
 
-import {Button} from 'react-native-paper';
+import {Button, TextInput} from 'react-native-paper';
+import axios from 'axios';
+import Consts from '../../ENV_VARS';
+import {bindActionCreators} from 'redux';
+import {addSocket, addUser, loadPlanters} from '../../FriendActions';
+import {connect} from 'react-redux';
 
 const logger = new Logger('SignIn');
 
-export default class SignIn extends AuthPiece {
+class SignIn extends AuthPiece {
   constructor(props) {
     super(props);
 
@@ -69,8 +75,38 @@ export default class SignIn extends AuthPiece {
         } else {
           this.checkContact(user);
         }
+        //create table for user
+        // console.log(user.signInUserSession.idToken.jwtToken);
+
+        const AuthStr = 'Bearer '.concat(
+          user.signInUserSession.idToken.jwtToken,
+        );
+
+        //create planter table for user if not existant yet
+        axios
+          .post(
+            Consts.apigatewayRoute + '/createPlanterTable',
+            {
+              username: user.username,
+            },
+            {
+              headers: {Authorization: AuthStr},
+            },
+          )
+          .then(response => {
+            // If request is good...
+            console.log(response);
+            // this.dealWithUrlData(response.data);
+          })
+          .catch(error => {
+            console.log('error ' + error);
+          });
       })
-      .catch(err => this.error(err));
+      .catch(err => {
+        console.log(err);
+        this.setState({loginigIn: false});
+        this.error(err);
+      });
   }
 
   showComponent(theme) {
@@ -96,16 +132,24 @@ export default class SignIn extends AuthPiece {
                   style={{
                     alignSelf: 'center',
                     flex: 1,
-                    height: 50,
-                    width: 350,
+                    height: 40,
+                    width: 340,
                     marginBottom: 20,
                   }}
                   source={require('../../assets/logo.png')}
                 />
-                <Header theme={theme}>{I18n.get("Welcome to Plant'y")}</Header>
+                {/*<Header theme={theme}>{I18n.get("Welcome to Plant'y")}</Header>*/}
 
                 <View style={theme.sectionBody}>
-                  {this.renderUsernameField(theme)}
+                  {/*{this.renderUsernameField(theme)}*/}
+                  <FormField
+                    // theme={theme}
+                    onChangeText={text => this.setState({username: text})}
+                    label={I18n.get('Username')}
+                    placeholder={I18n.get('Enter your username')}
+                    secureTextEntry={false}
+                    required={true}
+                  />
                   <FormField
                     // theme={theme}
                     onChangeText={text => this.setState({password: text})}
@@ -121,7 +165,7 @@ export default class SignIn extends AuthPiece {
                   {/*  disabled={!this.getUsernameFromInput() && this.state.password}*/}
                   {/*/>*/}
                   <Button
-                    icon={this.state.addingPlanticon}
+                    // icon={this.state.addingPlanticon}
                     // style={{margin: 10}}
                     loading={this.state.loginigIn}
                     disabled={
@@ -152,7 +196,6 @@ export default class SignIn extends AuthPiece {
                 </View>
                 <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
               </View>
-              {/*</TouchableWithoutFeedback>*/}
             </ImageBackground>
           </SafeAreaView>
         </KeyboardAwareScrollView>
@@ -160,3 +203,84 @@ export default class SignIn extends AuthPiece {
     );
   }
 }
+
+export default SignIn;
+//
+// 'use strict';
+// import React, {Component} from 'react';
+// import {Alert, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
+//
+// import TouchID from 'react-native-touch-id';
+//
+// export default class FingerPrint extends Component<{}> {
+//   constructor() {
+//     super();
+//
+//     this.state = {
+//       biometryType: null,
+//     };
+//   }
+//
+//   componentDidMount() {
+//     TouchID.isSupported().then(biometryType => {
+//       this.setState({biometryType});
+//     });
+//   }
+//
+//   render() {
+//     return (
+//       <View style={styles.container}>
+//         <TouchableHighlight
+//           style={styles.btn}
+//           onPress={this.clickHandler}
+//           underlayColor="#0380BE"
+//           activeOpacity={1}>
+//           <Text
+//             style={{
+//               color: '#fff',
+//               fontWeight: '600',
+//             }}>
+//             {`Authenticate with ${this.state.biometryType}`}
+//           </Text>
+//         </TouchableHighlight>
+//       </View>
+//     );
+//   }
+//
+//   clickHandler() {
+//     TouchID.isSupported()
+//       .then(authenticate)
+//       .catch(error => {
+//         Alert.alert('TouchID not supported');
+//       });
+//   }
+// }
+//
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: '#F5FCFF',
+//   },
+//   btn: {
+//     borderRadius: 3,
+//     marginTop: 200,
+//     paddingTop: 15,
+//     paddingBottom: 15,
+//     paddingLeft: 15,
+//     paddingRight: 15,
+//     backgroundColor: '#0391D7',
+//   },
+// });
+//
+// function authenticate() {
+//   return TouchID.authenticate()
+//     .then(success => {
+//       Alert.alert('Authenticated Successfully');
+//     })
+//     .catch(error => {
+//       console.log(error);
+//       Alert.alert(error.message);
+//     });
+// }

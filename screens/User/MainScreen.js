@@ -37,8 +37,9 @@ import {
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import connect from 'react-redux/lib/connect/connect';
-import {addCleaner, addUser} from '../../FriendActions';
+import {addSocket, addUser, fetchAllPosts} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
+import SocketIOClient from 'socket.io-client';
 // import {idPattern} from 'react-native-svg/\lib/typescript/lib/util';
 
 const plantyColor = '#6f9e04';
@@ -107,6 +108,7 @@ class MainScreen extends React.Component {
     this.setState({user});
     if (this.state.user) this.setState({userLoggedIn: true});
   };
+
   dealWithPlantsData = plants => {
     if (plants.Items) {
       this.setState({plants: plants.Items});
@@ -124,12 +126,14 @@ class MainScreen extends React.Component {
   }
 
   async loadPlanters() {
+    console.log('called reload plants');
+
     let USER_TOKEN = '';
 
     USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
-
     this.state.USER_TOKEN = USER_TOKEN;
-    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+
+    const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
     await axios
       .post(
         Consts.apigatewayRoute + '/getuserplanters',
@@ -163,11 +167,27 @@ class MainScreen extends React.Component {
         this.props.navigation.setParams({
           userLoggedIn: this.state.userLoggedIn,
         });
+
+        //open socket
       })
       .catch(e => console.log(e));
   }
 
   componentDidMount(): void {
+    // try {
+    //   this.socket = SocketIOClient(Consts.host);
+    // } catch (e) {}
+    // if (this.socket) {
+    //   this.props.addSocket(this.socket);
+    // }
+
+    // this.props.plantyData.socket[0].on('changedStatus', () => {
+    //   // this.props.reloadEvents()
+    //   this.loadPlanters()
+    //     .then(r => console.log(r))
+    //     .catch(e => console.log(e));
+    // });
+
     const {authState, authData} = this.props;
     const user = authData;
     if (user) {
@@ -186,7 +206,8 @@ class MainScreen extends React.Component {
       .catch(e => console.log(e));
 
     this.props.addUser(user);
-    console.log(this); //check reducer
+
+    // this.props.fetchAllPosts(user);
   }
 
   logOut = () => {
@@ -223,6 +244,7 @@ class MainScreen extends React.Component {
                   this.props.navigation.navigate('planterScreen', {
                     item: item,
                     user_token: this.state.USER_TOKEN,
+                    loadPlanters: this.loadPlanters,
                   })
                 }>
                 <Image
@@ -240,6 +262,7 @@ class MainScreen extends React.Component {
               this.props.navigation.navigate('planterScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
+                loadPlanters: this.loadPlanters,
               })
             }>
             <Text style={styles.partyText}>{item.name}</Text>
@@ -251,157 +274,157 @@ class MainScreen extends React.Component {
 
   render() {
     let height = this.state.height;
-    console.log(this.props);
-    if (this.state.plants.length > 0) {
-      return (
-        <View style={styles.container} onLayout={this.onLayout}>
-          <PaperCard>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate('UserPage', {
-                  user: this.state.user,
-                })
-              }>
-              <PaperCard.Title
-                title={'Welcome home,' + this.state.username}
-                // subtitle="Card Subtitle"
-                left={props => (
-                  <Avatar.Icon
-                    {...props}
-                    style={{backgroundColor: plantyColor}}
-                    icon="account"
-                  />
-                )}
-              />
-            </TouchableOpacity>
-            <PaperCard.Content />
-            <PaperCard.Cover
-              source={{
-                uri:
-                  'https://lh3.googleusercontent.com/proxy/PoGeIblQn392nWEhprouNyYclQo5K1D7FzmTiiEqes1iTpOgvurxMyVV1xxu1yWw7qTqUQP-pS8XxSPsx3g9uIkM_3CM1HxVcoUJUy7NnmAK31FF8w',
-              }}
-            />
-            <PaperCard.Actions>
-              {/*<Button>Cancel</Button>*/}
-              {/*<Button>Ok</Button>*/}
-            </PaperCard.Actions>
-          </PaperCard>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>My garden</Text>
-          </View>
-          <ScrollView style={styles.data}>
-            <FlatList
-              vertical={true}
-              scrollEnabled={false}
-              numColumns={3}
-              style={{width: this.state.width, margin: 5}}
-              data={this.state.plants}
-              keyExtractor={this._keyExtractor}
-              renderItem={this._renderItem}
-            />
-          </ScrollView>
-          <FAB
-            style={{
-              position: 'absolute',
-              margin: 16,
-              backgroundColor: '#6f9e04',
-              color: '#6f9e04',
-              right: 0,
-              top: height - 200,
-            }}
-            large
-            icon="plus"
+    // if (this.state.plants.length > 0) {
+    return (
+      <View style={styles.container} onLayout={this.onLayout}>
+        <PaperCard>
+          <TouchableOpacity
             onPress={() =>
-              this.props.navigation.navigate('AllAvailablePlants', {
-                user_token: this.state.USER_TOKEN,
+              this.props.navigation.navigate('UserPage', {
+                user: this.state.user,
               })
-            }
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View style={styles.container} onLayout={this.onLayout}>
-          <PaperCard>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate('UserPage', {
-                  user: this.state.user,
-                })
-              }>
-              <PaperCard.Title
-                title={'Welcome home,' + this.state.username}
-                // subtitle="Card Subtitle"
-                left={props => (
-                  <Avatar.Icon
-                    {...props}
-                    style={{backgroundColor: plantyColor}}
-                    icon="account"
-                  />
-                )}
-              />
-            </TouchableOpacity>
-            <PaperCard.Content />
-            <PaperCard.Cover
-              source={{
-                uri:
-                  'https://lh3.googleusercontent.com/proxy/PoGeIblQn392nWEhprouNyYclQo5K1D7FzmTiiEqes1iTpOgvurxMyVV1xxu1yWw7qTqUQP-pS8XxSPsx3g9uIkM_3CM1HxVcoUJUy7NnmAK31FF8w',
-              }}
+            }>
+            <PaperCard.Title
+              title={'Welcome home,' + this.state.username}
+              // subtitle="Card Subtitle"
+              left={props => (
+                <Avatar.Icon
+                  {...props}
+                  style={{backgroundColor: plantyColor}}
+                  icon="account"
+                />
+              )}
             />
-            <PaperCard.Actions>
-              {/*<Button>Cancel</Button>*/}
-              {/*<Button>Ok</Button>*/}
-            </PaperCard.Actions>
-          </PaperCard>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>My garden</Text>
-          </View>
-          <ScrollView style={styles.data}>
-            {/*<FlatList*/}
-            {/*  vertical={true}*/}
-            {/*  scrollEnabled={false}*/}
-            {/*  numColumns={3}*/}
-            {/*  style={{width: this.state.width, margin: 5}}*/}
-            {/*  data={this.state.plants}*/}
-            {/*  keyExtractor={this._keyExtractor}*/}
-            {/*  renderItem={this._renderItem}*/}
-            {/*/>*/}
-            <Text style={{alignSelf: 'center', flex: 1}}>
-              No Plants in your garden
-            </Text>
-          </ScrollView>
-          <FAB
-            style={
-              //styles.fab
-              {
-                position: 'absolute',
-                margin: 16,
-                // width: 50,
-
-                backgroundColor: '#6f9e04',
-                color: '#6f9e04',
-                right: 0,
-                top: height - 200,
-              }
-            }
-            large
-            icon="plus"
-            onPress={() =>
-              this.props.navigation.navigate('AllAvailablePlants', {
-                user_token: this.state.USER_TOKEN,
-              })
-            }
+          </TouchableOpacity>
+          <PaperCard.Content />
+          <PaperCard.Cover
+            source={require('../../assets/background_image.jpeg')}
           />
+          <PaperCard.Actions>
+            {/*<Button>Cancel</Button>*/}
+            {/*<Button>Ok</Button>*/}
+          </PaperCard.Actions>
+        </PaperCard>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>My garden</Text>
         </View>
-
-        // <Text style={{flex: 1}}>No Plants in your garden</Text>
-        // <ActivityIndicator
-        //   style={{flex: 1}}
-        //   animating={true}
-        //   color={'#6f9e04'}
-        // />
-      );
-    }
+        <ScrollView style={styles.data}>
+          <FlatList
+            vertical={true}
+            scrollEnabled={false}
+            numColumns={3}
+            style={{width: this.state.width, margin: 5}}
+            data={this.state.plants}
+            keyExtractor={this._keyExtractor}
+            renderItem={this._renderItem}
+          />
+        </ScrollView>
+        <FAB
+          style={{
+            position: 'absolute',
+            margin: 16,
+            backgroundColor: '#6f9e04',
+            color: '#6f9e04',
+            right: 0,
+            bottom: 10,
+          }}
+          large
+          icon="plus"
+          onPress={() =>
+            this.props.navigation.navigate('addPlanterScreen', {
+              user_token: this.state.USER_TOKEN,
+              user: this.state.user,
+              loadPlanters: this.loadPlanters,
+            })
+          }
+        />
+      </View>
+    );
+    //   } else {
+    //     return (
+    //       <View style={styles.container} onLayout={this.onLayout}>
+    //         <PaperCard>
+    //           <TouchableOpacity
+    //             onPress={() =>
+    //               this.props.navigation.navigate('UserPage', {
+    //                 user: this.state.user,
+    //               })
+    //             }>
+    //             <PaperCard.Title
+    //               title={'Welcome home,' + this.state.username}
+    //               // subtitle="Card Subtitle"
+    //               left={props => (
+    //                 <Avatar.Icon
+    //                   {...props}
+    //                   style={{backgroundColor: plantyColor}}
+    //                   icon="account"
+    //                 />
+    //               )}
+    //             />
+    //           </TouchableOpacity>
+    //           <PaperCard.Content />
+    //           <PaperCard.Cover
+    //             source={{
+    //               uri:
+    //                 'https://lh3.googleusercontent.com/proxy/PoGeIblQn392nWEhprouNyYclQo5K1D7FzmTiiEqes1iTpOgvurxMyVV1xxu1yWw7qTqUQP-pS8XxSPsx3g9uIkM_3CM1HxVcoUJUy7NnmAK31FF8w',
+    //             }}
+    //           />
+    //           <PaperCard.Actions>
+    //             {/*<Button>Cancel</Button>*/}
+    //             {/*<Button>Ok</Button>*/}
+    //           </PaperCard.Actions>
+    //         </PaperCard>
+    //         <View style={styles.header}>
+    //           <Text style={styles.headerText}>My garden</Text>
+    //         </View>
+    //         <ScrollView style={styles.data}>
+    //           {/*<FlatList*/}
+    //           {/*  vertical={true}*/}
+    //           {/*  scrollEnabled={false}*/}
+    //           {/*  numColumns={3}*/}
+    //           {/*  style={{width: this.state.width, margin: 5}}*/}
+    //           {/*  data={this.state.plants}*/}
+    //           {/*  keyExtractor={this._keyExtractor}*/}
+    //           {/*  renderItem={this._renderItem}*/}
+    //           {/*/>*/}
+    //           <Text style={{alignSelf: 'center', flex: 1}}>
+    //             No Planters in your garden, maybe add some?
+    //           </Text>
+    //         </ScrollView>
+    //         <FAB
+    //           style={
+    //             //styles.fab
+    //             {
+    //               position: 'absolute',
+    //               margin: 16,
+    //               // width: 50,
+    //
+    //               backgroundColor: '#6f9e04',
+    //               color: '#6f9e04',
+    //               right: 0,
+    //               bottom: 10,
+    //             }
+    //           }
+    //           large
+    //           icon="plus"
+    //           onPress={() =>
+    //             this.props.navigation.navigate('addPlanterScreen', {
+    //               user_token: this.state.USER_TOKEN,
+    //               user: this.state.user,
+    //             })
+    //           }
+    //         />
+    //       </View>
+    //
+    //       // <Text style={{flex: 1}}>No Plants in your garden</Text>
+    //       // <ActivityIndicator
+    //       //   style={{flex: 1}}
+    //       //   animating={true}
+    //       //   color={'#6f9e04'}
+    //       // />
+    //     );
+    //   }
+    // }
   }
 }
 
@@ -411,15 +434,17 @@ MainScreen.propTypes = {
 };
 
 const mapStateToProps = state => {
-  const {plantyData, cleaners, events, socket, myCognitoUsers} = state;
+  const {plantyData} = state;
 
-  return {plantyData, cleaners, events, socket, myCognitoUsers};
+  return {plantyData};
 };
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       addUser,
+      // fetchAllPosts,
+      // addSocket,
     },
     dispatch,
   );
@@ -443,6 +468,8 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '98%',
+    margin: '1%',
     backgroundColor: 'white',
     position: 'relative',
   },

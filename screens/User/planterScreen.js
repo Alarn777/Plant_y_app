@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Auth} from 'aws-amplify';
-
+import data from '../../ENV_VARS';
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
-import {Icon, Text, Card} from '@ui-kitten/components';
+import {Icon, Text, Card, Spinner} from '@ui-kitten/components';
 import {
   FAB,
   Title,
@@ -21,6 +21,8 @@ import {
   ActivityIndicator,
   Colors,
   Chip,
+  Button,
+  IconButton,
 } from 'react-native-paper';
 
 import {withAuthenticator} from 'aws-amplify-react-native';
@@ -39,10 +41,9 @@ import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import Video from 'react-native-video';
 import connect from 'react-redux/lib/connect/connect';
-import {addCleaner, addUser} from '../../FriendActions';
+import {addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import {Button} from 'react-native-paper';
 
 const plantyColor = '#6f9e04';
 
@@ -56,22 +57,25 @@ class planterScreen extends React.Component {
       username: '',
       width: 0,
       height: 0,
-      // plants: [
-      // ],
-      plants: this.props.navigation.getParam('item').plants,
+      // plants: this.props.navigation.getParam('item').plants,
+      plants: [],
+      planter: this.props.navigation.getParam('item'),
       parties: [],
       places: null,
       change: false,
       user: null,
       USER_TOKEN: '',
       userAvatar: '',
-
+      loadBuffering: true,
+      videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
       myCognitoUser: null,
+      loading: true,
+      videoURL: '',
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
-    this.dealWithData = this.dealWithData.bind(this);
-    this.fetchUser = this.fetchUser.bind(this);
+    // this.dealWithData = this.dealWithData.bind(this);
+    // this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
   }
 
@@ -102,56 +106,109 @@ class planterScreen extends React.Component {
     };
   };
 
-  dealWithData = user => {
-    //add to redux
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    // console.log('componentDidUpdate');
+    // console.log(this.props.navigation.getParam('plantWasAdded'));
+    if (this.props.navigation.getParam('plantWasAdded')) {
+      this.loadPlants()
+        .then()
+        .catch();
+      this.props.navigation.setParams({plantWasAdded: false});
+    }
+  }
 
-    this.setState({user});
-    if (this.state.user) this.setState({userLoggedIn: true});
-  };
-  dealWithPlantsData = plants => {
-    if (plants.Items) {
-      this.setState({plants: plants.Items});
-    } else this.setState({plants: []});
-    // plants.Items.map(plant => this.state.plants.push(plant))
-    //   // this.setState({plants})
-    // this.setState({change:false})
-  };
+  UNSAFE_componentWillMount(): void {
+    console.log('componentWillMount');
+    this.loadUrl()
+      .then()
+      .catch();
+  }
 
-  async fetchUser() {
-    await Auth.currentAuthenticatedUser({
-      bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
-    })
-      .then(user => {
-        this.dealWithData(user);
+  componentDidMount(): void {
+    console.log('componentDidMount');
+    // console.log(
+    //   this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
+    // );
+    // let USER_TOKEN = this.props.plantyData.signInUserSession.idToken.jwtToken;
+    // //
+    // console.log(USER_TOKEN);
+    // const {authState, authData} = this.props;
+    // const user = authData;
+    // if (user) {
+    //   const {usernameAttributes = []} = this.props;
+    //   if (usernameAttributes === 'email') {
+    //     // Email as Username
+    //     this.setState({
+    //       username: user.attributes ? user.attributes.email : user.username,
+    //     });
+    //   }
+    //
+    //   this.setState({username: user.username});
+    // } else this.setState({username: 'Guest'});
+
+    this.loadPlants()
+      .then()
+      .catch(e => console.log(e));
+
+    // this.props.addUser(user);
+  }
+
+  // dealWithData = user => {
+  //   //add to redux
+  //
+  //   this.setState({user});
+  //   if (this.state.user) this.setState({userLoggedIn: true});
+  // };
+
+  //maybe post is needed (this.props.navigation.getParam('item').stream)
+  async loadUrl() {
+    console.log('loadstreamUrl');
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+      .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+
+    await axios
+      .get(Consts.apigatewayRoute + '/streams', {
+        headers: {Authorization: AuthStr},
       })
-      .catch(err => console.log(err));
+      .then(response => {
+        // If request is good...
+        // console.log(response.data);
+        this.setState({videoURL: response.data.HLSStreamingSessionURL});
+        this.setState({
+          videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
+        });
+        this.forceUpdate();
+
+        // this.dealWithUrlData(response.data);
+      })
+      .catch(error => {
+        console.log('error ' + error);
+
+        this.setState({
+          videoErrorObj: {
+            videoErrorFlag: true,
+            videoErrorMessage: error.errorMessage,
+          },
+        });
+      });
   }
 
   async loadPlants() {
-    let USER_TOKEN = '';
-
-    USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
-
-    this.state.USER_TOKEN = USER_TOKEN;
-
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+      .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
-    // await axios
-    //   .get(Consts.apigatewayRoute + '/plants', {
-    //     headers: {Authorization: AuthStr},
-    //   })
-    //   .then(response => {
-    //     // If request is good...
-    //     console.log(response.data);
-    //     this.dealWithPlantsData(response.data);
-    //   })
-    //   .catch(error => {
-    //     console.log('error ' + error);
-    //   });
+
     await axios
       .post(
-        Consts.apigatewayRoute + '/plants',
+        Consts.apigatewayRoute + '/getPlantsInPlanter',
         {
           username: this.props.authData.username,
+          planterName: this.props.navigation.getParam('item').name,
         },
         {
           headers: {Authorization: AuthStr},
@@ -165,65 +222,13 @@ class planterScreen extends React.Component {
       .catch(error => {
         console.log('error ' + error);
       });
-
-    // await axios.get('https://i7maox5n5g.execute-api.eu-west-1.amazonaws.com/test').then(res => {
-    //   // this.dealWithUserData(res.data[0])
-    //   console.log(res);
-    // }).catch(error => console.log(error))
   }
 
-  componentDidUpdate(
-    prevProps: Readonly<P>,
-    prevState: Readonly<S>,
-    snapshot: SS,
-  ): void {}
-
-  componentWillMount() {
-    this.fetchUser()
-      .then(() => {
-        this.props.navigation.setParams({logOut: this.logOut});
-
-        this.props.navigation.setParams({
-          userLoggedIn: this.state.userLoggedIn,
-        });
-      })
-      .catch(e => console.log(e));
-  }
-
-  componentDidMount(): void {
-    const {authState, authData} = this.props;
-    const user = authData;
-    if (user) {
-      const {usernameAttributes = []} = this.props;
-      if (usernameAttributes === 'email') {
-        // Email as Username
-        this.setState({
-          username: user.attributes ? user.attributes.email : user.username,
-        });
-      }
-
-      this.setState({username: user.username});
-    } else this.setState({username: 'Guest'});
-    this.loadPlants()
-      .then()
-      .catch(e => console.log(e));
-
-    this.props.addUser(user);
-    console.log(this); //check reducer
-  }
-
-  logOut = () => {
-    // const { onStateChange } = this.props;
-    Auth.signOut()
-      .then(() => {
-        this.props.onStateChange('signedOut');
-        // onStateChange('signedOut');
-      })
-      .catch(e => console.log(e));
-
-    this.state.userLoggedIn = !this.state.userLoggedIn;
-    this.state.user = null;
-    this.setState({userLoggedIn: false});
+  dealWithPlantsData = plants => {
+    if (plants) {
+      this.setState({plants: plants});
+    } else this.setState({plants: []});
+    this.setState({loading: false});
   };
 
   onLayout(e) {
@@ -233,7 +238,7 @@ class planterScreen extends React.Component {
     });
   }
 
-  _keyExtractor = item => item.id;
+  _keyExtractor = item => item.UUID;
 
   _renderItem = ({item}) => {
     return (
@@ -262,17 +267,6 @@ class planterScreen extends React.Component {
                 user_token: this.state.USER_TOKEN,
               })
             }>
-            {/*    <View>*/}
-            {/*    <Image*/}
-            {/*        style={styles.headerImage}*/}
-            {/*        source={{uri: item.pic}}*/}
-            {/*    />*/}
-            {/*  </TouchableOpacity>*/}
-            {/*  <TouchableOpacity*/}
-            {/*      onPress={() => this.props.navigation.navigate('PlantScreen', {*/}
-            {/*        item: item,*/}
-            {/*      })}*/}
-            {/*  >*/}
             <Text style={styles.partyText}>{item.name}</Text>
           </TouchableOpacity>
         </Card>
@@ -280,9 +274,53 @@ class planterScreen extends React.Component {
     );
   };
 
+  loadBuffering = () => {
+    return (
+      <View
+        style={{
+          alignSelf: 'center',
+        }}>
+        <Spinner
+          style={{
+            alignSelf: 'center',
+            backgroundColor: plantyColor,
+          }}
+          status="basic"
+        />
+      </View>
+    );
+  };
+
+  videoError = () => {
+    return (
+      <View>
+        <Text syle={{color: 'red'}}>Error loading Video</Text>
+      </View>
+    );
+  };
+
+  showVideoError = () => {
+    if (this.state.videoErrorObj.videoErrorFlag)
+      return (
+        <View>
+          <Text syle={{color: 'red'}}>
+            {this.state.videoErrorObj.videoErrorMessage}
+          </Text>
+        </View>
+      );
+    else return <View />;
+  };
+
   render() {
+    if (this.state.loading) {
+      return (
+        <View>
+          <Spinner style={{flex: 1}} status="basic" />
+        </View>
+      );
+    }
+
     let height = this.state.height;
-    console.log(this.props);
     if (this.state.plants.length > 0) {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
@@ -291,19 +329,75 @@ class planterScreen extends React.Component {
               Planter: {this.props.navigation.getParam('item').name}
             </Text>
           </View>
-          {/*<Button*/}
-          {/*  style={{margin: 5}}*/}
-          {/*  mode="outlined"*/}
-          {/*  backgroundColor="#6f9e04"*/}
-          {/*  color="#6f9e04"*/}
-          {/*  onPress={() =>*/}
-          {/*    this.props.navigation.navigate('AdjustPlantConditions', {*/}
-          {/*      user_token: this.state.USER_TOKEN,*/}
-          {/*      item: this.props.navigation.getParam('item'),*/}
-          {/*    })*/}
-          {/*  }>*/}
-          {/*  Adjust Conditions*/}
-          {/*</Button>*/}
+          <PaperCard>
+            <PaperCard.Title
+              title={
+                <Text style={styles.mainText}>
+                  {'Climate:' + this.props.navigation.getParam('item').climate}
+                </Text>
+              }
+            />
+            <PaperCard.Content>
+              <Video
+                source={{uri: this.state.videoURL}} // Can be a URL or a local file.
+                ref={ref => {
+                  this.player = ref;
+                }} // Store reference
+                resizeMode="stretch"
+                controls={true}
+                onBuffer={this.loadBuffering} // Callback when remote video is buffering
+                // onError={this.videoError}
+
+                onError={this.videoError} // Callback when video cannot be loaded
+                style={styles.backgroundVideo}
+                minLoadRetryCount={10000}
+                paused={true}
+              />
+
+              {this.showVideoError()}
+            </PaperCard.Content>
+            <PaperCard.Actions
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'center',
+                padding: 8,
+              }}>
+              <Text style={styles.mainText}>Camera Controllers</Text>
+              <View
+                style={{
+                  // flex:
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-between',
+                  padding: 8,
+                }}>
+                <IconButton
+                  icon="arrow-left"
+                  color={plantyColor}
+                  size={40}
+                  onPress={() => console.log('Pressed camera')}
+                />
+                <IconButton
+                  icon="camera"
+                  color={plantyColor}
+                  size={40}
+                  onPress={() => console.log('Pressed left')}
+                />
+                <IconButton
+                  icon="arrow-right"
+                  color={plantyColor}
+                  size={40}
+                  onPress={() => console.log('Pressed right')}
+                />
+              </View>
+              <Text style={styles.headerText}>Plants in Planter</Text>
+            </PaperCard.Actions>
+          </PaperCard>
+          {/*<PaperCard>*/}
+          {/*  <PaperCard.Title*/}
+          {/*    title={<Text style={styles.headerText}>Plants in Planter</Text>}*/}
+          {/*  />*/}
+          {/*</PaperCard>*/}
           <ScrollView style={styles.data}>
             <FlatList
               vertical={true}
@@ -324,13 +418,17 @@ class planterScreen extends React.Component {
               backgroundColor: '#6f9e04',
               color: '#6f9e04',
               right: 0,
-              top: height - 200,
+              // top: height - 200,
+              bottom: 10,
             }}
             large
             icon="plus"
             onPress={() =>
               this.props.navigation.navigate('AllAvailablePlants', {
                 user_token: this.state.USER_TOKEN,
+                // item: this.props.navigation.getParam('item'),
+                planterName: this.props.navigation.getParam('item').name,
+                loadPlanters: this.props.navigation.getParam('loadPlanters'),
               })
             }
           />
@@ -343,7 +441,7 @@ class planterScreen extends React.Component {
               backgroundColor: '#6f9e04',
               color: '#6f9e04',
               left: 0,
-              top: height - 193,
+              bottom: 14,
             }}
             label="Adjust Conditions"
             lage
@@ -360,20 +458,14 @@ class planterScreen extends React.Component {
     } else {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
-          <ScrollView style={styles.data}>
-            {/*<FlatList*/}
-            {/*  vertical={true}*/}
-            {/*  scrollEnabled={false}*/}
-            {/*  numColumns={3}*/}
-            {/*  style={{width: this.state.width, margin: 5}}*/}
-            {/*  data={this.state.plants}*/}
-            {/*  keyExtractor={this._keyExtractor}*/}
-            {/*  renderItem={this._renderItem}*/}
-            {/*/>*/}
-            <Text style={{alignSelf: 'center', flex: 1}}>
-              No Plants in your garden
-            </Text>
-          </ScrollView>
+          <PaperCard>
+            <PaperCard.Title
+              title={'Planter:' + this.props.navigation.getParam('item').name}
+            />
+            <PaperCard.Content>
+              <Text>Planter is empty now, add some plants</Text>
+            </PaperCard.Content>
+          </PaperCard>
           <FAB
             style={
               //styles.fab
@@ -385,7 +477,7 @@ class planterScreen extends React.Component {
                 backgroundColor: plantyColor,
                 color: plantyColor,
                 right: 0,
-                top: height - 200,
+                bottom: 10,
               }
             }
             large
@@ -393,6 +485,8 @@ class planterScreen extends React.Component {
             onPress={() =>
               this.props.navigation.navigate('AllAvailablePlants', {
                 user_token: this.state.USER_TOKEN,
+                planterName: this.props.navigation.getParam('item').name,
+                loadPlanters: this.props.navigation.getParam('loadPlanters'),
               })
             }
           />
@@ -414,21 +508,10 @@ planterScreen.propTypes = {
   addEvent: PropTypes.func,
 };
 
-// export default withAuthenticator(MainScreen, false, [
-//   <SignIn />,
-//   <ConfirmSignIn />,
-//   <VerifyContact />,
-//   <SignUp />,
-//   <ConfirmSignUp />,
-//   <ForgotPassword />,
-//   <Greetings />,
-//   <RequireNewPassword />,
-// ]);
-
 const mapStateToProps = state => {
-  const {plantyData, cleaners, events, socket, myCognitoUsers} = state;
+  const {plantyData} = state;
 
-  return {plantyData, cleaners, events, socket, myCognitoUsers};
+  return {plantyData};
 };
 
 const mapDispatchToProps = dispatch =>
@@ -493,5 +576,15 @@ const styles = StyleSheet.create({
   headerImage: {
     flex: 1,
     height: 100,
+  },
+  backgroundVideo: {
+    // position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    width: '100%',
+    height: 200,
+    backgroundColor: '#D3D3D3',
   },
 });

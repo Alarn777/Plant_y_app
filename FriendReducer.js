@@ -1,4 +1,6 @@
 import {combineReducers} from 'redux';
+import axios from 'axios';
+import Consts from './ENV_VARS';
 
 const INITIAL_STATE = {
   // current: [],
@@ -7,18 +9,19 @@ const INITIAL_STATE = {
   // cleaners: [],
   plantyData: [],
   // events: [],
-  // socket: [],
+  socket: [],
   myCognitoUser: {},
+  planters: [],
 };
 
 const cleanerReducer = (state = INITIAL_STATE, action) => {
-  const {myCognitoUser} = state;
+  const {myCognitoUser, planters, socket} = state;
 
   switch (action.type) {
-    // case 'ADD_SOCKET':
-    //   socket.push(action.payload);
-    //   return {events, favorite_cleaners, socket};
-    //
+    case 'ADD_SOCKET':
+      socket.push(action.payload);
+      return {myCognitoUser, planters, socket};
+
     // case 'RELOAD_EVENTS':
     //   return {events: [], favorite_cleaners, socket};
     //
@@ -66,7 +69,6 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     //   return {events, favorite_cleaners: [], socket};
 
     case 'ADD_USER':
-      console.log('LOAD');
       // console.log(action.payload);
       // return {myCognitoUser: tempMyCognitoUser};
       // if (
@@ -85,6 +87,46 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         // socket: [],
         myCognitoUser: action.payload,
       };
+
+    case 'FETCH_POST':
+      console.log(action.payload);
+      return {
+        // events: [],
+        // favorite_cleaners: [],
+        // socket: [],
+        planters: action.payload.Items,
+        myCognitoUser: action.payload,
+      };
+    // return action.Items;
+
+    case 'LOAD_PLANTERS':
+      console.log('LOLOAD_PLANTERS');
+      // axios
+      //   .post(
+      //     Consts.apigatewayRoute + '/getuserplanters',
+      //     {
+      //       username: this.props.authData.username,
+      //     },
+      //     {
+      //       headers: {Authorization: AuthStr},
+      //     },
+      //   )
+      //   .then(response => {
+      //     console.log(response.data);
+      //     return {
+      //       planters: response.data.Items,
+      //       myCognitoUser: action.payload,
+      //     };
+      //     // this.dealWithPlantsData(response.data);
+      //   })
+      //   .catch(error => {
+      //     console.log('error ' + error);
+      //     return {
+      //       planters: [],
+      //       myCognitoUser: action.payload,
+      //     };
+      //   });
+      return state;
 
     default:
       return state;

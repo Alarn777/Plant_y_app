@@ -14,7 +14,7 @@ import {StyleSheet} from 'react-native';
 import {Icon, Text, Card, Button} from '@ui-kitten/components';
 import {FAB} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
-
+// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   withAuthenticator,
   //Greetings,
@@ -49,7 +49,8 @@ class AllAvailablePlants extends React.Component {
       parties: [],
       change: false,
       user: null,
-      USER_TOKEN: '',
+      USER_TOKEN: this.props.navigation.getParam('user_token'),
+      planterToAddTo: this.props.navigation.getParam('planterName'),
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -62,8 +63,9 @@ class AllAvailablePlants extends React.Component {
     this.setState({user});
     if (this.state.user) this.setState({userLoggedIn: true});
   };
+
   dealWithPlantsData = plants => {
-    console.log(plants.Items);
+    // console.log(plants.Items);
     this.setState({plants: plants.Items});
     // plants.Items.map(plant => this.state.plants.push(plant))
     //   // this.setState({plants})
@@ -81,7 +83,6 @@ class AllAvailablePlants extends React.Component {
   }
 
   async loadPlants() {
-    console.log('loadPlants');
     let USER_TOKEN = '';
 
     USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
@@ -107,16 +108,16 @@ class AllAvailablePlants extends React.Component {
     // }).catch(error => console.log(error))
   }
 
-  componentWillMount() {
-    this.fetchUser()
-      .then(() => {
-        this.props.navigation.setParams({logOut: this.logOut});
-
-        this.props.navigation.setParams({
-          userLoggedIn: this.state.userLoggedIn,
-        });
-      })
-      .catch(e => console.log(e));
+  UNSAFE_componentWillMount() {
+    // this.fetchUser()
+    //   .then(() => {
+    //     this.props.navigation.setParams({logOut: this.logOut});
+    //
+    //     this.props.navigation.setParams({
+    //       userLoggedIn: this.state.userLoggedIn,
+    //     });
+    //   })
+    //   .catch(e => console.log(e));
   }
 
   componentDidMount(): void {
@@ -131,6 +132,9 @@ class AllAvailablePlants extends React.Component {
         });
       }
     } else this.setState({userName: 'Guest'});
+
+    console.log(this.state);
+
     this.loadPlants()
       .then()
       .catch(e => console.log(e));
@@ -183,6 +187,7 @@ class AllAvailablePlants extends React.Component {
                   this.props.navigation.navigate('AddPlantScreen', {
                     item: item,
                     user_token: this.state.USER_TOKEN,
+                    planterName: this.props.navigation.getParam('planterName'),
                   })
                 }>
                 <Image style={styles.headerImage} source={{uri: item.pic}} />
@@ -193,23 +198,15 @@ class AllAvailablePlants extends React.Component {
           index={item.id}
           key={item.id}>
           <TouchableOpacity
-            onPress={() =>
+            onPress={() => {
+              console.log(this.props.navigation);
               this.props.navigation.navigate('AddPlantScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
-              })
-            }>
-            {/*    <View>*/}
-            {/*    <Image*/}
-            {/*        style={styles.headerImage}*/}
-            {/*        source={{uri: item.pic}}*/}
-            {/*    />*/}
-            {/*  </TouchableOpacity>*/}
-            {/*  <TouchableOpacity*/}
-            {/*      onPress={() => this.props.navigation.navigate('PlantScreen', {*/}
-            {/*        item: item,*/}
-            {/*      })}*/}
-            {/*  >*/}
+                loadPlanters: this.props.navigation.getParam('loadPlanters'),
+                planterName: this.props.navigation.getParam('planterName'),
+              });
+            }}>
             <Text style={styles.partyText}>{item.name}</Text>
           </TouchableOpacity>
         </Card>

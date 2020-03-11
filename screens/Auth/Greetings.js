@@ -76,18 +76,20 @@ export default class Greetings extends AuthPiece {
         />
       </View>
     ) : (
+      <View />
       // <Text style={theme.greetingMessage}>{message}</Text>
-      <Text style={{backgroundColor: '#74faf9', color: 'white'}}>
-        {message}
-      </Text>
+      // <Text style={{backgroundColor: '#74faf9', color: 'white'}}>
+      //   {message}
+      // </Text>
     );
 
     // return content;
 
-    return (
-      <View width="100%" style={{backgroundColor: '#74faf9'}}>
-        <Text style={{alignSelf: 'center', color: 'black'}}>{message}</Text>
-      </View>
-    );
+    // return (
+    //   <View width="100%" style={{backgroundColor: '#74faf9'}}>
+    //     <Text style={{alignSelf: 'center', color: 'black'}}>{message}</Text>
+    //   </View>
+    // );
+    return <View />;
   }
 }

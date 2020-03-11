@@ -4,7 +4,7 @@ import Video from 'react-native-video';
 import {Icon, Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-import {Button, FAB} from 'react-native-paper';
+import {Button, Divider, FAB} from 'react-native-paper';
 //redusx
 import {connect} from 'react-redux';
 import {addPlace} from '../../actions/place';
@@ -88,11 +88,6 @@ class PlantScreen extends React.Component {
       .catch(error => {
         console.log('error ' + error);
       });
-
-    // await axios.get('https://i7maox5n5g.execute-api.eu-west-1.amazonaws.com/test').then(res => {
-    //   // this.dealWithUserData(res.data[0])
-    //   console.log(res);
-    // }).catch(error => console.log(error))
   }
 
   UNSAFE_componentWillMount(): void {
@@ -125,69 +120,80 @@ class PlantScreen extends React.Component {
           header={() => {
             return <Text style={styles.mainText}>{item.name}</Text>;
           }}
-          footer={() => {
-            return (
-              <View>
-                <Text style={styles.mainText}>Camera Controller</Text>
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: 16,
-                  }}>
-                  {this.props.navigation.getParam('item').description}
-                </Text>
-              </View>
-            );
-          }}>
-          <Text style={styles.mainText}>Live stream</Text>
-          <Video
-            source={{uri: this.state.URL}} // Can be a URL or a local file.
-            ref={ref => {
-              this.player = ref;
-            }} // Store reference
-            resizeMode="stretch"
-            controls={true}
-            onBuffer={this.onBuffer} // Callback when remote video is buffering
-            // onError={this.videoError}
-
-            // onBuffer={this.onBuffer}                // Callback when remote video is buffering
-            // onError={this.videoError}               // Callback when video cannot be loaded
-            style={styles.backgroundVideo}
-            minLoadRetryCount={10000}
-            paused={true}
+          // footer={() => {
+          //   return (
+          //     <View>
+          //       <Text style={styles.mainText}>Camera Controller</Text>
+          //       <Text
+          //         style={{
+          //           textAlign: 'center',
+          //           fontSize: 16,
+          //         }}>
+          //         {this.props.navigation.getParam('item').description}
+          //       </Text>
+          //     </View>
+          //   );
+          // }}
+        >
+          <Image
+            style={{height: 300}}
+            source={{uri: this.props.navigation.getParam('item').pic}}
           />
-          {this.loadBuffering()}
-          <Text style={styles.mainText}>Camera Controllers</Text>
-          <View
-            style={{
-              flexDirection: 'column',
-              justifyContent: 'center',
-              padding: 8,
-            }}>
-            <View
-              style={{
-                // flex:
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'space-between',
-                padding: 8,
-              }}>
-              <IconButton
-                icon="arrow-left"
-                color={plantyColor}
-                size={40}
-                onPress={() => console.log('Pressed left')}
-              />
-              <IconButton
-                icon="arrow-right"
-                color={plantyColor}
-                size={40}
-                onPress={() => console.log('Pressed right')}
-              />
-              {/*<Button>Left</Button>*/}
-              {/*<Button>Right</Button>*/}
-            </View>
-          </View>
+          <Text style={styles.mainText}>Description</Text>
+          <Text>{this.props.navigation.getParam('item').description}</Text>
+          <Divider />
+          <Text style={{marginTop: 10, fontWeight: 'bold'}}>
+            Appropriate soils:{' '}
+            {this.props.navigation.getParam('item').soil.type}
+          </Text>
+          {/*<Video*/}
+          {/*  source={{uri: this.state.URL}} // Can be a URL or a local file.*/}
+          {/*  ref={ref => {*/}
+          {/*    this.player = ref;*/}
+          {/*  }} // Store reference*/}
+          {/*  resizeMode="stretch"*/}
+          {/*  controls={true}*/}
+          {/*  onBuffer={this.onBuffer} // Callback when remote video is buffering*/}
+          {/*  // onError={this.videoError}*/}
+
+          {/*  // onBuffer={this.onBuffer}                // Callback when remote video is buffering*/}
+          {/*  // onError={this.videoError}               // Callback when video cannot be loaded*/}
+          {/*  style={styles.backgroundVideo}*/}
+          {/*  minLoadRetryCount={10000}*/}
+          {/*  paused={true}*/}
+          {/*/>*/}
+          {/*{this.loadBuffering()}*/}
+          {/*<Text style={styles.mainText}>Camera Controllers</Text>*/}
+          {/*<View*/}
+          {/*  style={{*/}
+          {/*    flexDirection: 'column',*/}
+          {/*    justifyContent: 'center',*/}
+          {/*    padding: 8,*/}
+          {/*  }}>*/}
+          {/*  <View*/}
+          {/*    style={{*/}
+          {/*      // flex:*/}
+          {/*      flexDirection: 'row',*/}
+          {/*      flexWrap: 'wrap',*/}
+          {/*      justifyContent: 'space-between',*/}
+          {/*      padding: 8,*/}
+          {/*    }}>*/}
+          {/*    <IconButton*/}
+          {/*      icon="arrow-left"*/}
+          {/*      color={plantyColor}*/}
+          {/*      size={40}*/}
+          {/*      onPress={() => console.log('Pressed left')}*/}
+          {/*    />*/}
+          {/*    <IconButton*/}
+          {/*      icon="arrow-right"*/}
+          {/*      color={plantyColor}*/}
+          {/*      size={40}*/}
+          {/*      onPress={() => console.log('Pressed right')}*/}
+          {/*    />*/}
+          {/*    /!*<Button>Left</Button>*!/*/}
+          {/*    /!*<Button>Right</Button>*!/*/}
+          {/*  </View>*/}
+          {/*</View>*/}
         </Card>
       </View>
     );

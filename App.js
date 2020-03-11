@@ -52,6 +52,7 @@ import {
 } from './screens/Auth';
 import {Image} from 'react-native';
 import AdjustPlantConditions from './screens/User/AdjustPlantConditions';
+import addPlanterScreen from './screens/User/addPlanterScreen';
 
 const store = createStore(Reducer);
 
@@ -106,6 +107,13 @@ const AppNavigator = createStackNavigator(
         gesturesEnabled: true,
       },
     },
+    addPlanterScreen: {
+      name: 'Add Planter Screen',
+      screen: addPlanterScreen,
+      navigationOptions: {
+        gesturesEnabled: true,
+      },
+    },
 
     // Login,
     // Register,
@@ -145,7 +153,7 @@ class App extends React.Component {
     await Auth.signOut()
       .then(data => console.log(data))
       .catch(err => console.log(err));
-    this.rerender();
+    // this.rerender();
   };
 
   render() {
