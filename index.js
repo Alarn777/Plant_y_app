@@ -34,9 +34,9 @@ const theme = {
 export default function Main() {
   return (
     <PaperProvider theme={theme}>
-      <SafeAreaProvider>
-        <App />
-      </SafeAreaProvider>
+      {/*<SafeAreaProvider>*/}
+      <App />
+      {/*</SafeAreaProvider>*/}
     </PaperProvider>
   );
 }

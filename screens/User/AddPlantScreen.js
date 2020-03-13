@@ -75,9 +75,9 @@ class AddPlantScreen extends React.Component {
           username: this.props.plantyData.myCognitoUser.username,
           plantName: this.state.plant.name,
           planterName: this.state.planterName,
-          plantDescription: this.state.plant.description,
-          plantGrowthPlanGroup: this.state.plant.growthPlanGroup,
-          plantSoil: this.state.plant.soil,
+          // plantDescription: this.state.plant.description,
+          // plantGrowthPlanGroup: this.state.plant.growthPlanGroup,
+          // plantSoil: this.state.plant.soil,
         },
 
         {
@@ -106,7 +106,7 @@ class AddPlantScreen extends React.Component {
       addingPlantText: 'Added',
       addingPlantDisabled: true,
     });
-    setTimeout(this.goBack, 3);
+    setTimeout(this.goBack, 1200);
 
     // this.props.navigation.getParam('loadPlanters')();
   };

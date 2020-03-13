@@ -5,14 +5,14 @@ import {
   FlatList,
   ScrollView,
   Dimensions,
+  StyleSheet,
   TouchableOpacity,
 } from 'react-native';
 import {Auth} from 'aws-amplify';
 
 import PropTypes from 'prop-types';
-import {StyleSheet} from 'react-native';
 import {Icon, Text, Card, Button} from '@ui-kitten/components';
-import {FAB} from 'react-native-paper';
+import {ActivityIndicator, FAB} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
 // import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -34,6 +34,7 @@ import AmplifyTheme from '../AmplifyTheme';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import {HeaderBackButton} from 'react-navigation-stack';
+const plantyColor = '#6f9e04';
 
 class AllAvailablePlants extends React.Component {
   constructor(props) {
@@ -43,10 +44,11 @@ class AllAvailablePlants extends React.Component {
       userLoggedIn: true,
       userEmail: '',
       userName: '',
-      width: 0,
-      height: 0,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height,
       plants: [],
       parties: [],
+      loading: false,
       change: false,
       user: null,
       USER_TOKEN: this.props.navigation.getParam('user_token'),
@@ -66,7 +68,8 @@ class AllAvailablePlants extends React.Component {
 
   dealWithPlantsData = plants => {
     // console.log(plants.Items);
-    this.setState({plants: plants.Items});
+    // this.setState({loading: false});
+    this.setState({loading: false, plants: plants.Items});
     // plants.Items.map(plant => this.state.plants.push(plant))
     //   // this.setState({plants})
     // this.setState({change:false})
@@ -84,7 +87,7 @@ class AllAvailablePlants extends React.Component {
 
   async loadPlants() {
     let USER_TOKEN = '';
-
+    this.setState({loading: true});
     USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
 
     this.state.USER_TOKEN = USER_TOKEN;
@@ -132,8 +135,6 @@ class AllAvailablePlants extends React.Component {
         });
       }
     } else this.setState({userName: 'Guest'});
-
-    console.log(this.state);
 
     this.loadPlants()
       .then()
@@ -215,6 +216,19 @@ class AllAvailablePlants extends React.Component {
   };
 
   render() {
+    if (this.state.loading) {
+      return (
+        // <View>
+        <ActivityIndicator
+          // style={{flex: 1}}
+          size="large"
+          color={plantyColor}
+          style={{top: this.state.height / 2 - 50}}
+        />
+        // </View>
+      );
+    }
+
     let height = this.state.height;
     return (
       <View style={styles.container} onLayout={this.onLayout}>

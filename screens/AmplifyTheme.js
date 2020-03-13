@@ -105,7 +105,7 @@ export default StyleSheet.create({
     marginBottom: 22,
   },
   input: {
-    // color: plantyColor,
+    color: plantyColor,
     padding: 16,
     borderWidth: 1,
     borderRadius: 3,

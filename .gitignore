@@ -61,3 +61,4 @@ aws-exports.js
 
 # CocoaPods
 /ios/Pods/
+image_fetching.js

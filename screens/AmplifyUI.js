@@ -140,7 +140,8 @@ export const ErrorRow = props => {
   const theme = props.theme || AmplifyTheme;
   if (!props.children) return null;
   return (
-    <View style={theme.errorRow}>
+    <View
+      style={{flexDirection: 'row', justifyContent: 'center', width: '99%'}}>
       <Icon name="warning" color={errorIconColor} />
       <Text style={{margin: 3, color: 'red'}}>{props.children}</Text>
     </View>

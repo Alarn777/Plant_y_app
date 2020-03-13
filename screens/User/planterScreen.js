@@ -55,8 +55,10 @@ class planterScreen extends React.Component {
       userLoggedIn: true,
       userEmail: '',
       username: '',
-      width: 0,
-      height: 0,
+      // width: 0,
+      // height: 0,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height,
       // plants: this.props.navigation.getParam('item').plants,
       plants: [],
       planter: this.props.navigation.getParam('item'),
@@ -257,7 +259,8 @@ class planterScreen extends React.Component {
               </TouchableOpacity>
             );
           }}
-          style={{width: this.state.width / 3 - 5}}
+          // style={{width: this.state.width / 3 - 5, margin: 1}}
+          style={{width: this.state.width / 3, padding: 3}}
           index={item.id}
           key={item.id}>
           <TouchableOpacity
@@ -314,9 +317,14 @@ class planterScreen extends React.Component {
   render() {
     if (this.state.loading) {
       return (
-        <View>
-          <Spinner style={{flex: 1}} status="basic" />
-        </View>
+        // <View>
+        <ActivityIndicator
+          // style={{flex: 1}}
+          size="large"
+          color={plantyColor}
+          style={{top: this.state.height / 2 - 50}}
+        />
+        // </View>
       );
     }
 
@@ -403,7 +411,7 @@ class planterScreen extends React.Component {
               vertical={true}
               scrollEnabled={false}
               numColumns={3}
-              style={{width: this.state.width, margin: 5}}
+              // style={{width: this.state.width, margin: 5}}
               data={this.state.plants}
               keyExtractor={this._keyExtractor}
               renderItem={this._renderItem}
@@ -575,7 +583,9 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     flex: 1,
+    // margin: 10,
     height: 100,
+    // width: 100,
   },
   backgroundVideo: {
     // position: 'absolute',

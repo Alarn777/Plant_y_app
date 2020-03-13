@@ -176,7 +176,7 @@ class addPlanterScreen extends React.Component {
       return <View />;
     } else {
       return (
-        <Text style={{color: 'red'}}>
+        <Text style={{color: 'red', margin: 10}}>
           Name must have only numbers and Letters
         </Text>
       );
@@ -195,10 +195,12 @@ class addPlanterScreen extends React.Component {
             // subtitle="Card Subtitle"
           />
           <PaperCard.Content>
-            {/*<Text style={styles.simpleText}>Name</Text>*/}
+            <Text style={styles.simpleText}>Name</Text>
             <TextInput
+              style={styles.textInput}
               disabled={allActionsDisabled}
               label="Name"
+              mode={'outlined'}
               value={this.state.planterName}
               error={this.state.nameError}
               onChangeText={text => {
@@ -206,9 +208,11 @@ class addPlanterScreen extends React.Component {
               }}
             />
             {this.renderErrorMsg()}
-            {/*<Text style={styles.simpleText}>Description</Text>*/}
-            <Text style={styles.simpleText} />
+            <Text style={styles.simpleText}>Description</Text>
+            {/*<Text style={styles.simpleText} />*/}
             <TextInput
+              style={styles.textInput}
+              mode={'outlined'}
               disabled={allActionsDisabled}
               label="Description"
               value={this.state.planterDescription}
@@ -222,6 +226,7 @@ class addPlanterScreen extends React.Component {
                   // backgroundColor: 'black',
                   borderRadius: 4,
                   borderWidth: 0.5,
+                  margin: 10,
                   borderColor: plantyColor,
                 }}
                 data={data}
@@ -258,15 +263,19 @@ const styles = StyleSheet.create({
     minHeight: 228,
   },
   simpleText: {
-    margin: 5,
+    margin: 10,
   },
   select: {
-    margin: 8,
+    margin: 10,
   },
   controlContainer: {
     borderRadius: 4,
-    margin: 8,
+    // margin: 8,
     // backgroundColor: '#3366FF',
+  },
+  textInput: {
+    borderRadius: 4,
+    margin: 10,
   },
 });
 

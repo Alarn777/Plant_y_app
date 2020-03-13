@@ -17,8 +17,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ImageBackground,
+  StatusBar,
   Image,
 } from 'react-native';
+StatusBar.setBarStyle('light-content', true);
 import {Auth, I18n, Logger, JS} from 'aws-amplify';
 import AuthPiece from './AuthPiece';
 import {
@@ -29,7 +31,7 @@ import {
   ErrorRow,
 } from '../AmplifyUI';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import SafeAreaView from 'react-native-safe-area-view';
+// import SafeAreaView from 'react-native-safe-area-view';
 import SocketIOClient from 'socket.io-client';
 
 import {Button, TextInput} from 'react-native-paper';
@@ -111,7 +113,10 @@ class SignIn extends AuthPiece {
 
   showComponent(theme) {
     return (
-      <SafeAreaView style={{flex: 1}}>
+      <View>
+        <StatusBar translucent barStyle="dark-content" />
+
+        {/*<SafeAreaView style={{flex: 0, color: 'gray', backgroundColor: 'red'}}>*/}
         <KeyboardAwareScrollView
           extraScrollHeight={30}
           contentContainerStyle={{
@@ -121,85 +126,86 @@ class SignIn extends AuthPiece {
             height: '100%',
             width: '100%',
           }}>
-          <SafeAreaView style={{flex: 1}}>
-            <ImageBackground
-              source={require('../../assets/iphone11Wallpaper.jpg')}
-              style={{width: '100%', height: '100%'}}>
-              <View style={theme.section}>
-                <Image
-                  // resizeMode="contain"
-                  resizeMode="stretch"
-                  style={{
-                    alignSelf: 'center',
-                    flex: 1,
-                    height: 40,
-                    width: 340,
-                    marginBottom: 20,
-                  }}
-                  source={require('../../assets/logo.png')}
-                />
-                {/*<Header theme={theme}>{I18n.get("Welcome to Plant'y")}</Header>*/}
+          {/*<SafeAreaView style={{flex: 1}}>*/}
+          <ImageBackground
+            source={require('../../assets/iphone11Wallpaper.jpg')}
+            style={{width: '100%', height: '100%'}}>
+            <View style={theme.section}>
+              <Image
+                // resizeMode="contain"
+                resizeMode="stretch"
+                style={{
+                  alignSelf: 'center',
+                  flex: 1,
+                  height: 40,
+                  width: 340,
+                  marginBottom: 20,
+                }}
+                source={require('../../assets/logo.png')}
+              />
+              {/*<Header theme={theme}>{I18n.get("Welcome to Plant'y")}</Header>*/}
 
-                <View style={theme.sectionBody}>
-                  {/*{this.renderUsernameField(theme)}*/}
-                  <FormField
-                    // theme={theme}
-                    onChangeText={text => this.setState({username: text})}
-                    label={I18n.get('Username')}
-                    placeholder={I18n.get('Enter your username')}
-                    secureTextEntry={false}
-                    required={true}
-                  />
-                  <FormField
-                    // theme={theme}
-                    onChangeText={text => this.setState({password: text})}
-                    label={I18n.get('Password')}
-                    placeholder={I18n.get('Enter your password')}
-                    secureTextEntry={true}
-                    required={true}
-                  />
-                  {/*<AmplifyButton*/}
-                  {/*  text={I18n.get('Sign In').toUpperCase()}*/}
-                  {/*  // theme={theme}*/}
-                  {/*  onPress={this.signIn}*/}
-                  {/*  disabled={!this.getUsernameFromInput() && this.state.password}*/}
-                  {/*/>*/}
-                  <Button
-                    // icon={this.state.addingPlanticon}
-                    // style={{margin: 10}}
-                    loading={this.state.loginigIn}
-                    disabled={
-                      !this.getUsernameFromInput() ||
-                      // !this.state.username ||
-                      !this.state.password
-                    }
-                    mode="contained"
-                    style={{padding: 10}}
-                    backgroundColor="#6f9e04"
-                    color="#6f9e04"
-                    onPress={this.signIn}>
-                    {I18n.get('Sign In').toUpperCase()}
-                  </Button>
-                </View>
-                <View style={theme.sectionFooter}>
-                  <LinkCell
-                    // theme={theme}
-                    style={{with: '100%'}}
-                    onPress={() => this.changeState('forgotPassword')}>
-                    {I18n.get('Forgot Password')}
-                  </LinkCell>
-                  <LinkCell
-                    theme={theme}
-                    onPress={() => this.changeState('signUp')}>
-                    {I18n.get('Sign Up')}
-                  </LinkCell>
-                </View>
-                <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
+              <View style={theme.sectionBody}>
+                {/*{this.renderUsernameField(theme)}*/}
+                <FormField
+                  // theme={theme}
+                  onChangeText={text => this.setState({username: text})}
+                  label={I18n.get('Username')}
+                  placeholder={I18n.get('Enter your username')}
+                  secureTextEntry={false}
+                  required={true}
+                />
+                <FormField
+                  // theme={theme}
+                  onChangeText={text => this.setState({password: text})}
+                  label={I18n.get('Password')}
+                  placeholder={I18n.get('Enter your password')}
+                  secureTextEntry={true}
+                  required={true}
+                />
+                {/*<AmplifyButton*/}
+                {/*  text={I18n.get('Sign In').toUpperCase()}*/}
+                {/*  // theme={theme}*/}
+                {/*  onPress={this.signIn}*/}
+                {/*  disabled={!this.getUsernameFromInput() && this.state.password}*/}
+                {/*/>*/}
+                <Button
+                  // icon={this.state.addingPlanticon}
+                  // style={{margin: 10}}
+                  loading={this.state.loginigIn}
+                  disabled={
+                    !this.getUsernameFromInput() ||
+                    // !this.state.username ||
+                    !this.state.password
+                  }
+                  mode="contained"
+                  style={{padding: 10}}
+                  backgroundColor="#6f9e04"
+                  color="#6f9e04"
+                  onPress={this.signIn}>
+                  {I18n.get('Sign In').toUpperCase()}
+                </Button>
               </View>
-            </ImageBackground>
-          </SafeAreaView>
+              <View style={theme.sectionFooter}>
+                <LinkCell
+                  // theme={theme}
+                  style={{with: '100%'}}
+                  onPress={() => this.changeState('forgotPassword')}>
+                  {I18n.get('Forgot Password')}
+                </LinkCell>
+                <LinkCell
+                  theme={theme}
+                  onPress={() => this.changeState('signUp')}>
+                  {I18n.get('Sign Up')}
+                </LinkCell>
+              </View>
+              <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
+            </View>
+          </ImageBackground>
+          {/*</SafeAreaView>*/}
         </KeyboardAwareScrollView>
-      </SafeAreaView>
+        {/*/ </SafeAreaView>*/}
+      </View>
     );
   }
 }

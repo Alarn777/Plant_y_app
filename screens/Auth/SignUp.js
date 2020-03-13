@@ -15,10 +15,9 @@ import React from 'react';
 import {
   View,
   Text,
-  TextInput,
-  Button,
   TouchableWithoutFeedback,
   Keyboard,
+  TextInput,
   Picker,
   ScrollView,
   ImageBackground,
@@ -34,6 +33,7 @@ import {
 } from '../AmplifyUI';
 import AuthPiece from './AuthPiece';
 import countryDialCodes from '../CountryDialCodes';
+import {Button} from 'react-native-paper';
 import signUpWithUsernameFields, {
   signUpWithEmailFields,
   signUpWithPhoneNumberFields,
@@ -277,18 +277,35 @@ export default class SignUp extends AuthPiece {
                 // 	/>
                 // );
               })}
-              <AmplifyButton
-                text={I18n.get('Sign Up').toUpperCase()}
-                // theme={theme}
-                style={() => {
-                  if (!(this.state.username && this.state.password))
-                    return {color: '#6f9e04'};
-                  else return {color: '#93a272'};
-                }}
-                onPress={this.signUp}
-                // disabled={!this.isValid}
-                disabled={!(this.state.username && this.state.password)}
-              />
+              <Button
+                // icon={this.state.addingPlanticon}
+                // style={{margin: 10}}
+                loading={this.state.loginigIn}
+                disabled={
+                  !this.state.username ||
+                  !this.state.email ||
+                  !this.state.password
+                }
+                mode="contained"
+                style={{padding: 10}}
+                backgroundColor="#6f9e04"
+                color="#6f9e04"
+                onPress={this.signUp}>
+                {I18n.get('Sign Up').toUpperCase()}
+              </Button>
+
+              {/*<AmplifyButton*/}
+              {/*  text={I18n.get('Sign Up').toUpperCase()}*/}
+              {/*  // theme={theme}*/}
+              {/*  style={() => {*/}
+              {/*    if (!(this.state.username && this.state.password))*/}
+              {/*      return {color: '#6f9e04'};*/}
+              {/*    else return {color: '#93a272'};*/}
+              {/*  }}*/}
+              {/*  onPress={this.signUp}*/}
+              {/*  // disabled={!this.isValid}*/}
+              {/*  disabled={!(this.state.username && this.state.password)}*/}
+              {/*/>*/}
             </View>
             <View style={theme.sectionFooter}>
               <LinkCell

@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {Auth} from 'aws-amplify';
 
@@ -42,6 +43,16 @@ import {bindActionCreators} from 'redux';
 import SocketIOClient from 'socket.io-client';
 // import {idPattern} from 'react-native-svg/\lib/typescript/lib/util';
 
+// import Amplify from 'aws-amplify';
+import Amplify, {Storage} from 'aws-amplify-react-native';
+
+// import AWS from 'aws-sdk-react-native';
+// const credentials = new AWS.Crendentials({
+//   accessKeyId: 'AKIAUVUXKW347CV4UK4P',
+//   secretAccessKey: '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',
+// });
+// const s3 = new AWS.S3({credentials, signatureVersion: 'v4', region: ''});
+
 const plantyColor = '#6f9e04';
 
 class MainScreen extends React.Component {
@@ -56,6 +67,7 @@ class MainScreen extends React.Component {
       height: 0,
       plants: [],
       parties: [],
+      // logOut: this.props.navigation.getParam('logOut'),
       places: null,
       change: false,
       user: null,
@@ -86,19 +98,19 @@ class MainScreen extends React.Component {
         textAlign: 'center',
         alignSelf: 'center',
       },
-      headerRight: () => (
-        <Button
-          onPress={navigation.getParam('logOut')}
-          title="Info"
-          // color="#fff"
-          appearance="ghost"
-          style={{color: plantyColor}}
-          icon={style => {
-            return <Icon {...style} name="log-out-outline" />;
-          }}
-          status="basic"
-        />
-      ),
+      // headerRight: () => (
+      //   <Button
+      //     onPress={navigation.getParam('logOut')}
+      //     title="Info"
+      //     // color="#fff"
+      //     appearance="ghost"
+      //     style={{color: plantyColor}}
+      //     icon={style => {
+      //       return <Icon {...style} name="log-out-outline" />;
+      //     }}
+      //     status="basic"
+      //   />
+      // ),
     };
   };
 
@@ -126,7 +138,7 @@ class MainScreen extends React.Component {
   }
 
   async loadPlanters() {
-    console.log('called reload plants');
+    // console.log('called reload plants');
 
     let USER_TOKEN = '';
 
@@ -145,7 +157,7 @@ class MainScreen extends React.Component {
         },
       )
       .then(response => {
-        console.log(response.data);
+        // console.log(response.data);
         this.dealWithPlantsData(response.data);
       })
       .catch(error => {
@@ -159,7 +171,31 @@ class MainScreen extends React.Component {
     snapshot: SS,
   ): void {}
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
+    // Storage.configure({level: 'private'});
+    // Storage.get('aaa');
+
+    // let AWS = require('aws-sdk');
+    // let s3 = new AWS.S3({
+    //   accessKeyId: Consts.accessKeyId,
+    //   secretAccessKey: Consts.secretAccessKey,
+    //   region: 'eu',
+    // });
+    //
+    // let params = {
+    //   Bucket: 'pictures-bucket-planty',
+    //   Key: 'aaa.jpg',
+    //   Expires: 60,
+    //   ResponseContentType: 'image/jpeg',
+    // };
+    // s3.getSignedUrl('getObject', params, function(err, url) {
+    //   if (err) {
+    //     console.log(err);
+    //     return;
+    //   }
+    //   console.log('Your generated pre-signed URL is', url);
+    // });
+
     this.fetchUser()
       .then(() => {
         this.props.navigation.setParams({logOut: this.logOut});
@@ -208,13 +244,19 @@ class MainScreen extends React.Component {
     this.props.addUser(user);
 
     // this.props.fetchAllPosts(user);
+
+    // console.log(this.props);
   }
 
   logOut = () => {
+    // console.log('log out in main');
+    // this.props.onStateChange('signedOut');
+
     // const { onStateChange } = this.props;
     Auth.signOut()
       .then(() => {
         this.props.onStateChange('signedOut');
+        this.props.navigation.goBack();
         // onStateChange('signedOut');
       })
       .catch(e => console.log(e));
@@ -249,12 +291,13 @@ class MainScreen extends React.Component {
                 }>
                 <Image
                   style={styles.headerImage}
-                  source={require('../../assets/pot.png')}
+                  source={require('../../assets/greenhouse.png')}
                 />
               </TouchableOpacity>
             );
           }}
-          style={{width: this.state.width / 3 - 5}}
+          style={{width: this.state.width / 3 - 5, margin: 1}}
+          // style={{width: '100%'}}
           index={item.UUID}
           key={item.UUID}>
           <TouchableOpacity
@@ -277,11 +320,13 @@ class MainScreen extends React.Component {
     // if (this.state.plants.length > 0) {
     return (
       <View style={styles.container} onLayout={this.onLayout}>
+        <StatusBar translucent barStyle="dark-content" />
         <PaperCard>
           <TouchableOpacity
             onPress={() =>
               this.props.navigation.navigate('UserPage', {
                 user: this.state.user,
+                logOut: this.logOut,
               })
             }>
             <PaperCard.Title
@@ -300,10 +345,7 @@ class MainScreen extends React.Component {
           <PaperCard.Cover
             source={require('../../assets/background_image.jpeg')}
           />
-          <PaperCard.Actions>
-            {/*<Button>Cancel</Button>*/}
-            {/*<Button>Ok</Button>*/}
-          </PaperCard.Actions>
+          <PaperCard.Actions />
         </PaperCard>
         <View style={styles.header}>
           <Text style={styles.headerText}>My garden</Text>
@@ -313,7 +355,7 @@ class MainScreen extends React.Component {
             vertical={true}
             scrollEnabled={false}
             numColumns={3}
-            style={{width: this.state.width, margin: 5}}
+            // style={{width: this.state.width, margin: 5}}
             data={this.state.plants}
             keyExtractor={this._keyExtractor}
             renderItem={this._renderItem}
@@ -508,5 +550,13 @@ const styles = StyleSheet.create({
     margin: 5,
     alignSelf: 'center',
     height: 100,
+  },
+  parent: {
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+  },
+  child: {
+    flexBasis: '33%',
   },
 });
