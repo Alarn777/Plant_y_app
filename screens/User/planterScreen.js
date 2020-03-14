@@ -124,14 +124,14 @@ class planterScreen extends React.Component {
   }
 
   UNSAFE_componentWillMount(): void {
-    console.log('componentWillMount');
+    // console.log('componentWillMount');
     this.loadUrl()
       .then()
       .catch();
   }
 
   componentDidMount(): void {
-    console.log('componentDidMount');
+    // console.log('componentDidMount');
     // console.log(
     //   this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
     // );
@@ -168,7 +168,7 @@ class planterScreen extends React.Component {
 
   //maybe post is needed (this.props.navigation.getParam('item').stream)
   async loadUrl() {
-    console.log('loadstreamUrl');
+    // console.log('loadstreamUrl');
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -383,13 +383,13 @@ class planterScreen extends React.Component {
                   icon="arrow-left"
                   color={plantyColor}
                   size={40}
-                  onPress={() => console.log('Pressed camera')}
+                  onPress={() => console.log('Pressed left')}
                 />
                 <IconButton
                   icon="camera"
                   color={plantyColor}
                   size={40}
-                  onPress={() => console.log('Pressed left')}
+                  onPress={() => console.log('Pressed camera')}
                 />
                 <IconButton
                   icon="arrow-right"

@@ -27,6 +27,8 @@ import ImagePicker from 'react-native-image-picker';
 // import RNFetchBlob from 'react-native-fetch-blob';
 import {Storage} from 'aws-amplify';
 import Consts from '../../ENV_VARS';
+import {Notifications} from 'react-native-notifications';
+import Amplify, {Analytics} from 'aws-amplify';
 
 const plantyColor = '#6f9e04';
 
@@ -40,6 +42,83 @@ class UserPage extends React.Component {
     };
     // this.dealWithData = this.dealWithData.bind(this);
     // this.fetchUser = this.fetchUser.bind(this);
+    // Notifications.registerRemoteNotifications();
+    //
+    // Notifications.events().registerNotificationReceivedForeground(
+    //   (notification: Notification, completion) => {
+    //     console.log(
+    //       `Notification received in foreground: ${notification.title} : ${
+    //         notification.body
+    //       }`,
+    //     );
+    //     completion({alert: false, sound: false, badge: false});
+    //   },
+    // );
+    //
+    // Notifications.events().registerNotificationOpened(
+    //   (notification: Notification, completion) => {
+    //     console.log(`Notification opened: ${notification.payload}`);
+    //     completion();
+    //   },
+    // );
+
+    // const amplifyConfig = {
+    //   Auth: {
+    //     identityPoolId: 'COGNITO_IDENTITY_POOL_ID',
+    //     region: 'eu-west-1',
+    //   },
+    // };
+    // //Initialize Amplify
+    // Auth.configure(amplifyConfig);
+
+    // const analyticsConfig = {
+    //   AWSPinpoint: {
+    //     // Amazon Pinpoint App Client ID
+    //     // appId: '1093d25f5b254aa8a0f65ea0f21d814f',
+    //     appId: 'db51ad32869d40dea43e82099124bca2',
+    //     // Amazon service region
+    //     region: 'us-east-1',
+    //     mandatorySignIn: false,
+    //   },
+    // };
+    // Analytics.configure(analyticsConfig);
+
+    Analytics.record({name: 'albumVisit'})
+      .then(r => console.log(r))
+      .catch(error => console.log(error));
+
+    Analytics.record({name: 'delete', attributes: 'aaaa'})
+      .then(r => console.log(r))
+      .catch(error => console.log(error));
+    // Analytics.updateEndpoint({
+    //   attributes: {
+    //     interests: ['science', 'politics', 'travel'],
+    //     //..
+    //   },
+    //   // userId: 'UserIdValue',
+    //   UserAttributes: [
+    //     ['email', 'family_name', 'phone_number'],
+    //     // {
+    //     //   Name: 'email' /* required */,
+    //     //   Value: 'emailaddress',
+    //     // },
+    //     // {
+    //     //   Name: 'family_name',
+    //     //   Value: 'familyname',
+    //     // },
+    //     // {
+    //     //   Name: 'given_name',
+    //     //   Value: 'givenname',
+    //     // },
+    //     // {
+    //     //   Name: 'phone_number',
+    //     //   Value: '+19999999999',
+    //     // },
+    //     /* more attributed if needed */
+    //   ],
+    // })
+    //   .then(r => console.log(r))
+    //   .catch(error => console.log(error));
   }
   componentDidMount(): void {
     let a = this.props.navigation.getParam('logOut');
@@ -146,7 +225,6 @@ class UserPage extends React.Component {
   };
 
   render() {
-    console.log(this.state);
     return (
       <View>
         <Card>
@@ -304,6 +382,19 @@ class UserPage extends React.Component {
           {/*  Log Out*/}
           {/*</Button>*/}
         </Card>
+        <Button
+          // icon="logout"
+          mode="outlined"
+          onPress={() => {
+            console.log('pressed waba');
+            Analytics.record('FIRST-EVENT-NAME')
+              .then(r => console.log(r))
+              .catch(error => console.log(error));
+          }}
+          // this.props.navigation.getParam('logOut')}>
+        >
+          waba laba dub dub
+        </Button>
       </View>
     );
   }
