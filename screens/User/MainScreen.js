@@ -38,13 +38,20 @@ import {
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import connect from 'react-redux/lib/connect/connect';
-import {addSocket, addUser, fetchAllPosts} from '../../FriendActions';
+import {
+  AddAvatarLink,
+  addSocket,
+  addUser,
+  addImage,
+  fetchAllPosts,
+} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import SocketIOClient from 'socket.io-client';
 // import {idPattern} from 'react-native-svg/\lib/typescript/lib/util';
 
 // import Amplify from 'aws-amplify';
-import Amplify, {Storage} from 'aws-amplify-react-native';
+// import Amplify, {Storage} from 'aws-amplify-react-native';
+import Amplify, {Storage} from 'aws-amplify';
 
 // import AWS from 'aws-sdk-react-native';
 // const credentials = new AWS.Crendentials({
@@ -74,6 +81,7 @@ class MainScreen extends React.Component {
       USER_TOKEN: '',
       userAvatar: '',
       myCognitoUser: null,
+      url: '',
     };
     this.loadPlanters = this.loadPlanters.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -112,6 +120,28 @@ class MainScreen extends React.Component {
       //   />
       // ),
     };
+  };
+
+  preloadImages = () => {
+    let allImages = ['mint', 'potato', 'sunflower', 'tomato', 'cucumber'];
+
+    allImages.map(oneImage => {
+      Storage.get(oneImage + '_img.jpg', {
+        level: 'public',
+        type: 'image/png',
+      })
+        .then(data => {
+          // console.log(data);
+
+          this.props.addImage({name: oneImage, URL: data});
+          // this.setState({url: data});
+          // this.props.AddAvatarLink(data);
+          // this.setState({buttonMode: 'pick'});
+        })
+        .catch(error => console.log(error));
+    });
+
+    console.log('didmount');
   };
 
   dealWithData = user => {
@@ -172,30 +202,6 @@ class MainScreen extends React.Component {
   ): void {}
 
   UNSAFE_componentWillMount() {
-    // Storage.configure({level: 'private'});
-    // Storage.get('aaa');
-
-    // let AWS = require('aws-sdk');
-    // let s3 = new AWS.S3({
-    //   accessKeyId: Consts.accessKeyId,
-    //   secretAccessKey: Consts.secretAccessKey,
-    //   region: 'eu',
-    // });
-    //
-    // let params = {
-    //   Bucket: 'pictures-bucket-planty',
-    //   Key: 'aaa.jpg',
-    //   Expires: 60,
-    //   ResponseContentType: 'image/jpeg',
-    // };
-    // s3.getSignedUrl('getObject', params, function(err, url) {
-    //   if (err) {
-    //     console.log(err);
-    //     return;
-    //   }
-    //   console.log('Your generated pre-signed URL is', url);
-    // });
-
     this.fetchUser()
       .then(() => {
         this.props.navigation.setParams({logOut: this.logOut});
@@ -210,20 +216,6 @@ class MainScreen extends React.Component {
   }
 
   componentDidMount(): void {
-    // try {
-    //   this.socket = SocketIOClient(Consts.host);
-    // } catch (e) {}
-    // if (this.socket) {
-    //   this.props.addSocket(this.socket);
-    // }
-
-    // this.props.plantyData.socket[0].on('changedStatus', () => {
-    //   // this.props.reloadEvents()
-    //   this.loadPlanters()
-    //     .then(r => console.log(r))
-    //     .catch(e => console.log(e));
-    // });
-
     const {authState, authData} = this.props;
     const user = authData;
     if (user) {
@@ -243,9 +235,26 @@ class MainScreen extends React.Component {
 
     this.props.addUser(user);
 
+    let userAvatarKey = user.username + '_avatar.jpg';
+
+    Storage.get(userAvatarKey, {
+      level: 'public',
+      type: 'image/jpg',
+      // bucket: 'plant-pictures-planty',
+      // region: 'eu',
+    })
+      .then(data => {
+        // console.log(data);
+        this.props.AddAvatarLink(data);
+        // this.setState({url: data});
+      })
+      .catch(error => console.log(error));
+
     // this.props.fetchAllPosts(user);
 
-    // console.log(this.props);
+    // console.log(this.props.plantyData);
+
+    this.preloadImages();
   }
 
   logOut = () => {
@@ -316,7 +325,9 @@ class MainScreen extends React.Component {
   };
 
   render() {
-    let height = this.state.height;
+    // let height = this.state.height;
+    // console.log(this.state.url);
+    // console.log(this.props.plantyData);
     // if (this.state.plants.length > 0) {
     return (
       <View style={styles.container} onLayout={this.onLayout}>
@@ -333,10 +344,16 @@ class MainScreen extends React.Component {
               title={'Welcome home,' + this.state.username}
               // subtitle="Card Subtitle"
               left={props => (
-                <Avatar.Icon
+                // <Avatar.Icon
+                //   {...props}
+                //   style={{backgroundColor: plantyColor}}
+                //   icon="account"
+                // />
+                <Avatar.Image
+                  // style={{alignSelf: 'center', backgroundColor: 'lightgray'}}
                   {...props}
-                  style={{backgroundColor: plantyColor}}
-                  icon="account"
+                  // size={200}
+                  source={{uri: this.props.plantyData.avatarUrl}}
                 />
               )}
             />
@@ -487,6 +504,8 @@ const mapDispatchToProps = dispatch =>
       addUser,
       // fetchAllPosts,
       // addSocket,
+      addImage,
+      AddAvatarLink,
     },
     dispatch,
   );

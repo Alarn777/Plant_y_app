@@ -9,19 +9,15 @@ const INITIAL_STATE = {
   // cleaners: [],
   plantyData: [],
   // events: [],
-  socket: [],
-  myCognitoUser: {},
-  planters: [],
+  // socket: [],
+  // myCognitoUser: {},
+  // planters: [],
 };
 
 const cleanerReducer = (state = INITIAL_STATE, action) => {
-  const {myCognitoUser, planters, socket} = state;
+  const {myCognitoUser, avatarUrl, plantsImages} = state;
 
   switch (action.type) {
-    case 'ADD_SOCKET':
-      socket.push(action.payload);
-      return {myCognitoUser, planters, socket};
-
     // case 'RELOAD_EVENTS':
     //   return {events: [], favorite_cleaners, socket};
     //
@@ -55,15 +51,30 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     //
     //   return {events, favorite_cleaners, socket};
     //
-    // case 'ADD_CLEANER':
-    //   if (
-    //     favorite_cleaners.indexOf(c => {
-    //       return c._id === action.payload._id;
-    //     }) < 0
-    //   ) {
-    //     favorite_cleaners.push(action.payload);
-    //   }
-    //   return {events, favorite_cleaners, socket};
+
+    case 'ADD_IMAGE':
+      let newArr = [];
+      if (!plantsImages) {
+        newArr = [];
+      } else {
+        newArr = plantsImages;
+      }
+
+      if (
+        newArr.indexOf(c => {
+          return c.name === action.payload.name;
+        }) < 0
+      ) {
+        newArr.push(action.payload);
+      }
+      return {
+        // events: [],
+        // favorite_cleaners: [],
+        // socket: [],
+        plantsImages: newArr,
+        avatarUrl: avatarUrl,
+        myCognitoUser: myCognitoUser,
+      };
     //
     // case 'RELOAD_CLEANERS':
     //   return {events, favorite_cleaners: [], socket};
@@ -85,7 +96,19 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         // events: [],
         // favorite_cleaners: [],
         // socket: [],
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
         myCognitoUser: action.payload,
+      };
+
+    case 'ADD_AVATAR_LINK':
+      return {
+        // events: [],
+        // favorite_cleaners: [],
+        // socket: [],
+        plantsImages: plantsImages,
+        avatarUrl: action.payload,
+        myCognitoUser: myCognitoUser,
       };
 
     case 'FETCH_POST':

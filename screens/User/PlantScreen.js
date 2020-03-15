@@ -7,7 +7,6 @@ import Consts from '../../ENV_VARS';
 import {Button, Divider, FAB} from 'react-native-paper';
 //redusx
 import {connect} from 'react-redux';
-import {addPlace} from '../../actions/place';
 import {HeaderBackButton} from 'react-navigation-stack';
 import {IconButton} from 'react-native-paper';
 
@@ -109,7 +108,6 @@ class PlantScreen extends React.Component {
   };
 
   render() {
-    console.log(this.state.URL);
     const {navigation} = this.props;
     let item = navigation.getParam('item');
 

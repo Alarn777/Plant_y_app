@@ -34,6 +34,9 @@ import AmplifyTheme from '../AmplifyTheme';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import {HeaderBackButton} from 'react-navigation-stack';
+import {bindActionCreators} from 'redux';
+import {AddAvatarLink, addImage, addUser} from '../../FriendActions';
+import connect from 'react-redux/lib/connect/connect';
 const plantyColor = '#6f9e04';
 
 class AllAvailablePlants extends React.Component {
@@ -98,7 +101,7 @@ class AllAvailablePlants extends React.Component {
       })
       .then(response => {
         // If request is good...
-        console.log(response.data);
+        // console.log(response.data);
         this.dealWithPlantsData(response.data);
       })
       .catch(error => {
@@ -178,6 +181,21 @@ class AllAvailablePlants extends React.Component {
   _keyExtractor = item => item.id;
 
   _renderItem = ({item}) => {
+    let url = '';
+    // console.log(item.name);
+
+    for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
+      if (
+        this.props.plantyData.plantsImages[i].name.toLowerCase() ===
+        item.name.toLowerCase()
+      ) {
+        url = this.props.plantyData.plantsImages[i].URL;
+      }
+      // console.log(this.props.plantyData.plantsImages[i].name);
+    }
+    // console.log(url);
+    item.url = url;
+
     return (
       <View>
         <Card
@@ -191,16 +209,18 @@ class AllAvailablePlants extends React.Component {
                     planterName: this.props.navigation.getParam('planterName'),
                   })
                 }>
-                <Image style={styles.headerImage} source={{uri: item.pic}} />
+                {/*url*/}
+                <Image style={styles.headerImage} source={{uri: url}} />
+                {/*<Image style={styles.headerImage} source={{uri: item.pic}} />*/}
               </TouchableOpacity>
             );
           }}
           style={{width: this.state.width / 3 - 5}}
-          index={item.id}
-          key={item.id}>
+          index={item.UUID}
+          key={item.UUID}>
           <TouchableOpacity
             onPress={() => {
-              console.log(this.props.navigation);
+              // console.log(this.props.navigation);
               this.props.navigation.navigate('AddPlantScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
@@ -254,16 +274,50 @@ AllAvailablePlants.propTypes = {
   addEvent: PropTypes.func,
 };
 
-export default withAuthenticator(AllAvailablePlants, false, [
-  <SignIn />,
-  <ConfirmSignIn />,
-  <VerifyContact />,
-  <SignUp />,
-  <ConfirmSignUp />,
-  <ForgotPassword />,
-  <Greetings />,
-  <RequireNewPassword />,
-]);
+// export default withAuthenticator(AllAvailablePlants, false, [
+//   <SignIn />,
+//   <ConfirmSignIn />,
+//   <VerifyContact />,
+//   <SignUp />,
+//   <ConfirmSignUp />,
+//   <ForgotPassword />,
+//   <Greetings />,
+//   <RequireNewPassword />,
+// ]);
+
+const mapStateToProps = state => {
+  const {plantyData} = state;
+
+  return {plantyData};
+};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      addUser,
+      // fetchAllPosts,
+      // addSocket,
+      addImage,
+      AddAvatarLink,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(
+  withAuthenticator(AllAvailablePlants, false, [
+    <SignIn />,
+    <ConfirmSignIn />,
+    <VerifyContact />,
+    <SignUp />,
+    <ConfirmSignUp />,
+    <ForgotPassword />,
+    <Greetings />,
+    <RequireNewPassword />,
+  ]),
+);
 
 const styles = StyleSheet.create({
   container: {

@@ -41,7 +41,7 @@ import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import Video from 'react-native-video';
 import connect from 'react-redux/lib/connect/connect';
-import {addUser} from '../../FriendActions';
+import {AddAvatarLink, addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
 
@@ -125,6 +125,8 @@ class planterScreen extends React.Component {
 
   UNSAFE_componentWillMount(): void {
     // console.log('componentWillMount');
+    // console.log(this.props.plantyData.myCognitoUser.signInUserSession);
+
     this.loadUrl()
       .then()
       .catch();
@@ -204,7 +206,7 @@ class planterScreen extends React.Component {
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
-
+    // console.log(this.props);
     await axios
       .post(
         Consts.apigatewayRoute + '/getPlantsInPlanter',
@@ -243,6 +245,18 @@ class planterScreen extends React.Component {
   _keyExtractor = item => item.UUID;
 
   _renderItem = ({item}) => {
+    let url = '';
+    for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
+      if (
+        this.props.plantyData.plantsImages[i].name.toLowerCase() ===
+        item.name.toLowerCase()
+      ) {
+        url = this.props.plantyData.plantsImages[i].URL;
+      }
+      // console.log(this.props.plantyData.plantsImages[i].name);
+    }
+    item.url = url;
+    // console.log(url);
     return (
       <View>
         <Card
@@ -255,7 +269,7 @@ class planterScreen extends React.Component {
                     user_token: this.state.USER_TOKEN,
                   })
                 }>
-                <Image style={styles.headerImage} source={{uri: item.pic}} />
+                <Image style={styles.headerImage} source={{uri: url}} />
               </TouchableOpacity>
             );
           }}
@@ -526,6 +540,7 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       addUser,
+      AddAvatarLink,
     },
     dispatch,
   );

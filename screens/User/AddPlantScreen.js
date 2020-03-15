@@ -15,7 +15,6 @@ import {Button, Divider} from 'react-native-paper';
 
 //redusx
 import {connect} from 'react-redux';
-import {addPlace} from '../../actions/place';
 import {bindActionCreators} from 'redux';
 import {addSocket, addUser, loadPlanters} from '../../FriendActions';
 
@@ -198,10 +197,7 @@ const mapDispatchToProps = dispatch =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(AddPlantScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(AddPlantScreen);
 
 let styles = StyleSheet.create({
   backgroundVideo: {

@@ -6,9 +6,9 @@ export const removeCleaner = cleaner => ({
   payload: cleaner,
 });
 
-export const addCleaner = cleaner => ({
-  type: 'ADD_CLEANER',
-  payload: cleaner,
+export const addImage = imageUrl => ({
+  type: 'ADD_IMAGE',
+  payload: imageUrl,
 });
 
 export const removeEvent = event => ({
@@ -44,6 +44,11 @@ export const addUser = user => ({
 export const loadPlanters = user => ({
   type: 'LOAD_PLANTERS',
   payload: user,
+});
+
+export const AddAvatarLink = link => ({
+  type: 'ADD_AVATAR_LINK',
+  payload: link,
 });
 
 export const fetchPosts = posts => {

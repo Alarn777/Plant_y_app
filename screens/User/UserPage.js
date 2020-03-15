@@ -8,7 +8,7 @@
 
 import React from 'react';
 import {Provider} from 'react-redux';
-import {createStore} from 'redux';
+import {bindActionCreators, createStore} from 'redux';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator, HeaderBackButton} from 'react-navigation-stack';
 import {Image, Text, TouchableOpacity, View, Dimensions} from 'react-native';
@@ -21,14 +21,26 @@ import {
   ContributionGraph,
   StackedBarChart,
 } from 'react-native-chart-kit';
-import {Avatar, Card as PaperCard, Card, Button, FAB} from 'react-native-paper';
+import {
+  Avatar,
+  Card as PaperCard,
+  Card,
+  Button,
+  FAB,
+  ActivityIndicator,
+} from 'react-native-paper';
 import {Icon} from '@ui-kitten/components';
+import socketIO from 'socket.io-client';
 import ImagePicker from 'react-native-image-picker';
 // import RNFetchBlob from 'react-native-fetch-blob';
-import {Storage} from 'aws-amplify';
 import Consts from '../../ENV_VARS';
 import {Notifications} from 'react-native-notifications';
-import Amplify, {Analytics} from 'aws-amplify';
+import Amplify, {Storage} from 'aws-amplify';
+import {getWSService} from '../websocket';
+// global.Buffer = global.Buffer || require('buffer').Buffer;
+import Buffer from 'buffer';
+import connect from 'react-redux/lib/connect/connect';
+import {AddAvatarLink} from '../../FriendActions';
 
 const plantyColor = '#6f9e04';
 
@@ -38,135 +50,47 @@ class UserPage extends React.Component {
     this.state = {
       user: this.props.navigation.getParam('user'),
       USER_TOKEN: '',
-      url: '',
+      url: this.props.plantyData.avatarUrl,
+      fileName: '',
+
+      filePath: null,
+      fileData: null,
+      fileUri: '',
+      fileUrl: '',
+      buttonMode: 'pick', //pick,upload
     };
-    // this.dealWithData = this.dealWithData.bind(this);
-    // this.fetchUser = this.fetchUser.bind(this);
-    // Notifications.registerRemoteNotifications();
-    //
-    // Notifications.events().registerNotificationReceivedForeground(
-    //   (notification: Notification, completion) => {
-    //     console.log(
-    //       `Notification received in foreground: ${notification.title} : ${
-    //         notification.body
-    //       }`,
-    //     );
-    //     completion({alert: false, sound: false, badge: false});
-    //   },
-    // );
-    //
-    // Notifications.events().registerNotificationOpened(
-    //   (notification: Notification, completion) => {
-    //     console.log(`Notification opened: ${notification.payload}`);
-    //     completion();
-    //   },
-    // );
+  }
 
-    // const amplifyConfig = {
-    //   Auth: {
-    //     identityPoolId: 'COGNITO_IDENTITY_POOL_ID',
-    //     region: 'eu-west-1',
-    //   },
-    // };
-    // //Initialize Amplify
-    // Auth.configure(amplifyConfig);
-
-    // const analyticsConfig = {
-    //   AWSPinpoint: {
-    //     // Amazon Pinpoint App Client ID
-    //     // appId: '1093d25f5b254aa8a0f65ea0f21d814f',
-    //     appId: 'db51ad32869d40dea43e82099124bca2',
-    //     // Amazon service region
-    //     region: 'us-east-1',
-    //     mandatorySignIn: false,
-    //   },
-    // };
-    // Analytics.configure(analyticsConfig);
-
-    Analytics.record({name: 'albumVisit'})
-      .then(r => console.log(r))
-      .catch(error => console.log(error));
-
-    Analytics.record({name: 'delete', attributes: 'aaaa'})
-      .then(r => console.log(r))
-      .catch(error => console.log(error));
-    // Analytics.updateEndpoint({
-    //   attributes: {
-    //     interests: ['science', 'politics', 'travel'],
-    //     //..
-    //   },
-    //   // userId: 'UserIdValue',
-    //   UserAttributes: [
-    //     ['email', 'family_name', 'phone_number'],
-    //     // {
-    //     //   Name: 'email' /* required */,
-    //     //   Value: 'emailaddress',
-    //     // },
-    //     // {
-    //     //   Name: 'family_name',
-    //     //   Value: 'familyname',
-    //     // },
-    //     // {
-    //     //   Name: 'given_name',
-    //     //   Value: 'givenname',
-    //     // },
-    //     // {
-    //     //   Name: 'phone_number',
-    //     //   Value: '+19999999999',
-    //     // },
-    //     /* more attributed if needed */
-    //   ],
+  componentDidMount(): void {
+    // let a = this.props.navigation.getParam('logOut');
+    // // console.log(a);
+    // console.log('didmount');
+    // Storage.get('Test_avatar.jpg', {
+    //   level: 'public',
+    //   type: 'image/jpg',
     // })
-    //   .then(r => console.log(r))
+    //   .then(data => {
+    //     console.log(data);
+    //     // this.setState({url: data});
+    //     // this.props.AddAvatarLink(data);
+    //     // this.setState({buttonMode: 'pick'});
+    //   })
+    //   .catch(error => console.log(error));
+    // let userAvatarKey = this.state.user.username + '_avatar.jpg';
+    //
+    // Storage.get(userAvatarKey, {
+    //   level: 'public',
+    //   type: 'image/jpg',
+    //   // bucket: 'plant-pictures-planty',
+    //   // region: 'eu',
+    // })
+    //   .then(data => {
+    //     // console.log(data);
+    //     this.setState({url: data});
+    //   })
     //   .catch(error => console.log(error));
   }
-  componentDidMount(): void {
-    let a = this.props.navigation.getParam('logOut');
-    // console.log(a);
-  }
-
-  async loadImage() {
-    let AWS = require('aws-sdk');
-    let s3 = new AWS.S3({
-      accessKeyId: Consts.accessKeyId,
-      secretAccessKey: Consts.secretAccessKey,
-      region: 'eu',
-    });
-
-    let params = {
-      Bucket: 'pictures-bucket-planty',
-      Key: 'aaa.jpg',
-      Expires: 60,
-      ResponseContentType: 'image/jpg',
-    };
-
-    new Promise((resolve, reject) => {
-      s3.getSignedUrl('getObject', params, function(err, url) {
-        if (err) reject(err);
-        else resolve(url);
-      });
-    }).then(url => {
-      this.setState({url: url});
-      console.log(url);
-    });
-    await Storage.get('cucumber_img.jpg', {
-      level: 'protected',
-      bucket: 'plant-pictures-planty',
-      region: 'eu',
-    })
-      .then(result => {
-        this.setState({url: result});
-
-        console.log(result);
-      })
-      .catch(err => console.log(err));
-  }
-
-  UNSAFE_componentWillMount(): void {
-    // this.loadImage()
-    //   .then(r => console.log('RES ' + r))
-    //   .catch(e => console.log(e));
-  }
+  UNSAFE_componentWillMount(): void {}
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
@@ -195,6 +119,89 @@ class UserPage extends React.Component {
     };
   };
 
+  renderAvatarButton = () => {
+    if (this.state.buttonMode === 'pick') {
+      return (
+        <FAB
+          style={{
+            position: 'absolute',
+            margin: 16,
+            // width: 50,
+
+            backgroundColor: '#6f9e04',
+            color: '#6f9e04',
+            right: 120,
+            // top: height - 200,
+            bottom: -10,
+          }}
+          large
+          icon="pencil"
+          onPress={() => {
+            this.launchCamera();
+          }}
+        />
+      );
+    }
+    if (this.state.buttonMode === 'upload') {
+      return (
+        <View>
+          <FAB
+            style={{
+              position: 'absolute',
+              margin: 16,
+              // width: 50,
+
+              backgroundColor: '#6f9e04',
+              color: '#6f9e04',
+              right: 120,
+              // top: height - 200,
+              bottom: -10,
+            }}
+            large
+            icon="cloud-upload-outline"
+            onPress={() => {
+              this.uploadImage();
+            }}
+          />
+          <FAB
+            style={{
+              position: 'absolute',
+              margin: 16,
+              // width: 50,
+
+              backgroundColor: '#6f9e04',
+              color: '#6f9e04',
+              left: 120,
+              // top: height - 200,
+              bottom: -10,
+            }}
+            large
+            icon="close"
+            onPress={() => {
+              this.setState({
+                filePath: null,
+                fileData: null,
+                fileUri: '',
+                buttonMode: 'pick',
+                url: this.props.plantyData.avatarUrl,
+              });
+            }}
+          />
+        </View>
+      );
+    }
+    if (this.state.buttonMode === 'loading') {
+      return (
+        <ActivityIndicator
+          // style={{flex: 1}}
+          size="huge"
+          color={plantyColor}
+          style={{top: -120}}
+        />
+      );
+    }
+  };
+
   launchCamera = () => {
     let options = {
       storageOptions: {
@@ -203,7 +210,7 @@ class UserPage extends React.Component {
       },
     };
     ImagePicker.launchCamera(options, response => {
-      console.log('Response = ', response);
+      // console.log('Response = ', response);
 
       if (response.didCancel) {
         console.log('User cancelled image picker');
@@ -213,96 +220,64 @@ class UserPage extends React.Component {
         console.log('User tapped custom button: ', response.customButton);
         alert(response.customButton);
       } else {
-        const source = {uri: response.uri};
-        console.log('response', JSON.stringify(response));
         this.setState({
           filePath: response,
           fileData: response.data,
           fileUri: response.uri,
+          buttonMode: 'upload',
+          url: response.uri, //showPic
         });
       }
     });
   };
 
+  uploadImage = () => {
+    this.setState({buttonMode: 'loading'});
+
+    const bufferedImageData = new Buffer.Buffer(this.state.fileData, 'base64');
+
+    let userAvatarKey = this.state.user.username + '_avatar.jpg';
+    Storage.put(userAvatarKey, bufferedImageData, {
+      contentType: 'image/jpg',
+      level: 'public',
+    })
+      .then(result => {
+        Storage.get(userAvatarKey, {
+          level: 'public',
+          type: 'image/jpg',
+        })
+          .then(data => {
+            // console.log(data);
+            // this.setState({url: data});
+            this.props.AddAvatarLink(data);
+            this.setState({buttonMode: 'pick'});
+          })
+          .catch(error => console.log(error));
+      })
+      .catch(err => console.log(err));
+  };
+
   render() {
+    // console.log(this.state.user);
     return (
       <View>
         <Card>
           <PaperCard.Title
-            title={this.state.user.username}
-            // subtitle="Card Subtitle"
-            // left={props => (
-            //   <Avatar.Icon
-            //     {...props}
-            //     style={{backgroundColor: plantyColor}}
-            //     icon="account"
-            //   />
-            // )}
+            title={'Username: ' + this.state.user.username}
+            subtitle={'Email: ' + this.state.user.attributes.email}
           />
-          {/*<Avatar.Image*/}
-          {/*  style={{alignSelf: 'center', backgroundColor: 'red'}}*/}
-          {/*  size={200}*/}
-          {/*  source={''}*/}
-          {/*/>*/}
-          {/*<FAB*/}
-          {/*  style={{*/}
-          {/*    position: 'absolute',*/}
-          {/*    margin: 16,*/}
-          {/*    // width: 50,*/}
 
-          {/*    backgroundColor: '#6f9e04',*/}
-          {/*    color: '#6f9e04',*/}
-          {/*    right: 120,*/}
-          {/*    // top: height - 200,*/}
-          {/*    bottom: -10,*/}
-          {/*  }}*/}
-          {/*  large*/}
-          {/*  icon="pencil"*/}
-          {/*  onPress={() => {*/}
-          {/*    this.launchCamera();*/}
-          {/*  }}*/}
-          {/*  //     this.props.navigation.navigate('AllAvailablePlants', {*/}
-          {/*  //       user_token: this.state.USER_TOKEN,*/}
-          {/*  //       // item: this.props.navigation.getParam('item'),*/}
-          {/*  //       planterName: this.props.navigation.getParam('item').name,*/}
-          {/*  //       loadPlanters: this.props.navigation.getParam('loadPlanters'),*/}
-          {/*  //     })*/}
-          {/*  // }*/}
-          {/*/>*/}
-          {/*<FAB*/}
-          {/*  style={{*/}
-          {/*    position: 'absolute',*/}
-          {/*    margin: 16,*/}
-          {/*    // width: 50,*/}
-
-          {/*    backgroundColor: '#6f9e04',*/}
-          {/*    color: '#6f9e04',*/}
-          {/*    // right: 120,*/}
-          {/*    // top: height - 200,*/}
-          {/*    // bottom: -10,*/}
-          {/*  }}*/}
-          {/*  large*/}
-          {/*  icon="pencil"*/}
-          {/*  onPress={() => {*/}
-          {/*    this.loadPic();*/}
-          {/*  }}*/}
-          {/*  //     this.props.navigation.navigate('AllAvailablePlants', {*/}
-          {/*  //       user_token: this.state.USER_TOKEN,*/}
-          {/*  //       // item: this.props.navigation.getParam('item'),*/}
-          {/*  //       planterName: this.props.navigation.getParam('item').name,*/}
-          {/*  //       loadPlanters: this.props.navigation.getParam('loadPlanters'),*/}
-          {/*  //     })*/}
-          {/*  // }*/}
-          {/*/>*/}
+          <Avatar.Image
+            style={{
+              alignSelf: 'center',
+              backgroundColor: 'lightgray',
+              margin: 20,
+            }}
+            size={200}
+            source={{uri: this.state.url}}
+          />
+          {this.renderAvatarButton()}
         </Card>
-
-        {/*<Text>{this.state.user.username}</Text></Card>*/}
-        {/*<Image*/}
-        {/*  style={{height: 100, width: 100}}*/}
-        {/*  source={{*/}
-        {/*    uri: this.state.url,*/}
-        {/*  }}*/}
-        {/*/>*/}
         <Card>
           <LineChart
             data={{
@@ -367,81 +342,27 @@ class UserPage extends React.Component {
           >
             Log Out
           </Button>
-
-          {/*<Button*/}
-          {/*  onPress={this.props.navigation.getParam('logOut')}*/}
-          {/*  // title="Info"*/}
-          {/*  // color="#fff"*/}
-          {/*  // appearance="outl"*/}
-          {/*  // style={{color: plantyColor}}*/}
-          {/*  icon={style => {*/}
-          {/*    return <Icon {...style} name="log-out-outline" />;*/}
-          {/*  }}*/}
-          {/*  // status="basic"*/}
-          {/*>*/}
-          {/*  Log Out*/}
-          {/*</Button>*/}
+          {/*<Button onPress={this.uploadImage}>Upload</Button>*/}
         </Card>
-        <Button
-          // icon="logout"
-          mode="outlined"
-          onPress={() => {
-            console.log('pressed waba');
-            Analytics.record('FIRST-EVENT-NAME')
-              .then(r => console.log(r))
-              .catch(error => console.log(error));
-          }}
-          // this.props.navigation.getParam('logOut')}>
-        >
-          waba laba dub dub
-        </Button>
       </View>
     );
   }
-
-  loadPic() {
-    console.log(this.state);
-    // Storage.configure({
-    //   AWSS3: {
-    //     bucket: '', //Your bucket ARN;
-    //     region: '', //Specify the region your bucket was created in;
-    //   },
-    // });
-
-    // ImagePicker.launchImageLibrary(options, response => {
-    //   if (response.didCancel) {
-    //     console.log('User cancelled image picker');
-    //   } else if (response.error) {
-    //     console.log('ImagePicker error: ', response.error);
-    //   } else {
-    //     this.setState({
-    //       vidFileName: response.fileName,
-    //     });
-    //
-    //     console.log(response.uri);
-    //
-    //     this.putFileInS3(response.path, repsonse.filename);
-    //   }
-    // });
-  }
-
-  readFile = somefilePath => {
-    return RNFetchBlob.fs
-      .readFile(somefilePath, 'base64')
-      .then(data => new Buffer(data, 'base64'));
-  };
-
-  putFileInS3 = (filePath, fileName) => {
-    this.readFile(filePath).then(buffer => {
-      Storage.put(fileName, buffer, {contentType: 'video/mp4'})
-        .then(() => {
-          console.log('successfully saved to bucket');
-        })
-        .catch(e => {
-          console.log(e);
-        });
-    });
-  };
 }
 
-export default UserPage;
+const mapStateToProps = state => {
+  const {plantyData} = state;
+
+  return {plantyData};
+};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      AddAvatarLink,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserPage);
+
+// export default UserPage;

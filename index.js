@@ -18,7 +18,6 @@ import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {AppRegistry} from 'react-native';
 import App from './App';
 
-import configureStore from './store';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 const theme = {
@@ -41,4 +40,4 @@ export default function Main() {
   );
 }
 
-AppRegistry.registerComponent('Plant_y_app', () => Main);
+AppRegistry.registerComponent('plant_y_app', () => Main);
