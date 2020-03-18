@@ -44,6 +44,7 @@ import {
   addUser,
   addImage,
   fetchAllPosts,
+  cleanReduxState,
 } from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import SocketIOClient from 'socket.io-client';
@@ -107,19 +108,6 @@ class MainScreen extends React.Component {
         textAlign: 'center',
         alignSelf: 'center',
       },
-      // headerRight: () => (
-      //   <Button
-      //     onPress={navigation.getParam('logOut')}
-      //     title="Info"
-      //     // color="#fff"
-      //     appearance="ghost"
-      //     style={{color: plantyColor}}
-      //     icon={style => {
-      //       return <Icon {...style} name="log-out-outline" />;
-      //     }}
-      //     status="basic"
-      //   />
-      // ),
     };
   };
 
@@ -147,6 +135,8 @@ class MainScreen extends React.Component {
 
   dealWithData = user => {
     //add to redux
+    console.log(user);
+    if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
 
     this.setState({user});
     if (this.state.user) this.setState({userLoggedIn: true});
@@ -241,7 +231,7 @@ class MainScreen extends React.Component {
       .then()
       .catch(e => console.log(e));
 
-    this.props.addUser(user);
+    if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
 
     let userAvatarKey = 'user_avatars/' + user.username + '_avatar.jpeg';
 
@@ -273,6 +263,7 @@ class MainScreen extends React.Component {
     Auth.signOut()
       .then(() => {
         this.props.onStateChange('signedOut');
+        this.props.cleanReduxState();
         this.props.navigation.goBack();
         // onStateChange('signedOut');
       })
@@ -510,10 +501,9 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       addUser,
-      // fetchAllPosts,
-      // addSocket,
       addImage,
       AddAvatarLink,
+      cleanReduxState,
     },
     dispatch,
   );

@@ -41,9 +41,10 @@ import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import Video from 'react-native-video';
 import connect from 'react-redux/lib/connect/connect';
-import {AddAvatarLink, addUser} from '../../FriendActions';
+import {AddAvatarLink, addStreamUrl, addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
+import {DeviceEventEmitter} from 'react-native';
 
 const plantyColor = '#6f9e04';
 
@@ -72,7 +73,8 @@ class planterScreen extends React.Component {
       videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
       myCognitoUser: null,
       loading: true,
-      videoURL: '',
+      videoUrl: '',
+      loadingActions: false,
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -113,8 +115,6 @@ class planterScreen extends React.Component {
     prevState: Readonly<S>,
     snapshot: SS,
   ): void {
-    // console.log('componentDidUpdate');
-    // console.log(this.props.navigation.getParam('plantWasAdded'));
     if (
       this.props.navigation.getParam('plantWasRemoved') ||
       this.props.navigation.getParam('plantWasAdded')
@@ -127,23 +127,39 @@ class planterScreen extends React.Component {
     }
   }
 
+  componentWillUnmount(): void {}
+
   UNSAFE_componentWillMount(): void {
-    // console.log('componentWillMount');
-    // console.log(this.props.plantyData.myCognitoUser.signInUserSession);
+    // this.loadUrl()
+    //   .then(() => this.forceUpdate())
+    //   .catch();
+  }
+
+  setUrl = () => {
+    console.log('setUrl');
+    this.state.videoUrl =
+      'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8';
+    this.setState({
+      videoUrl:
+        'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
+    });
+    this.props.addStreamUrl(this.state.videoUrl);
+  };
+
+  componentDidMount(): void {
+    console.log(this.props.plantyData.streamUrl);
+    // if (!this.props.plantyData.streamUrl) this.setUrl();
+    // else this.setState({videoUrl: this.props.plantyData.streamUrl});
+
+    // if (!this.props.plantyData.streamUrl) this.loadUrl();
+    // else this.setState({videoUrl: this.props.plantyData.streamUrl});
 
     this.loadUrl()
       .then()
-      .catch();
-  }
+      .catch(e => console.log(e));
 
-  componentDidMount(): void {
-    // console.log('componentDidMount');
-    // console.log(
-    //   this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
-    // );
     // let USER_TOKEN = this.props.plantyData.signInUserSession.idToken.jwtToken;
-    // //
-    // console.log(USER_TOKEN);
+    //
     // const {authState, authData} = this.props;
     // const user = authData;
     // if (user) {
@@ -157,11 +173,9 @@ class planterScreen extends React.Component {
     //
     //   this.setState({username: user.username});
     // } else this.setState({username: 'Guest'});
-
     this.loadPlants()
       .then()
       .catch(e => console.log(e));
-
     // this.props.addUser(user);
   }
 
@@ -171,10 +185,14 @@ class planterScreen extends React.Component {
   //   this.setState({user});
   //   if (this.state.user) this.setState({userLoggedIn: true});
   // };
+  // reload = () => {
+  //   this.setState({videoURL: ''});
+  //   this.loadUrl();
+  //   // this.forceUpdate();
+  // };
 
   //maybe post is needed (this.props.navigation.getParam('item').stream)
   async loadUrl() {
-    // console.log('loadstreamUrl');
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -184,15 +202,23 @@ class planterScreen extends React.Component {
         headers: {Authorization: AuthStr},
       })
       .then(response => {
-        // If request is good...
-        // console.log(response.data);
-        this.setState({videoURL: response.data.HLSStreamingSessionURL});
-        this.setState({
-          videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
-        });
-        this.forceUpdate();
+        if (response.data) {
+          if (!this.props.plantyData.streamUrl) {
+            this.setState({videoUrl: response.data.HLSStreamingSessionURL});
+            // this.setState({videoUrl: response.data.HLSStreamingSessionURL});
+            this.props.addStreamUrl(this.state.videoUrl);
+          }
+        } else {
+          this.setState({videoUrl: ''});
+          this.props.addStreamUrl('');
 
-        // this.dealWithUrlData(response.data);
+          // this.setState({videoUrl: response.data.HLSStreamingSessionURL});
+          // else this.setState({videoUrl: this.props.plantyData.streamUrl});
+
+          this.setState({
+            videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
+          });
+        }
       })
       .catch(error => {
         console.log('error ' + error);
@@ -210,7 +236,6 @@ class planterScreen extends React.Component {
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
-    // console.log(this.props);
     await axios
       .post(
         Consts.apigatewayRoute + '/getPlantsInPlanter',
@@ -223,8 +248,6 @@ class planterScreen extends React.Component {
         },
       )
       .then(response => {
-        // If request is good...
-        // console.log(response.data);
         this.dealWithPlantsData(response.data);
       })
       .catch(error => {
@@ -238,6 +261,31 @@ class planterScreen extends React.Component {
     } else this.setState({plants: []});
     this.setState({loading: false});
   };
+
+  async sendAction(action) {
+    this.setState({loadingActions: true});
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+      .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/sendMessageToQueue',
+        {
+          username: this.props.authData.username,
+          action: action,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        this.setState({loadingActions: false});
+      })
+      .catch(error => {
+        this.setState({loadingActions: false});
+        console.log('error ' + error);
+      });
+  }
 
   onLayout(e) {
     this.setState({
@@ -257,10 +305,8 @@ class planterScreen extends React.Component {
       ) {
         url = this.props.plantyData.plantsImages[i].URL;
       }
-      // console.log(this.props.plantyData.plantsImages[i].name);
     }
     item.pic = url;
-    // console.log(url);
     return (
       <View>
         <Card
@@ -298,6 +344,7 @@ class planterScreen extends React.Component {
   };
 
   loadBuffering = () => {
+    console.log('loadBuffering');
     return (
       <View
         style={{
@@ -332,6 +379,35 @@ class planterScreen extends React.Component {
         </View>
       );
     else return <View />;
+  };
+
+  renderVideo = () => {
+    if (this.state.videoUrl === '' || this.state.videoUrl === undefined) {
+      return (
+        <ActivityIndicator
+          // style={{flex: 1}}
+          size="large"
+          color={plantyColor}
+          // style={{top: this.state.height / 3 - 50}}
+        />
+      );
+    } else
+      return (
+        <Video
+          source={{uri: this.state.videoUrl, type: 'm3u8'}} // Can be a URL or a local file.
+          ref={ref => {
+            this.player = ref;
+          }} // Store reference
+          resizeMode="stretch"
+          controls={true}
+          onBuffer={this.loadBuffering} // Callback when remote video is buffering
+          // onError={this.videoError}
+          onError={this.videoError} // Callback when video cannot be loaded
+          style={styles.backgroundVideo}
+          minLoadRetryCount={10000}
+          paused={true}
+        />
+      );
   };
 
   render() {
@@ -378,22 +454,7 @@ class planterScreen extends React.Component {
               />
             </View>
             <PaperCard.Content>
-              <Video
-                source={{uri: this.state.videoURL}} // Can be a URL or a local file.
-                ref={ref => {
-                  this.player = ref;
-                }} // Store reference
-                resizeMode="stretch"
-                controls={true}
-                onBuffer={this.loadBuffering} // Callback when remote video is buffering
-                // onError={this.videoError}
-
-                onError={this.videoError} // Callback when video cannot be loaded
-                style={styles.backgroundVideo}
-                minLoadRetryCount={10000}
-                paused={true}
-              />
-
+              {this.renderVideo()}
               {this.showVideoError()}
             </PaperCard.Content>
             <PaperCard.Actions
@@ -412,22 +473,37 @@ class planterScreen extends React.Component {
                   padding: 8,
                 }}>
                 <IconButton
-                  icon="arrow-left"
+                  icon={this.state.loadingActions ? 'reload' : 'arrow-left'}
                   color={plantyColor}
+                  disabled={this.state.loadingActions}
                   size={40}
-                  onPress={() => console.log('Pressed left')}
+                  onPress={() => {
+                    this.sendAction('left')
+                      .then(r => console.log())
+                      .catch(error => console.log(error));
+                  }}
                 />
                 <IconButton
-                  icon="camera"
+                  icon={this.state.loadingActions ? 'reload' : 'camera'}
                   color={plantyColor}
                   size={40}
-                  onPress={() => console.log('Pressed camera')}
+                  disabled={this.state.loadingActions}
+                  onPress={() => {
+                    this.sendAction('camera')
+                      .then(r => console.log())
+                      .catch(error => console.log(error));
+                  }}
                 />
                 <IconButton
-                  icon="arrow-right"
+                  icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
                   size={40}
-                  onPress={() => console.log('Pressed right')}
+                  disabled={this.state.loadingActions}
+                  onPress={() => {
+                    this.sendAction('right')
+                      .then(r => console.log())
+                      .catch(error => console.log(error));
+                  }}
                 />
               </View>
               <Text style={styles.headerText}>Plants in Planter</Text>
@@ -559,6 +635,7 @@ const mapDispatchToProps = dispatch =>
     {
       addUser,
       AddAvatarLink,
+      addStreamUrl,
     },
     dispatch,
   );

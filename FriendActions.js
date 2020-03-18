@@ -21,8 +21,8 @@ export const addEvent = event => ({
   payload: event,
 });
 
-export const reloadEvents = event => ({
-  type: 'RELOAD_EVENTS',
+export const cleanReduxState = event => ({
+  type: 'CLEAN_STATE',
   payload: event,
 });
 
@@ -31,8 +31,8 @@ export const addSocket = socket => ({
   payload: socket,
 });
 
-export const reloadCleaners = cleaner => ({
-  type: 'RELOAD_CLEANERS',
+export const addStreamUrl = cleaner => ({
+  type: 'ADD_STREAM_URL',
   payload: cleaner,
 });
 
