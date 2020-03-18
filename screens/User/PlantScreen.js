@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, View, FlatList, StyleSheet} from 'react-native';
+import {Image, View, FlatList, StyleSheet, ScrollView} from 'react-native';
 import Video from 'react-native-video';
 import {Icon, Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
@@ -9,6 +9,8 @@ import {Button, Divider, FAB} from 'react-native-paper';
 import {connect} from 'react-redux';
 import {HeaderBackButton} from 'react-navigation-stack';
 import {IconButton} from 'react-native-paper';
+import {bindActionCreators} from 'redux';
+import {AddAvatarLink} from '../../FriendActions';
 
 // import RNAmazonKinesis from 'react-native-amazon-kinesis';
 
@@ -19,15 +21,21 @@ class PlantScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      plant: null,
-      USER_TOKEN: '',
+      plant: this.props.navigation.getParam('item'),
+      // deletingPlantIcon:'delete',
+      USER_TOKEN: this.props.navigation.getParam('user_token'),
       URL: '',
+      planterName: this.props.navigation.getParam('planterName'),
       loadBuffering: false,
-
+      loading: false,
       adjustments: false,
+      // deletingPlant:false,
+      deletingPlantText: 'Remove',
+      deletingPlant: false,
+      deletingPlanticon: 'delete',
+      // deletingPlantText: 'Failed to delete',
+      deletingPlantDisabled: false,
     };
-
-    this.dealWithUrlData = this.dealWithUrlData.bind(this);
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -58,53 +66,86 @@ class PlantScreen extends React.Component {
     };
   };
 
-  dealWithUrlData = url => {
-    this.setState({URL: url.HLSStreamingSessionURL});
-    this.forceUpdate();
-  };
+  UNSAFE_componentWillMount(): void {
+    // this.loadUrl().then(r => console.log());
+  }
 
-  async loadUrl() {
-    console.log('loadUrl');
-    let USER_TOKEN = '';
+  componentDidMount(): void {
+    // console.log(this.state.plant);
+    // console.log(this.state.USER_TOKEN);
+  }
 
-    // USER_TOKEN = this.props.navigation.state
-    // console.log( this.props.navigation.state.params)
+  async removePlantFromPlanter() {
+    // console.log('pressed');
+    this.setState({deletingPlant: true});
 
-    USER_TOKEN = this.props.navigation.state.params.user_token;
+    // console.log(this.props.plantyData.myCognitoUser.username);
+    // console.log(this.props.navigation.getParam('item').name);
+    // console.log(this.props.navigation.getParam('planterName'));
+    // console.log(this.state.USER_TOKEN);
+    // console.log(this.state.plant.description);
 
-    this.state.USER_TOKEN = USER_TOKEN;
-
+    // console.log(this.state.plant.UUID);
+    // console.log(this.state.planterName);
+    // console.log(this.props.plantyData.myCognitoUser.username);
     const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
+
     await axios
-      .get(Consts.apigatewayRoute + '/streams', {
-        headers: {Authorization: AuthStr},
-      })
+      .post(
+        Consts.apigatewayRoute + '/removePlantFromPlanter',
+        {
+          username: this.props.plantyData.myCognitoUser.username,
+          plantUUID: this.state.plant.UUID,
+          planterName: this.state.planterName,
+          // plantDescription: this.state.plant.description,
+          // plantGrowthPlanGroup: this.state.plant.growthPlanGroup,
+          // plantSoil: this.state.plant.soil,
+        },
+
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
       .then(response => {
         // If request is good...
-        console.log(response.data);
-        this.dealWithUrlData(response.data);
+        // console.log(response.data);
+        this.successDeleting();
+        // this.dealWithUrlData(response.data);
       })
       .catch(error => {
         console.log('error ' + error);
+        this.failureDeleting();
       });
+
+    // setTimeout(this.successAdding, 1000);
+    // this.props.navigation.goBack();
   }
 
-  UNSAFE_componentWillMount(): void {
-    this.loadUrl().then(r => console.log());
-  }
+  successDeleting = () => {
+    this.setState({
+      deletingPlant: false,
+      deletingPlanticon: 'check',
+      deletingPlantText: 'Deleted',
+      deletingPlantDisabled: true,
+    });
+    setTimeout(this.goBack, 1200);
 
-  componentDidMount(): void {}
-
-  onBuffer = () => {
-    this.setState({loadBuffering: true});
+    // this.props.navigation.getParam('loadPlanters')();
   };
 
-  loadBuffering = () => {
-    console.log('buffering');
-    // if(this.state.loadBuffering)
-    //     return <Text>Loading Video</Text>
-    // else
-    //     return <View/>
+  goBack = () => {
+    this.props.navigation.navigate('planterScreen', {
+      plantWasRemoved: true,
+    });
+  };
+
+  failureDeleting = () => {
+    this.setState({
+      deletingPlant: false,
+      deletingPlanticon: 'alert-circle-outline',
+      deletingPlantText: 'Failed to delete',
+      deletingPlantDisabled: true,
+    });
   };
 
   render() {
@@ -114,25 +155,29 @@ class PlantScreen extends React.Component {
     return (
       <View style={styles.container}>
         <Card
-          // style={{margin: 5, width: '95%'}}
           header={() => {
             return <Text style={styles.mainText}>{item.name}</Text>;
           }}
-          // footer={() => {
-          //   return (
-          //     <View>
-          //       <Text style={styles.mainText}>Camera Controller</Text>
-          //       <Text
-          //         style={{
-          //           textAlign: 'center',
-          //           fontSize: 16,
-          //         }}>
-          //         {this.props.navigation.getParam('item').description}
-          //       </Text>
-          //     </View>
-          //   );
-          // }}
-        >
+          footer={() => {
+            return (
+              <Button
+                icon={this.state.deletingPlanticon}
+                style={{margin: 10}}
+                loading={this.state.deletingPlant}
+                disabled={this.state.addingPlantDisabled}
+                mode="outlined"
+                backgroundColor="#6f9e04"
+                color="#6f9e04"
+                onPress={() => {
+                  this.removePlantFromPlanter()
+                    .then()
+                    .catch();
+                  // navigation.goBack();
+                }}>
+                {this.state.deletingPlantText}
+              </Button>
+            );
+          }}>
           <Image
             style={{height: 300}}
             source={{uri: this.props.navigation.getParam('item').pic}}
@@ -144,61 +189,13 @@ class PlantScreen extends React.Component {
             Appropriate soils:{' '}
             {this.props.navigation.getParam('item').soil.type}
           </Text>
-          {/*<Video*/}
-          {/*  source={{uri: this.state.URL}} // Can be a URL or a local file.*/}
-          {/*  ref={ref => {*/}
-          {/*    this.player = ref;*/}
-          {/*  }} // Store reference*/}
-          {/*  resizeMode="stretch"*/}
-          {/*  controls={true}*/}
-          {/*  onBuffer={this.onBuffer} // Callback when remote video is buffering*/}
-          {/*  // onError={this.videoError}*/}
-
-          {/*  // onBuffer={this.onBuffer}                // Callback when remote video is buffering*/}
-          {/*  // onError={this.videoError}               // Callback when video cannot be loaded*/}
-          {/*  style={styles.backgroundVideo}*/}
-          {/*  minLoadRetryCount={10000}*/}
-          {/*  paused={true}*/}
-          {/*/>*/}
-          {/*{this.loadBuffering()}*/}
-          {/*<Text style={styles.mainText}>Camera Controllers</Text>*/}
-          {/*<View*/}
-          {/*  style={{*/}
-          {/*    flexDirection: 'column',*/}
-          {/*    justifyContent: 'center',*/}
-          {/*    padding: 8,*/}
-          {/*  }}>*/}
-          {/*  <View*/}
-          {/*    style={{*/}
-          {/*      // flex:*/}
-          {/*      flexDirection: 'row',*/}
-          {/*      flexWrap: 'wrap',*/}
-          {/*      justifyContent: 'space-between',*/}
-          {/*      padding: 8,*/}
-          {/*    }}>*/}
-          {/*    <IconButton*/}
-          {/*      icon="arrow-left"*/}
-          {/*      color={plantyColor}*/}
-          {/*      size={40}*/}
-          {/*      onPress={() => console.log('Pressed left')}*/}
-          {/*    />*/}
-          {/*    <IconButton*/}
-          {/*      icon="arrow-right"*/}
-          {/*      color={plantyColor}*/}
-          {/*      size={40}*/}
-          {/*      onPress={() => console.log('Pressed right')}*/}
-          {/*    />*/}
-          {/*    /!*<Button>Left</Button>*!/*/}
-          {/*    /!*<Button>Right</Button>*!/*/}
-          {/*  </View>*/}
-          {/*</View>*/}
         </Card>
       </View>
     );
   }
 }
 
-export default PlantScreen;
+// export default PlantScreen;
 
 let styles = StyleSheet.create({
   backgroundVideo: {
@@ -233,6 +230,22 @@ let styles = StyleSheet.create({
     height: 100,
   },
 });
+
+const mapStateToProps = state => {
+  const {plantyData} = state;
+
+  return {plantyData};
+};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      AddAvatarLink,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(PlantScreen);
 
 // const mapStateToProps = state => {
 //     return {

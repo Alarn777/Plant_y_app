@@ -4,6 +4,7 @@ import {
   View,
   FlatList,
   StyleSheet,
+  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import Video from 'react-native-video';
@@ -55,7 +56,6 @@ class AddPlantScreen extends React.Component {
   };
 
   async addPlantToMyGarden() {
-    console.log('pressed');
     this.setState({addingPlant: true});
 
     // console.log(this.props.plantyData.myCognitoUser.username);
@@ -65,7 +65,6 @@ class AddPlantScreen extends React.Component {
     // console.log(this.state.plant.description);
 
     const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
-    console.log(this.state.plant);
 
     await axios
       .post(
@@ -129,6 +128,7 @@ class AddPlantScreen extends React.Component {
     const {navigation} = this.props;
     let item = navigation.getParam('item');
     let loading = this.state.addingPlant;
+    console.log(item);
     return (
       <View style={styles.container}>
         <Card

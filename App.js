@@ -53,7 +53,8 @@ import {
 import {Image} from 'react-native';
 import AdjustPlantConditions from './screens/User/AdjustPlantConditions';
 import addPlanterScreen from './screens/User/addPlanterScreen';
-
+import planterImagesGallery from './screens/User/planterImagesGallery';
+import Picture from './screens/User/Picture';
 const store = createStore(Reducer);
 
 const AppNavigator = createStackNavigator(
@@ -112,6 +113,20 @@ const AppNavigator = createStackNavigator(
       screen: addPlanterScreen,
       navigationOptions: {
         gesturesEnabled: true,
+      },
+    },
+    planterImagesGallery: {
+      name: 'Image Gallery',
+      screen: planterImagesGallery,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
+    Picture: {
+      name: 'Picture',
+      screen: Picture,
+      navigationOptions: {
+        gesturesEnabled: false,
       },
     },
 

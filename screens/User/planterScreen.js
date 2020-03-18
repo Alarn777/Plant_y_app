@@ -115,11 +115,15 @@ class planterScreen extends React.Component {
   ): void {
     // console.log('componentDidUpdate');
     // console.log(this.props.navigation.getParam('plantWasAdded'));
-    if (this.props.navigation.getParam('plantWasAdded')) {
+    if (
+      this.props.navigation.getParam('plantWasRemoved') ||
+      this.props.navigation.getParam('plantWasAdded')
+    ) {
       this.loadPlants()
         .then()
         .catch();
       this.props.navigation.setParams({plantWasAdded: false});
+      this.props.navigation.setParams({plantWasRemoved: false});
     }
   }
 
@@ -174,7 +178,7 @@ class planterScreen extends React.Component {
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
-
+    this.setState({USER_TOKEN: USER_TOKEN});
     await axios
       .get(Consts.apigatewayRoute + '/streams', {
         headers: {Authorization: AuthStr},
@@ -255,7 +259,7 @@ class planterScreen extends React.Component {
       }
       // console.log(this.props.plantyData.plantsImages[i].name);
     }
-    item.url = url;
+    item.pic = url;
     // console.log(url);
     return (
       <View>
@@ -267,6 +271,7 @@ class planterScreen extends React.Component {
                   this.props.navigation.navigate('PlantScreen', {
                     item: item,
                     user_token: this.state.USER_TOKEN,
+                    planterName: this.props.navigation.getParam('item').name,
                   })
                 }>
                 <Image style={styles.headerImage} source={{uri: url}} />
@@ -282,6 +287,7 @@ class planterScreen extends React.Component {
               this.props.navigation.navigate('PlantScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
+                planterName: this.props.navigation.getParam('item').name,
               })
             }>
             <Text style={styles.partyText}>{item.name}</Text>
@@ -346,19 +352,31 @@ class planterScreen extends React.Component {
     if (this.state.plants.length > 0) {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>
-              Planter: {this.props.navigation.getParam('item').name}
-            </Text>
-          </View>
           <PaperCard>
-            <PaperCard.Title
-              title={
-                <Text style={styles.mainText}>
-                  {'Climate:' + this.props.navigation.getParam('item').climate}
-                </Text>
-              }
-            />
+            <View style={{}}>
+              <PaperCard.Title
+                title={'Planter:' + this.props.navigation.getParam('item').name}
+                subtitle={
+                  'Climate:' + this.props.navigation.getParam('item').climate
+                }
+                right={props => (
+                  <IconButton
+                    icon="image-multiple"
+                    color={plantyColor}
+                    size={40}
+                    // onPress={() =>
+                    //   this.props.navigation.navigate('planterImagesGallery')
+                    // }
+                    onPress={() =>
+                      this.props.navigation.navigate('planterImagesGallery', {
+                        planter: this.state.planter,
+                        // user_token: this.state.USER_TOKEN,
+                      })
+                    }
+                  />
+                )}
+              />
+            </View>
             <PaperCard.Content>
               <Video
                 source={{uri: this.state.videoURL}} // Can be a URL or a local file.

@@ -91,7 +91,12 @@ class addPlanterScreen extends React.Component {
 
     this.setState({addingPlanter: true});
 
-    // console.log(this.props.user.username);
+    // console.log(this.props.navigation.getParam('user').username);
+    // console.log(this.state.planterName);
+    // console.log(this.state.planterDescription);
+    // console.log(this.state.selectedOption['text']);
+    // console.log(this.state.USER_TOKEN);
+
     const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
     await axios
       .post(
@@ -112,6 +117,7 @@ class addPlanterScreen extends React.Component {
         this.dealWithUrlData(response.data);
       })
       .catch(error => {
+        this.failureAdding();
         console.log('error ' + error);
       });
 

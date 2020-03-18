@@ -82,6 +82,7 @@ class MainScreen extends React.Component {
       userAvatar: '',
       myCognitoUser: null,
       url: '',
+      planterWasRemoved: false,
     };
     this.loadPlanters = this.loadPlanters.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -128,7 +129,7 @@ class MainScreen extends React.Component {
     allImages.map(oneImage => {
       Storage.get(oneImage + '_img.jpg', {
         level: 'public',
-        type: 'image/png',
+        type: 'image/jpg',
       })
         .then(data => {
           // console.log(data);
@@ -199,7 +200,14 @@ class MainScreen extends React.Component {
     prevProps: Readonly<P>,
     prevState: Readonly<S>,
     snapshot: SS,
-  ): void {}
+  ): void {
+    if (this.props.navigation.getParam('planterWasRemoved')) {
+      this.loadPlanters()
+        .then()
+        .catch();
+      this.props.navigation.setParams({planterWasRemoved: false});
+    }
+  }
 
   UNSAFE_componentWillMount() {
     this.fetchUser()
@@ -235,7 +243,7 @@ class MainScreen extends React.Component {
 
     this.props.addUser(user);
 
-    let userAvatarKey = user.username + '_avatar.jpg';
+    let userAvatarKey = 'user_avatars/' + user.username + '_avatar.jpeg';
 
     Storage.get(userAvatarKey, {
       level: 'public',

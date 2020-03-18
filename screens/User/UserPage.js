@@ -41,6 +41,9 @@ import {getWSService} from '../websocket';
 import Buffer from 'buffer';
 import connect from 'react-redux/lib/connect/connect';
 import {AddAvatarLink} from '../../FriendActions';
+import ImageResizer from 'react-native-image-resizer';
+// li RNFS = require('react-native-fs');
+import RNFS from 'react-native-fs';
 
 const plantyColor = '#6f9e04';
 
@@ -62,6 +65,7 @@ class UserPage extends React.Component {
   }
 
   componentDidMount(): void {
+    // console.log(this.props.plantyData.avatarUrl);
     // let a = this.props.navigation.getParam('logOut');
     // // console.log(a);
     // console.log('didmount');
@@ -90,6 +94,7 @@ class UserPage extends React.Component {
     //   })
     //   .catch(error => console.log(error));
   }
+
   UNSAFE_componentWillMount(): void {}
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -160,7 +165,8 @@ class UserPage extends React.Component {
             large
             icon="cloud-upload-outline"
             onPress={() => {
-              this.uploadImage();
+              this.resize();
+              // this.uploadImage();
             }}
           />
           <FAB
@@ -196,7 +202,7 @@ class UserPage extends React.Component {
           // style={{flex: 1}}
           size="huge"
           color={plantyColor}
-          style={{top: -120}}
+          style={{position: 'relative', top: -140}}
         />
       );
     }
@@ -231,30 +237,86 @@ class UserPage extends React.Component {
     });
   };
 
+  resize = () => {
+    ImageResizer.createResizedImage(this.state.fileUri, 500, 500, 'JPEG', 100)
+      .then(({uri}) => {
+        this.setState({
+          fileUri: uri,
+        });
+        this.uploadImage();
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
   uploadImage = () => {
     this.setState({buttonMode: 'loading'});
 
-    const bufferedImageData = new Buffer.Buffer(this.state.fileData, 'base64');
+    RNFS.readFile(this.state.fileUri, 'base64')
+      .then(fileData => {
+        // console.log(fileData);
+        const bufferedImageData = new Buffer.Buffer(fileData, 'base64');
 
-    let userAvatarKey = this.state.user.username + '_avatar.jpg';
-    Storage.put(userAvatarKey, bufferedImageData, {
-      contentType: 'image/jpg',
-      level: 'public',
-    })
-      .then(result => {
-        Storage.get(userAvatarKey, {
+        let userAvatarKey =
+          'user_avatars/' + this.state.user.username + '_avatar.jpeg';
+
+        // console.log(userAvatarKey);
+
+        Storage.put(userAvatarKey, bufferedImageData, {
+          contentType: 'image/jpg',
           level: 'public',
-          type: 'image/jpg',
         })
-          .then(data => {
-            // console.log(data);
-            // this.setState({url: data});
-            this.props.AddAvatarLink(data);
-            this.setState({buttonMode: 'pick'});
+          .then(result => {
+            Storage.get(userAvatarKey, {
+              level: 'public',
+              type: 'image/jpeg',
+            })
+              .then(data => {
+                // console.log(data);
+                // this.setState({url: data});
+                this.props.AddAvatarLink(data);
+                this.setState({buttonMode: 'pick'});
+              })
+              .catch(error => console.log(error));
           })
-          .catch(error => console.log(error));
+          .catch(err => console.log(err));
       })
-      .catch(err => console.log(err));
+      .catch(error => console.log(error));
+
+    // const bufferedImageData = new Buffer.Buffer(this.state.fileData, 'base64');
+    //
+    // let userAvatarKey = this.state.user.username + '_avatar.jpg';
+    // Storage.put(userAvatarKey, bufferedImageData, {
+    //   contentType: 'image/jpg',
+    //   level: 'public',
+    // })
+    //   .then(result => {
+    //     Storage.get(userAvatarKey, {
+    //       level: 'public',
+    //       type: 'image/jpg',
+    //     })
+    //       .then(data => {
+    //         // console.log(data);
+    //         // this.setState({url: data});
+    //         this.props.AddAvatarLink(data);
+    //         this.setState({buttonMode: 'pick'});
+    //       })
+    //       .catch(error => console.log(error));
+    //   })
+    //   .catch(err => console.log(err));
+  };
+
+  loadTestImg = () => {
+    Storage.get('test/plant.JPG', {
+      level: 'public',
+      type: 'image/jpg',
+    })
+      .then(data => {
+        console.log(data);
+        // this.setState({testImgUrl: data});
+      })
+      .catch(error => console.log(error));
   };
 
   render() {
@@ -342,7 +404,7 @@ class UserPage extends React.Component {
           >
             Log Out
           </Button>
-          {/*<Button onPress={this.uploadImage}>Upload</Button>*/}
+          <Button onPress={this.loadTestImg}>test</Button>
         </Card>
       </View>
     );

@@ -9,7 +9,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 // import {Provider} from 'react-redux';
-import {createStore} from 'redux';
+import {bindActionCreators, createStore} from 'redux';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator, HeaderBackButton} from 'react-navigation-stack';
 import {Image, TouchableOpacity, View, Dimensions} from 'react-native';
@@ -37,6 +37,10 @@ import {
 import {Layout, Modal} from '@ui-kitten/components';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import SafeAreaView from 'react-native-safe-area-view';
+import Consts from '../../ENV_VARS';
+import axios from 'axios';
+import {AddAvatarLink} from '../../FriendActions';
+import connect from 'react-redux/lib/connect/connect';
 
 const plantyColor = '#6f9e04';
 
@@ -52,12 +56,13 @@ class AdjustPlantConditions extends React.Component {
       uv: '1000',
       humidity: '50',
       isSwitchOn: false,
+      deletingPlanter: false,
     };
     // this.dealWithData = this.dealWithData.bind(this);
     // this.fetchUser = this.fetchUser.bind(this);
   }
   componentDidMount(): void {
-    console.log(this.state.user);
+    // console.log(this.state.user);
   }
 
   adjustValueOnPlanter() {
@@ -282,6 +287,90 @@ class AdjustPlantConditions extends React.Component {
     );
   };
 
+  async deletePlanter() {
+    // console.log(this.props.navigation.getParam('user').username);
+
+    this.setState({deletingPlanter: true});
+
+    // console.log(this.props.navigation.getParam('user').username);
+    // console.log(this.state.planterName);
+    // console.log(this.state.planterDescription);
+    // console.log(this.state.selectedOption['text']);
+    // console.log(this.state.USER_TOKEN);
+
+    // console.log(
+    //   this.props.plantyData.myCognitoUser.signInUserSession.accessToken
+    //     .jwtToken,
+    // );
+    // return null;
+
+    console.log('In delete plant');
+    // console.log(this.props.navigation);
+    const AuthStr = 'Bearer '.concat(
+      this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
+    );
+    // console.log(
+    //   this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
+    // );
+
+    // console.log(this.state.item.name);
+    // console.log(this.props.plantyData.myCognitoUser.username);
+    // console.log(Consts.apigatewayRoute + '/removePlantFromPlanter');
+
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/removePlantFromPlanter',
+        {
+          username: this.props.plantyData.myCognitoUser.username,
+          planterName: this.state.item.name,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        // If request is good...
+        // console.log(response.data);
+        // this.dealWithUrlData(response.data);
+        console.log(response);
+        this.successDeleting();
+      })
+      .catch(error => {
+        this.failureDeleting();
+        console.log('error ' + error);
+      });
+
+    // setTimeout(this.successDeleting, 1000);
+    // setTimeout(this.failureAdding, 1000);
+  }
+
+  successDeleting = () => {
+    this.setState({
+      deletingPlanter: false,
+      // deletingPlanticon: 'check',
+      // deletingPlantText: 'Deleted',
+      // deletingPlantDisabled: true,
+    });
+    setTimeout(this.goBack, 1000);
+
+    // this.props.navigation.getParam('loadPlanters')();
+  };
+
+  goBack = () => {
+    this.props.navigation.navigate('HomeScreenUser', {
+      planterWasRemoved: true,
+    });
+  };
+
+  failureDeleting = () => {
+    this.setState({
+      deletingPlanter: false,
+      // deletingPlanticon: 'alert-circle-outline',
+      // deletingPlantText: 'Failed to delete',
+      // deletingPlantDisabled: true,
+    });
+  };
+
   render() {
     return (
       <View style={{margin: '1%', width: '98%'}}>
@@ -370,6 +459,17 @@ class AdjustPlantConditions extends React.Component {
               {this.renderHumidityInput()}
               {this.renderUVInput()}
               {this.renderAutomation()}
+              <Button
+                icon="delete"
+                mode="outlined"
+                loading={this.state.deletingPlanter}
+                onPress={() => {
+                  this.deletePlanter()
+                    .then(r => this.goBack())
+                    .catch(error => console.log(error));
+                }}>
+                Delete planter
+              </Button>
             </PaperCard.Content>
           </Card>
         </KeyboardAwareScrollView>
@@ -403,4 +503,21 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AdjustPlantConditions;
+const mapStateToProps = state => {
+  const {plantyData} = state;
+
+  return {plantyData};
+};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      AddAvatarLink,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AdjustPlantConditions);

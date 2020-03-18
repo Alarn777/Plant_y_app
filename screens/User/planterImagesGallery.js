@@ -9,10 +9,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Auth} from 'aws-amplify';
-
+import Amplify, {Storage} from 'aws-amplify';
 import PropTypes from 'prop-types';
 import {Icon, Text, Card, Button} from '@ui-kitten/components';
-import {ActivityIndicator, FAB} from 'react-native-paper';
+import {
+  ActivityIndicator,
+  FAB,
+  Card as PaperCard,
+  IconButton,
+  Title,
+  Paragraph,
+} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
 // import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -39,79 +46,24 @@ import {AddAvatarLink, addImage, addUser} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
 const plantyColor = '#6f9e04';
 
-class AllAvailablePlants extends React.Component {
+class planterImagesGallery extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       index: 0,
-      userLoggedIn: true,
-      userEmail: '',
-      userName: '',
+      planter: this.props.navigation.getParam('planter'),
       width: Dimensions.get('window').width,
       height: Dimensions.get('window').height,
-      plants: [],
-      parties: [],
-      loading: false,
-      change: false,
       user: null,
-      USER_TOKEN: this.props.navigation.getParam('user_token'),
-      planterToAddTo: this.props.navigation.getParam('planterName'),
+      pictures: [],
+      // USER_TOKEN: this.props.navigation.getParam('user_token'),
+      // planterToAddTo: this.props.navigation.getParam('planterName'),
     };
-    this.loadPlants = this.loadPlants.bind(this);
-    this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
-    this.dealWithData = this.dealWithData.bind(this);
-    this.fetchUser = this.fetchUser.bind(this);
+    // this.loadPlants = this.loadPlants.bind(this);
+    // this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
+    // this.dealWithData = this.dealWithData.bind(this);
+    // this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
-  }
-
-  dealWithData = user => {
-    this.setState({user});
-    if (this.state.user) this.setState({userLoggedIn: true});
-  };
-
-  dealWithPlantsData = plants => {
-    // console.log(plants.Items);
-    // this.setState({loading: false});
-    this.setState({loading: false, plants: plants.Items});
-    // plants.Items.map(plant => this.state.plants.push(plant))
-    //   // this.setState({plants})
-    // this.setState({change:false})
-  };
-
-  async fetchUser() {
-    await Auth.currentAuthenticatedUser({
-      bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
-    })
-      .then(user => {
-        this.dealWithData(user);
-      })
-      .catch(err => console.log(err));
-  }
-
-  async loadPlants() {
-    let USER_TOKEN = '';
-    this.setState({loading: true});
-    USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
-
-    this.state.USER_TOKEN = USER_TOKEN;
-    const AuthStr = 'Bearer '.concat(USER_TOKEN);
-    await axios
-      .get(Consts.apigatewayRoute + '/getAllAvailablePlants', {
-        headers: {Authorization: AuthStr},
-      })
-      .then(response => {
-        // If request is good...
-        // console.log(response.data);
-        this.dealWithPlantsData(response.data);
-      })
-      .catch(error => {
-        console.log('error ' + error);
-      });
-
-    // await axios.get('https://i7maox5n5g.execute-api.eu-west-1.amazonaws.com/test').then(res => {
-    //   // this.dealWithUserData(res.data[0])
-    //   console.log(res);
-    // }).catch(error => console.log(error))
   }
 
   UNSAFE_componentWillMount() {
@@ -126,22 +78,75 @@ class AllAvailablePlants extends React.Component {
     //   .catch(e => console.log(e));
   }
 
-  componentDidMount(): void {
-    const {authState, authData} = this.props;
-    const user = authData;
-    if (user) {
-      const {usernameAttributes = []} = this.props;
-      if (usernameAttributes === 'email') {
-        // Email as Username
-        this.setState({
-          userName: user.attributes ? user.attributes.email : user.username,
-        });
-      }
-    } else this.setState({userName: 'Guest'});
+  async preloadImages(images_array) {
+    // let allImages = ['mint', 'potato', 'sunflower', 'tomato', 'cucumber'];
+    let new_img_array = [];
+    await images_array.map(oneImage => {
+      Storage.get(oneImage.key, {
+        level: 'public',
+        type: 'image/jpg',
+      })
+        .then(data => {
+          // console.log(data);
+          // new_img_array.push({
+          //   UUID: oneImage.eTag,
+          //   url: data,
+          //   lastModified: oneImage.lastModified,
+          //   size: oneImage.size,
+          // });
+          let obj = {
+            UUID: oneImage.eTag,
+            url: data,
+            lastModified: oneImage.lastModified,
+            size: oneImage.size,
+            key: oneImage.key,
+          };
+          // this.props.addImage({name: oneImage, URL: data});
+          // this.setState({url: data});
+          // this.props.AddAvatarLink(data);
+          // this.setState({buttonMode: 'pick'});
+          // console.log(obj);
+          this.setState(prevState => ({
+            pictures: [...prevState.pictures, obj],
+          }));
 
-    this.loadPlants()
-      .then()
-      .catch(e => console.log(e));
+          // this.setState({pictures: [...this.state.pictures, obj]});
+        })
+        .catch(error => console.log(error));
+      // console.log(new_img_array);
+      // console.log(this.state.pictures);
+      // this.setState({images: new_img_array});
+    });
+  }
+
+  componentDidMount(): void {
+    // let USER_TOKEN = this.props.plantyData.myCognitoUser.username;
+
+    let bucketUrl =
+      this.props.plantyData.myCognitoUser.username +
+      '/' +
+      this.state.planter.name;
+
+    Storage.list(bucketUrl, {level: 'public'})
+      .then(result => {
+        // console.log(result);
+        let res_arr = [];
+        result.map(one => {
+          if (one.key === bucketUrl + '/') {
+          } else res_arr.push(one);
+        });
+        this.preloadImages(res_arr)
+          .then(r => console.log())
+          .catch(error => console.log(error));
+        // this.setState({pictures: res_arr});
+      })
+      .catch(err => console.log(err));
+
+    // this.setState({userName: 'Guest'});
+
+    // this.preloadImages()
+    //   .then()
+    //   .catch(e => console.log(e));
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -178,62 +183,40 @@ class AllAvailablePlants extends React.Component {
     });
   }
 
-  _keyExtractor = item => item.id;
+  _keyExtractor = item => item.UUID;
 
   _renderItem = ({item}) => {
     let url = '';
     // console.log(item.name);
-
-    for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
-      if (
-        this.props.plantyData.plantsImages[i].name.toLowerCase() ===
-        item.name.toLowerCase()
-      ) {
-        url = this.props.plantyData.plantsImages[i].URL;
-      }
-      // console.log(this.props.plantyData.plantsImages[i].name);
-    }
+    // for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
+    //   if (
+    //     this.props.plantyData.plantsImages[i].name.toLowerCase() ===
+    //     item.name.toLowerCase()
+    //   ) {
+    //     url = this.props.plantyData.plantsImages[i].URL;
+    //   }
+    // console.log(this.props.plantyData.plantsImages[i].name);
+    // }
     // console.log(url);
-    item.pic = url;
+    // item.pic = url;
 
     // console.log(item);
-
     return (
-      <View>
-        <Card
-          header={() => {
-            return (
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('AddPlantScreen', {
-                    item: item,
-                    user_token: this.state.USER_TOKEN,
-                    planterName: this.props.navigation.getParam('planterName'),
-                  })
-                }>
-                {/*url*/}
-                <Image style={styles.headerImage} source={{uri: url}} />
-                {/*<Image style={styles.headerImage} source={{uri: item.pic}} />*/}
-              </TouchableOpacity>
-            );
-          }}
-          style={{width: this.state.width / 3 - 5}}
-          index={item.UUID}
-          key={item.UUID}>
-          <TouchableOpacity
-            onPress={() => {
-              // console.log(this.props.navigation);
-              this.props.navigation.navigate('AddPlantScreen', {
-                item: item,
-                user_token: this.state.USER_TOKEN,
-                loadPlanters: this.props.navigation.getParam('loadPlanters'),
-                planterName: this.props.navigation.getParam('planterName'),
-              });
-            }}>
-            <Text style={styles.partyText}>{item.name}</Text>
-          </TouchableOpacity>
-        </Card>
-      </View>
+      <TouchableOpacity
+        onPress={() =>
+          this.props.navigation.navigate('Picture', {
+            picture: item,
+            planterName: this.state.planter.name,
+            // user_token: this.state.USER_TOKEN,
+          })
+        }
+        style={{width: this.state.width / 2 - 4}}
+        index={item.UUID}
+        key={item.UUID}>
+        <PaperCard>
+          <PaperCard.Cover style={{padding: 1}} source={{uri: item.url}} />
+        </PaperCard>
+      </TouchableOpacity>
     );
   };
 
@@ -254,14 +237,20 @@ class AllAvailablePlants extends React.Component {
     let height = this.state.height;
     return (
       <View style={styles.container} onLayout={this.onLayout}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>All Available Plants</Text>
-        </View>
+        <PaperCard>
+          <View style={{}}>
+            <PaperCard.Title
+              title={'Your Image Gallery'}
+              subtitle={
+                'Planter:' + this.props.navigation.getParam('planter').name
+              }
+            />
+          </View>
+        </PaperCard>
         <ScrollView style={styles.data}>
           <FlatList
-            numColumns={3}
-            style={{width: this.state.width, margin: 5}}
-            data={this.state.plants}
+            numColumns={2}
+            data={this.state.pictures}
             keyExtractor={this._keyExtractor}
             renderItem={this._renderItem}
           />
@@ -271,7 +260,7 @@ class AllAvailablePlants extends React.Component {
   }
 }
 
-AllAvailablePlants.propTypes = {
+planterImagesGallery.propTypes = {
   navigation: PropTypes.any,
   addEvent: PropTypes.func,
 };
@@ -309,7 +298,7 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(
-  withAuthenticator(AllAvailablePlants, false, [
+  withAuthenticator(planterImagesGallery, false, [
     <SignIn />,
     <ConfirmSignIn />,
     <VerifyContact />,
@@ -358,6 +347,7 @@ const styles = StyleSheet.create({
   data: {
     flexWrap: 'wrap',
     flex: 1,
+    margin: 1,
     flexDirection: 'row',
   },
   headerImage: {
