@@ -313,7 +313,7 @@ class planterScreen extends React.Component {
           this.props.navigation.getParam('item').name +
           '/' +
           timestamp +
-          '_capture.jpeg';
+          '_capture.jpg';
 
         console.log(uploadedImageKey);
 
@@ -451,13 +451,14 @@ class planterScreen extends React.Component {
               this.player = ref;
             }} // Store reference
             resizeMode="stretch"
-            controls={true}
+            // controls={true}
+            paused={false}
             onBuffer={this.loadBuffering} // Callback when remote video is buffering
             // onError={this.videoError}
             onError={this.videoError} // Callback when video cannot be loaded
             style={styles.backgroundVideo}
             minLoadRetryCount={10000}
-            paused={true}
+            // paused={true}
           />
         </ViewShot>
       );
