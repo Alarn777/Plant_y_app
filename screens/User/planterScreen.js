@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {Auth} from 'aws-amplify';
 import data from '../../ENV_VARS';
+import Amplify, {Storage} from 'aws-amplify';
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
 import {Icon, Text, Card, Spinner} from '@ui-kitten/components';
@@ -44,7 +45,9 @@ import connect from 'react-redux/lib/connect/connect';
 import {AddAvatarLink, addStreamUrl, addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import {DeviceEventEmitter} from 'react-native';
+import ViewShot from 'react-native-view-shot';
+import RNFS from 'react-native-fs';
+import Buffer from 'buffer';
 
 const plantyColor = '#6f9e04';
 
@@ -76,6 +79,9 @@ class planterScreen extends React.Component {
       videoUrl: '',
       loadingActions: false,
     };
+
+    this.btnRef = React.createRef();
+
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
     // this.dealWithData = this.dealWithData.bind(this);
@@ -147,16 +153,20 @@ class planterScreen extends React.Component {
   };
 
   componentDidMount(): void {
-    console.log(this.props.plantyData.streamUrl);
+    this.setUrl();
+
+    //
+    //
+
     // if (!this.props.plantyData.streamUrl) this.setUrl();
     // else this.setState({videoUrl: this.props.plantyData.streamUrl});
 
     // if (!this.props.plantyData.streamUrl) this.loadUrl();
     // else this.setState({videoUrl: this.props.plantyData.streamUrl});
 
-    this.loadUrl()
-      .then()
-      .catch(e => console.log(e));
+    // this.loadUrl()
+    //   .then()
+    //   .catch(e => console.log(e));
 
     // let USER_TOKEN = this.props.plantyData.signInUserSession.idToken.jwtToken;
     //
@@ -287,6 +297,45 @@ class planterScreen extends React.Component {
       });
   }
 
+  uploadImage = uri => {
+    this.setState({loadingActions: true});
+    let timestamp = new Date().toISOString();
+    timestamp = timestamp.replace('.', '');
+
+    console.log(uri);
+
+    RNFS.readFile(uri, 'base64')
+      .then(fileData => {
+        const bufferedImageData = new Buffer.Buffer(fileData, 'base64');
+        let uploadedImageKey =
+          this.props.plantyData.myCognitoUser.username +
+          '/' +
+          this.props.navigation.getParam('item').name +
+          '/' +
+          timestamp +
+          '_capture.jpeg';
+
+        console.log(uploadedImageKey);
+
+        Storage.put(uploadedImageKey, bufferedImageData, {
+          contentType: 'image/jpg',
+          level: 'public',
+        })
+          .then(result => {
+            console.log(result);
+            this.setState({loadingActions: false});
+          })
+          .catch(error => {
+            console.log(error);
+            this.setState({loadingActions: false});
+          });
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({loadingActions: false});
+      });
+  };
+
   onLayout(e) {
     this.setState({
       width: Dimensions.get('window').width,
@@ -391,22 +440,26 @@ class planterScreen extends React.Component {
           // style={{top: this.state.height / 3 - 50}}
         />
       );
-    } else
+    }
+    //ref="viewShot"
+    else
       return (
-        <Video
-          source={{uri: this.state.videoUrl, type: 'm3u8'}} // Can be a URL or a local file.
-          ref={ref => {
-            this.player = ref;
-          }} // Store reference
-          resizeMode="stretch"
-          controls={true}
-          onBuffer={this.loadBuffering} // Callback when remote video is buffering
-          // onError={this.videoError}
-          onError={this.videoError} // Callback when video cannot be loaded
-          style={styles.backgroundVideo}
-          minLoadRetryCount={10000}
-          paused={true}
-        />
+        <ViewShot ref={this.btnRef} options={{format: 'jpg', quality: 1}}>
+          <Video
+            source={{uri: this.state.videoUrl, type: 'm3u8'}} // Can be a URL or a local file.
+            ref={ref => {
+              this.player = ref;
+            }} // Store reference
+            resizeMode="stretch"
+            controls={true}
+            onBuffer={this.loadBuffering} // Callback when remote video is buffering
+            // onError={this.videoError}
+            onError={this.videoError} // Callback when video cannot be loaded
+            style={styles.backgroundVideo}
+            minLoadRetryCount={10000}
+            paused={true}
+          />
+        </ViewShot>
       );
   };
 
@@ -426,6 +479,7 @@ class planterScreen extends React.Component {
 
     let height = this.state.height;
     if (this.state.plants.length > 0) {
+      // let refToCapture = this.btnRef;
       return (
         <View style={styles.container} onLayout={this.onLayout}>
           <PaperCard>
@@ -489,9 +543,17 @@ class planterScreen extends React.Component {
                   size={40}
                   disabled={this.state.loadingActions}
                   onPress={() => {
-                    this.sendAction('camera')
-                      .then(r => console.log())
-                      .catch(error => console.log(error));
+                    this.btnRef.current.capture().then(uri => {
+                      this.uploadImage(uri);
+                      console.log(this);
+                    });
+                    // this.refs.viewShot.capture().then(uri => {
+                    //   console.log('do something with ', uri);
+                    // });
+
+                    // this.sendAction('camera')
+                    //   .then(r => console.log())
+                    //   .catch(error => console.log(error));
                   }}
                 />
                 <IconButton
