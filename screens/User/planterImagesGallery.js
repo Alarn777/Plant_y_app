@@ -186,6 +186,12 @@ class planterImagesGallery extends React.Component {
   _keyExtractor = item => item.UUID;
 
   _renderItem = ({item}) => {
+    if (!item.key.endsWith('.jpg') && !item.key.endsWith('.JPG')) {
+      return;
+    }
+
+    console.log(item.key);
+
     let url = '';
     // console.log(item.name);
     // for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {

@@ -324,10 +324,6 @@ class MainScreen extends React.Component {
   };
 
   render() {
-    // let height = this.state.height;
-    // console.log(this.state.url);
-    // console.log(this.props.plantyData);
-    // if (this.state.plants.length > 0) {
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <StatusBar translucent barStyle="dark-content" />

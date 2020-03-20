@@ -26,15 +26,13 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         myCognitoUser: myCognitoUser,
       };
 
-      // case 'REMOVE_EVENT':
-      //   if (events.includes(action.payload)) {
-      //     const index = events.indexOf(action.payload);
-      //     if (index > -1) {
-      //       events.splice(index, 1);
-      //     }
-      //   }
-
-      return {events, favorite_cleaners, socket};
+    // case 'REMOVE_EVENT':
+    //   if (events.includes(action.payload)) {
+    //     const index = events.indexOf(action.payload);
+    //     if (index > -1) {
+    //       events.splice(index, 1);
+    //     }
+    //   }
 
     case 'ADD_STREAM_URL':
       return {

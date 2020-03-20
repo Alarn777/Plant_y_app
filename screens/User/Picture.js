@@ -218,11 +218,15 @@ class Picture extends React.Component {
       <View style={styles.container}>
         <PaperCard style={{height: '100%'}}>
           {/*<PaperCard.Title title="Card Title" subtitle="Card Subtitle" left={(props) => <Avatar.Icon {...props} icon="folder" />} />*/}
-          <PaperCard.Cover
-            style={{height: '70%'}}
-            source={{uri: this.props.navigation.getParam('picture').url}}
-          />
+          {/*<PaperCard.Cover*/}
+          {/*  style={{height: '70%', resizeMode: 'contain'}}*/}
+          {/*  source={{uri: this.props.navigation.getParam('picture').url}}*/}
+          {/*/>*/}
           <PaperCard.Content style={{marginTop: 10}}>
+            <Image
+              style={{height: '70%', resizeMode: 'contain'}}
+              source={{uri: this.props.navigation.getParam('picture').url}}
+            />
             {this.renderTestResults()}
             <Button
               icon={this.state.testingPlanticon}

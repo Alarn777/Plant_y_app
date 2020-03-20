@@ -48,6 +48,7 @@ import {HeaderBackButton} from 'react-navigation-stack';
 import ViewShot from 'react-native-view-shot';
 import RNFS from 'react-native-fs';
 import Buffer from 'buffer';
+import {captureScreen} from 'react-native-view-shot';
 
 const plantyColor = '#6f9e04';
 
@@ -76,7 +77,7 @@ class planterScreen extends React.Component {
       videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
       myCognitoUser: null,
       loading: true,
-      videoUrl: '',
+      streamUrl: '',
       loadingActions: false,
     };
 
@@ -141,19 +142,8 @@ class planterScreen extends React.Component {
     //   .catch();
   }
 
-  setUrl = () => {
-    console.log('setUrl');
-    this.state.videoUrl =
-      'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8';
-    this.setState({
-      videoUrl:
-        'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    });
-    this.props.addStreamUrl(this.state.videoUrl);
-  };
-
   componentDidMount(): void {
-    this.setUrl();
+    // this.setUrl();
 
     //
     //
@@ -164,12 +154,15 @@ class planterScreen extends React.Component {
     // if (!this.props.plantyData.streamUrl) this.loadUrl();
     // else this.setState({videoUrl: this.props.plantyData.streamUrl});
 
-    // this.loadUrl()
-    //   .then()
-    //   .catch(e => console.log(e));
-
+    this.loadUrl()
+      .then()
+      .catch(e => console.log(e));
+    // this.setState({
+    //   streamUrl:
+    //     'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+    // });
     // let USER_TOKEN = this.props.plantyData.signInUserSession.idToken.jwtToken;
-    //
+    //z
     // const {authState, authData} = this.props;
     // const user = authData;
     // if (user) {
@@ -189,19 +182,6 @@ class planterScreen extends React.Component {
     // this.props.addUser(user);
   }
 
-  // dealWithData = user => {
-  //   //add to redux
-  //
-  //   this.setState({user});
-  //   if (this.state.user) this.setState({userLoggedIn: true});
-  // };
-  // reload = () => {
-  //   this.setState({videoURL: ''});
-  //   this.loadUrl();
-  //   // this.forceUpdate();
-  // };
-
-  //maybe post is needed (this.props.navigation.getParam('item').stream)
   async loadUrl() {
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
@@ -213,21 +193,36 @@ class planterScreen extends React.Component {
       })
       .then(response => {
         if (response.data) {
-          if (!this.props.plantyData.streamUrl) {
-            this.setState({videoUrl: response.data.HLSStreamingSessionURL});
+          // console.log(this.props.plantyData);
+          if (
+            this.props.plantyData.streamUrl === undefined ||
+            this.props.plantyData.streamUrl === null
+          ) {
+            console.log('SETTING URL');
+            console.log(response.data);
+
+            this.addUrl(response.data.HLSStreamingSessionURL);
+            // this.setState({videoUrl: this.props.plantyData.streamUrl});
             // this.setState({videoUrl: response.data.HLSStreamingSessionURL});
-            this.props.addStreamUrl(this.state.videoUrl);
+            // this.setState({videoUrl: response.data.HLSStreamingSessionURL});
+          } else {
+            console.log('NOT SETTING URL');
+            console.log(response.data);
+            this.setState({streamUrl: this.props.plantyData.streamUrl});
           }
         } else {
-          this.setState({videoUrl: ''});
-          this.props.addStreamUrl('');
+          console.log('No stream data URL');
+          console.log(response);
+
+          // this.setState({videoUrl: ''});
+          // this.props.addStreamUrl(null);
 
           // this.setState({videoUrl: response.data.HLSStreamingSessionURL});
           // else this.setState({videoUrl: this.props.plantyData.streamUrl});
 
-          this.setState({
-            videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
-          });
+          // this.setState({
+          //   videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
+          // });
         }
       })
       .catch(error => {
@@ -241,6 +236,18 @@ class planterScreen extends React.Component {
         });
       });
   }
+
+  addUrl = url => {
+    console.log(url);
+    this.props.addStreamUrl(url);
+    this.setState({streamUrl: this.props.plantyData.streamUrl});
+
+    this.btnRef = React.createRef();
+
+    this.forceUpdate();
+    this.forceUpdate();
+    this.forceUpdate();
+  };
 
   async loadPlants() {
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
@@ -277,12 +284,21 @@ class planterScreen extends React.Component {
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
+
+    // 'picture+' +
+    // this.props.authData.username +
+    // '+' +
+    // this.props.navigation.getParam('item').name +
+    // '+' +
+    // this.props.plantyData.streamUrl
+
     await axios
       .post(
-        Consts.apigatewayRoute + '/sendMessageToQueue',
+        Consts.apigatewayRoute + '/takePlanterPicture',
         {
           username: this.props.authData.username,
-          action: action,
+          planter: this.props.navigation.getParam('item').name,
+          url: this.props.plantyData.streamUrl,
         },
         {
           headers: {Authorization: AuthStr},
@@ -302,8 +318,6 @@ class planterScreen extends React.Component {
     let timestamp = new Date().toISOString();
     timestamp = timestamp.replace('.', '');
 
-    console.log(uri);
-
     RNFS.readFile(uri, 'base64')
       .then(fileData => {
         const bufferedImageData = new Buffer.Buffer(fileData, 'base64');
@@ -314,8 +328,6 @@ class planterScreen extends React.Component {
           '/' +
           timestamp +
           '_capture.jpg';
-
-        console.log(uploadedImageKey);
 
         Storage.put(uploadedImageKey, bufferedImageData, {
           contentType: 'image/jpg',
@@ -373,7 +385,6 @@ class planterScreen extends React.Component {
               </TouchableOpacity>
             );
           }}
-          // style={{width: this.state.width / 3 - 5, margin: 1}}
           style={{width: this.state.width / 3, padding: 3}}
           index={item.id}
           key={item.id}>
@@ -431,36 +442,27 @@ class planterScreen extends React.Component {
   };
 
   renderVideo = () => {
-    if (this.state.videoUrl === '' || this.state.videoUrl === undefined) {
+    if (
+      this.state.streamUrl === '' ||
+      this.state.streamUrl === undefined ||
+      this.state.streamUrl === null
+    ) {
+      return <ActivityIndicator size="large" color={plantyColor} />;
+    } else
       return (
-        <ActivityIndicator
-          // style={{flex: 1}}
-          size="large"
-          color={plantyColor}
-          // style={{top: this.state.height / 3 - 50}}
+        <Video
+          source={{uri: this.state.streamUrl, type: 'm3u8'}} // Can be a URL or a local file.
+          ref={ref => {
+            this.player = ref;
+          }} // Store reference
+          resizeMode="stretch"
+          paused={false}
+          controls={true}
+          onBuffer={this.loadBuffering} // Callback when remote video is buffering
+          onError={this.videoError} // Callback when video cannot be loaded
+          style={styles.backgroundVideo}
+          minLoadRetryCount={10}
         />
-      );
-    }
-    //ref="viewShot"
-    else
-      return (
-        <ViewShot ref={this.btnRef} options={{format: 'jpg', quality: 1}}>
-          <Video
-            source={{uri: this.state.videoUrl, type: 'm3u8'}} // Can be a URL or a local file.
-            ref={ref => {
-              this.player = ref;
-            }} // Store reference
-            resizeMode="stretch"
-            // controls={true}
-            paused={false}
-            onBuffer={this.loadBuffering} // Callback when remote video is buffering
-            // onError={this.videoError}
-            onError={this.videoError} // Callback when video cannot be loaded
-            style={styles.backgroundVideo}
-            minLoadRetryCount={10000}
-            // paused={true}
-          />
-        </ViewShot>
       );
   };
 
@@ -474,7 +476,6 @@ class planterScreen extends React.Component {
           color={plantyColor}
           style={{top: this.state.height / 2 - 50}}
         />
-        // </View>
       );
     }
 
@@ -484,7 +485,7 @@ class planterScreen extends React.Component {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
           <PaperCard>
-            <View style={{}}>
+            <View>
               <PaperCard.Title
                 title={'Planter:' + this.props.navigation.getParam('item').name}
                 subtitle={
@@ -495,13 +496,9 @@ class planterScreen extends React.Component {
                     icon="image-multiple"
                     color={plantyColor}
                     size={40}
-                    // onPress={() =>
-                    //   this.props.navigation.navigate('planterImagesGallery')
-                    // }
                     onPress={() =>
                       this.props.navigation.navigate('planterImagesGallery', {
                         planter: this.state.planter,
-                        // user_token: this.state.USER_TOKEN,
                       })
                     }
                   />
@@ -543,18 +540,19 @@ class planterScreen extends React.Component {
                   color={plantyColor}
                   size={40}
                   disabled={this.state.loadingActions}
-                  onPress={() => {
-                    this.btnRef.current.capture().then(uri => {
-                      this.uploadImage(uri);
-                      console.log(this);
-                    });
-                    // this.refs.viewShot.capture().then(uri => {
-                    //   console.log('do something with ', uri);
-                    // });
+                  // onPress={this.takeScreenShot}
 
-                    // this.sendAction('camera')
-                    //   .then(r => console.log())
-                    //   .catch(error => console.log(error));
+                  // onPress={() => {
+                  //   console.log('capture');
+                  //   this.btnRef.current.capture().then(uri => {
+                  //     this.uploadImage(uri);
+                  //   });
+                  // }}
+
+                  onPress={() => {
+                    this.sendAction()
+                      .then(r => console.log())
+                      .catch(error => console.log(error));
                   }}
                 />
                 <IconButton
@@ -766,6 +764,7 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
+    zIndex: 100,
     width: '100%',
     height: 200,
     backgroundColor: '#D3D3D3',
