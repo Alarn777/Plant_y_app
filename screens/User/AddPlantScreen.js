@@ -14,7 +14,7 @@ import Consts from '../../ENV_VARS';
 
 import {Button, Divider} from 'react-native-paper';
 
-//redusx
+//redux
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {addSocket, addUser, loadPlanters} from '../../FriendActions';

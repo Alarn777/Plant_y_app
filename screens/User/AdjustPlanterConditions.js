@@ -44,7 +44,7 @@ import connect from 'react-redux/lib/connect/connect';
 
 const plantyColor = '#6f9e04';
 
-class AdjustPlantConditions extends React.Component {
+class AdjustPlanterConditions extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -304,25 +304,30 @@ class AdjustPlantConditions extends React.Component {
     // );
     // return null;
 
-    console.log('In delete plant');
+    console.log('In deleting Planter');
     // console.log(this.props.navigation);
     const AuthStr = 'Bearer '.concat(
       this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
     );
+    // console.log(AuthStr);
     // console.log(
     //   this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
     // );
 
-    // console.log(this.state.item.name);
+    // console.log(Consts.apigatewayRoute + '/changeStatusOfPlanter');
     // console.log(this.props.plantyData.myCognitoUser.username);
     // console.log(Consts.apigatewayRoute + '/removePlantFromPlanter');
-
+    // console.log(this.props.plantyData.myCognitoUser.username);
+    // console.log(this.state.item.name);
+    // console.log(this.state.item.UUID);
     await axios
       .post(
-        Consts.apigatewayRoute + '/removePlantFromPlanter',
+        Consts.apigatewayRoute + '/changeStatusOfPlanter',
         {
           username: this.props.plantyData.myCognitoUser.username,
-          planterName: this.state.item.name,
+          // planterName: this.state.item.name,
+          planterUUID: this.state.item.UUID,
+          planterStatus: 'inactive',
         },
         {
           headers: {Authorization: AuthStr},
@@ -520,4 +525,4 @@ const mapDispatchToProps = dispatch =>
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(AdjustPlantConditions);
+)(AdjustPlanterConditions);

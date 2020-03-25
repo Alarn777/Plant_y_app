@@ -40,7 +40,7 @@ import {getWSService} from '../websocket';
 // global.Buffer = global.Buffer || require('buffer').Buffer;
 import Buffer from 'buffer';
 import connect from 'react-redux/lib/connect/connect';
-import {AddAvatarLink, cleanReduxState} from '../../FriendActions';
+import {AddAvatarLink, addSocket, cleanReduxState} from '../../FriendActions';
 import ImageResizer from 'react-native-image-resizer';
 // li RNFS = require('react-native-fs');
 import RNFS from 'react-native-fs';
@@ -94,8 +94,6 @@ class UserPage extends React.Component {
     //   })
     //   .catch(error => console.log(error));
   }
-
-  UNSAFE_componentWillMount(): void {}
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};

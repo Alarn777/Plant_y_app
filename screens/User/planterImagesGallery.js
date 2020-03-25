@@ -56,6 +56,7 @@ class planterImagesGallery extends React.Component {
       height: Dimensions.get('window').height,
       user: null,
       pictures: [],
+      picWasRemoved: false,
       // USER_TOKEN: this.props.navigation.getParam('user_token'),
       // planterToAddTo: this.props.navigation.getParam('planterName'),
     };
@@ -64,6 +65,23 @@ class planterImagesGallery extends React.Component {
     // this.dealWithData = this.dealWithData.bind(this);
     // this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    if (
+      // this.props.navigation.getParam('plantWasRemoved') ||
+      this.props.navigation.getParam('picWasRemoved')
+    ) {
+      this.listPicturesData()
+        .then()
+        .catch();
+      // this.props.navigation.setParams({plantWasAdded: false});
+      this.props.navigation.setParams({picWasRemoved: false});
+    }
   }
 
   UNSAFE_componentWillMount() {
@@ -80,7 +98,9 @@ class planterImagesGallery extends React.Component {
 
   async preloadImages(images_array) {
     // let allImages = ['mint', 'potato', 'sunflower', 'tomato', 'cucumber'];
-    let new_img_array = [];
+    console.log('Now loading');
+    console.log(images_array);
+
     await images_array.map(oneImage => {
       Storage.get(oneImage.key, {
         level: 'public',
@@ -122,6 +142,39 @@ class planterImagesGallery extends React.Component {
   componentDidMount(): void {
     // let USER_TOKEN = this.props.plantyData.myCognitoUser.username;
 
+    // let bucketUrl =
+    //   this.props.plantyData.myCognitoUser.username +
+    //   '/' +
+    //   this.state.planter.name;
+    //
+    // Storage.list(bucketUrl, {level: 'public'})
+    //   .then(result => {
+    //     // console.log(result);
+    //     let res_arr = [];
+    //     result.map(one => {
+    //       if (one.key === bucketUrl + '/') {
+    //       } else res_arr.push(one);
+    //     });
+    //     this.preloadImages(res_arr)
+    //       .then(r => console.log())
+    //       .catch(error => console.log(error));
+    //     // this.setState({pictures: res_arr});
+    //   })
+    //   .catch(err => console.log(err));
+
+    // this.setState({userName: 'Guest'});
+
+    // this.preloadImages()
+    //   .then()
+    //   .catch(e => console.log(e));
+    this.listPicturesData()
+      .then()
+      .catch();
+  }
+
+  async listPicturesData() {
+    this.setState({pictures: []});
+
     let bucketUrl =
       this.props.plantyData.myCognitoUser.username +
       '/' +
@@ -152,7 +205,6 @@ class planterImagesGallery extends React.Component {
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -190,30 +242,12 @@ class planterImagesGallery extends React.Component {
       return;
     }
 
-    console.log(item.key);
-
-    let url = '';
-    // console.log(item.name);
-    // for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
-    //   if (
-    //     this.props.plantyData.plantsImages[i].name.toLowerCase() ===
-    //     item.name.toLowerCase()
-    //   ) {
-    //     url = this.props.plantyData.plantsImages[i].URL;
-    //   }
-    // console.log(this.props.plantyData.plantsImages[i].name);
-    // }
-    // console.log(url);
-    // item.pic = url;
-
-    // console.log(item);
     return (
       <TouchableOpacity
         onPress={() =>
           this.props.navigation.navigate('Picture', {
             picture: item,
             planterName: this.state.planter.name,
-            // user_token: this.state.USER_TOKEN,
           })
         }
         style={{width: this.state.width / 2 - 4}}

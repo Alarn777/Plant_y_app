@@ -51,7 +51,7 @@ import {
   VerifyContact,
 } from './screens/Auth';
 import {Image} from 'react-native';
-import AdjustPlantConditions from './screens/User/AdjustPlantConditions';
+import AdjustPlantConditions from './screens/User/AdjustPlanterConditions';
 import addPlanterScreen from './screens/User/addPlanterScreen';
 import planterImagesGallery from './screens/User/planterImagesGallery';
 import Picture from './screens/User/Picture';

@@ -33,10 +33,10 @@ class Picture extends React.Component {
       // deletingPlantIcon:'delete',
       // USER_TOKEN: this.props.navigation.getParam('user_token'),
       URL: '',
-      // planterName: this.props.navigation.getParam('planterName'),
+      planterName: this.props.navigation.getParam('planterName'),
       loadBuffering: false,
       loading: false,
-
+      deletingPic: false,
       testingPlantText: 'Test',
       testingPlant: false,
       testingPlanticon: 'clipboard-play-outline',
@@ -135,7 +135,27 @@ class Picture extends React.Component {
       });
   }
 
-  async deletePicture() {}
+  async deletePicture() {
+    this.setState({deletingPic: true});
+    let pictureKey = this.props.navigation.getParam('picture').key;
+    // console.log(pictureKey);
+
+    Storage.remove(pictureKey, {level: 'public'})
+      .then(result => {
+        console.log(result);
+        this.setState({deletingPic: true});
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({deletingPic: true});
+      });
+  }
+
+  goBack = () => {
+    this.props.navigation.navigate('planterImagesGallery', {
+      picWasRemoved: true,
+    });
+  };
 
   successTesting = () => {
     this.setState({
@@ -240,60 +260,26 @@ class Picture extends React.Component {
                 this.checkPlantHealth()
                   .then()
                   .catch();
-                // navigation.goBack();
               }}>
               {this.state.testingPlantText}
             </Button>
+            <Button
+              icon="delete"
+              // mode="outlined"
+              style={{margin: 10}}
+              loading={this.state.deletingPic}
+              mode="outlined"
+              backgroundColor="#6f9e04"
+              color="#6f9e04"
+              onPress={() => {
+                this.deletePicture()
+                  .then(setTimeout(this.goBack, 500))
+                  .catch();
+              }}>
+              Delete picture
+            </Button>
           </PaperCard.Content>
-
-          {/*<PaperCard.Actions>*/}
-          {/*  <Button*/}
-          {/*    icon={this.state.testingPlanticon}*/}
-          {/*    style={{margin: 10}}*/}
-          {/*    loading={this.state.testingPlant}*/}
-          {/*    // disabled={this.state.testingPlantDisabled}*/}
-          {/*    mode="outlined"*/}
-          {/*    backgroundColor="#6f9e04"*/}
-          {/*    color="#6f9e04"*/}
-          {/*    onPress={() => {*/}
-          {/*      this.checkPlantHealth()*/}
-          {/*        .then()*/}
-          {/*        .catch();*/}
-          {/*      // navigation.goBack();*/}
-          {/*    }}>*/}
-          {/*    {this.state.testingPlantText}*/}
-          {/*  </Button>*/}
-          {/*</PaperCard.Actions>*/}
         </PaperCard>
-
-        {/*<PaperCard />*/}
-        {/*<PaperCard.Content>*/}
-        {/*  <Image*/}
-        {/*    style={{height: '75%', width: this.state.width - 10}}*/}
-        {/*    source={{uri: this.props.navigation.getParam('picture').url}}*/}
-        {/*  />*/}
-        {/*</PaperCard.Content>*/}
-        {/*<PaperCard.Actions>*/}
-        {/*  <Button*/}
-        {/*    icon={this.state.testingPlanticon}*/}
-        {/*    style={{margin: 10}}*/}
-        {/*    loading={this.state.testingPlant}*/}
-        {/*    // disabled={this.state.testingPlantDisabled}*/}
-        {/*    mode="outlined"*/}
-        {/*    backgroundColor="#6f9e04"*/}
-        {/*    color="#6f9e04"*/}
-        {/*    onPress={() => {*/}
-        {/*      this.checkPlantHealth()*/}
-        {/*        .then()*/}
-        {/*        .catch();*/}
-        {/*      // navigation.goBack();*/}
-        {/*    }}>*/}
-        {/*    {this.state.testingPlantText}*/}
-        {/*  </Button>*/}
-        {/*</PaperCard.Actions>*/}
-        {/*<PaperCard />*/}
-        {/*<Text style={styles.mainText}>Planter health</Text>*/}
-        {/*<PaperCard>{this.renderTestResults()}</PaperCard>*/}
       </View>
     );
   }

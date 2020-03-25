@@ -15,7 +15,7 @@ const INITIAL_STATE = {
 };
 
 const cleanerReducer = (state = INITIAL_STATE, action) => {
-  const {myCognitoUser, avatarUrl, plantsImages, streamUrl} = state;
+  const {myCognitoUser, avatarUrl, plantsImages, streamUrl, socket} = state;
 
   switch (action.type) {
     case 'CLEAN_STATE':
@@ -23,6 +23,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         streamUrl: null,
         plantsImages: [],
         avatarUrl: '',
+        socket: null,
         myCognitoUser: myCognitoUser,
       };
 
@@ -34,12 +35,21 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     //     }
     //   }
 
+    case 'ADD_SOCKET':
+      return {
+        streamUrl: streamUrl,
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
+        socket: action.payload,
+        myCognitoUser: myCognitoUser,
+      };
+
     case 'ADD_STREAM_URL':
       return {
         streamUrl: action.payload,
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
-        // myCognitoUser: action.payload,
+        socket: socket,
         myCognitoUser: myCognitoUser,
       };
 
@@ -76,6 +86,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         streamUrl: streamUrl,
         plantsImages: newArr,
         avatarUrl: avatarUrl,
+        socket: socket,
         myCognitoUser: myCognitoUser,
       };
     //
@@ -102,6 +113,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         streamUrl: streamUrl,
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
+        socket: socket,
         myCognitoUser: action.payload,
       };
 
@@ -113,6 +125,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         streamUrl: streamUrl,
         plantsImages: plantsImages,
         avatarUrl: action.payload,
+        socket: socket,
         myCognitoUser: myCognitoUser,
       };
 
@@ -123,6 +136,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         // favorite_cleaners: [],
         // socket: [],
         streamUrl: streamUrl,
+        socket: socket,
         planters: action.payload.Items,
         myCognitoUser: action.payload,
       };

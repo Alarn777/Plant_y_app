@@ -47,6 +47,19 @@ import {
   cleanReduxState,
 } from '../../FriendActions';
 import {bindActionCreators} from 'redux';
+const Sockette = require('sockette');
+import {w3cwebsocket as W3CWebSocket} from 'websocket';
+// const ws = new Sockette('ws://localhost:3000', {
+//   timeout: 5e3,
+//   maxAttempts: 3,
+//   onopen: e => console.log('Connected!', e),
+//   onmessage: e => console.log('Received:', e),
+//   onreconnect: e => console.log('Reconnecting...', e),
+//   onmaximum: e => console.log('Stop Attempting!', e),
+//   onclose: e => console.log('Closed!', e),
+//   onerror: e => console.log('Error:', e),
+// });
+
 import SocketIOClient from 'socket.io-client';
 // import {idPattern} from 'react-native-svg/\lib/typescript/lib/util';
 
@@ -129,8 +142,6 @@ class MainScreen extends React.Component {
         })
         .catch(error => console.log(error));
     });
-
-    console.log('didmount');
   };
 
   dealWithData = user => {
@@ -159,8 +170,10 @@ class MainScreen extends React.Component {
   }
 
   async loadPlanters() {
-    // console.log('called reload plants');
+    console.log('loading plants.');
+    this.setState({plants: []});
 
+    // console.log('called reload plants');
     let USER_TOKEN = '';
 
     USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
@@ -199,7 +212,7 @@ class MainScreen extends React.Component {
     }
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount(): void {
     this.fetchUser()
       .then(() => {
         this.props.navigation.setParams({logOut: this.logOut});
@@ -211,9 +224,7 @@ class MainScreen extends React.Component {
         //open socket
       })
       .catch(e => console.log(e));
-  }
 
-  componentDidMount(): void {
     const {authState, authData} = this.props;
     const user = authData;
     if (user) {
@@ -253,12 +264,46 @@ class MainScreen extends React.Component {
     // console.log(this.props.plantyData);
 
     this.preloadImages();
+
+    //socket initiation
+    // const client = new W3CWebSocket(Consts.socket_connection_url);
+    // client.onopen = () => {
+    //   console.log('WebSocket Client Connected');
+    // };
+    // client.onmessage = message => {
+    //   console.log(message);
+    // };
+
+    let socket = new Sockette(Consts.apigatewaySocket, {
+      timeout: 5e3,
+      maxAttempts: 3,
+      onopen: e => console.log('Connected!', e),
+      onmessage: e => this.showMessage(e),
+      onreconnect: e => console.log('Reconnecting...', e),
+      onmaximum: e => console.log('Stop Attempting!', e),
+      onclose: e => console.log('Closed!', e),
+      onerror: e => console.log('Error:', e),
+    });
+
+    this.props.addSocket(socket);
   }
+
+  showMessage = e => {
+    this.loadPlanters()
+      .then()
+      .catch();
+
+    console.log(e.data);
+  };
 
   logOut = () => {
     // console.log('log out in main');
     // this.props.onStateChange('signedOut');
-
+    try {
+      this.props.plantyData.websocket.close();
+    } catch (e) {
+      console.log(e);
+    }
     // const { onStateChange } = this.props;
     Auth.signOut()
       .then(() => {
@@ -281,9 +326,13 @@ class MainScreen extends React.Component {
     });
   }
 
-  _keyExtractor = item => item.id;
+  _keyExtractor = item => item.UUID;
 
   _renderItem = ({item}) => {
+    if (item.planterStatus === 'inactive') {
+      return;
+    }
+
     return (
       <View>
         <Card
@@ -391,6 +440,26 @@ class MainScreen extends React.Component {
               loadPlanters: this.loadPlanters,
             })
           }
+        />
+        <FAB
+          style={{
+            position: 'absolute',
+            margin: 16,
+            backgroundColor: '#6f9e04',
+            color: '#6f9e04',
+            left: 0,
+            bottom: 10,
+          }}
+          large
+          icon="plus"
+          onPress={() => {
+            console.log(this.props.plantyData.socket);
+
+            this.props.plantyData.socket.json({
+              message: 'Hello from react',
+              action: 'message',
+            });
+          }}
         />
       </View>
     );
@@ -500,6 +569,7 @@ const mapDispatchToProps = dispatch =>
       addImage,
       AddAvatarLink,
       cleanReduxState,
+      addSocket,
     },
     dispatch,
   );

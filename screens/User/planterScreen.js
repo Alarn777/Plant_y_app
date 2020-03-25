@@ -45,10 +45,8 @@ import connect from 'react-redux/lib/connect/connect';
 import {AddAvatarLink, addStreamUrl, addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import ViewShot from 'react-native-view-shot';
 import RNFS from 'react-native-fs';
 import Buffer from 'buffer';
-import {captureScreen} from 'react-native-view-shot';
 
 const plantyColor = '#6f9e04';
 
@@ -60,11 +58,8 @@ class planterScreen extends React.Component {
       userLoggedIn: true,
       userEmail: '',
       username: '',
-      // width: 0,
-      // height: 0,
       width: Dimensions.get('window').width,
       height: Dimensions.get('window').height,
-      // plants: this.props.navigation.getParam('item').plants,
       plants: [],
       planter: this.props.navigation.getParam('item'),
       parties: [],
@@ -80,13 +75,8 @@ class planterScreen extends React.Component {
       streamUrl: '',
       loadingActions: false,
     };
-
-    this.btnRef = React.createRef();
-
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
-    // this.dealWithData = this.dealWithData.bind(this);
-    // this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
   }
 
@@ -143,17 +133,6 @@ class planterScreen extends React.Component {
   }
 
   componentDidMount(): void {
-    // this.setUrl();
-
-    //
-    //
-
-    // if (!this.props.plantyData.streamUrl) this.setUrl();
-    // else this.setState({videoUrl: this.props.plantyData.streamUrl});
-
-    // if (!this.props.plantyData.streamUrl) this.loadUrl();
-    // else this.setState({videoUrl: this.props.plantyData.streamUrl});
-
     this.loadUrl()
       .then()
       .catch(e => console.log(e));
@@ -161,25 +140,10 @@ class planterScreen extends React.Component {
     //   streamUrl:
     //     'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
     // });
-    // let USER_TOKEN = this.props.plantyData.signInUserSession.idToken.jwtToken;
-    //z
-    // const {authState, authData} = this.props;
-    // const user = authData;
-    // if (user) {
-    //   const {usernameAttributes = []} = this.props;
-    //   if (usernameAttributes === 'email') {
-    //     // Email as Username
-    //     this.setState({
-    //       username: user.attributes ? user.attributes.email : user.username,
-    //     });
-    //   }
-    //
-    //   this.setState({username: user.username});
-    // } else this.setState({username: 'Guest'});
+
     this.loadPlants()
       .then()
       .catch(e => console.log(e));
-    // this.props.addUser(user);
   }
 
   async loadUrl() {
@@ -259,6 +223,7 @@ class planterScreen extends React.Component {
         {
           username: this.props.authData.username,
           planterName: this.props.navigation.getParam('item').name,
+          planterUUID: this.props.navigation.getParam('item').UUID,
         },
         {
           headers: {Authorization: AuthStr},
@@ -284,14 +249,31 @@ class planterScreen extends React.Component {
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/sendMessageToQueue',
+        {
+          username: this.props.authData.username,
+          action: action,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        this.setState({loadingActions: false});
+      })
+      .catch(error => {
+        this.setState({loadingActions: false});
+        console.log('error ' + error);
+      });
+  }
 
-    // 'picture+' +
-    // this.props.authData.username +
-    // '+' +
-    // this.props.navigation.getParam('item').name +
-    // '+' +
-    // this.props.plantyData.streamUrl
-
+  async takePicture() {
+    this.setState({loadingActions: true});
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+      .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
     await axios
       .post(
         Consts.apigatewayRoute + '/takePlanterPicture',
@@ -358,6 +340,10 @@ class planterScreen extends React.Component {
   _keyExtractor = item => item.UUID;
 
   _renderItem = ({item}) => {
+    if (item.plantStatus === 'inactive') {
+      return;
+    }
+
     let url = '';
     for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
       if (
@@ -379,6 +365,7 @@ class planterScreen extends React.Component {
                     item: item,
                     user_token: this.state.USER_TOKEN,
                     planterName: this.props.navigation.getParam('item').name,
+                    planterUUID: this.props.navigation.getParam('item').UUID,
                   })
                 }>
                 <Image style={styles.headerImage} source={{uri: url}} />
@@ -394,6 +381,7 @@ class planterScreen extends React.Component {
                 item: item,
                 user_token: this.state.USER_TOKEN,
                 planterName: this.props.navigation.getParam('item').name,
+                planterUUID: this.props.navigation.getParam('item').UUID,
               })
             }>
             <Text style={styles.partyText}>{item.name}</Text>
@@ -527,7 +515,7 @@ class planterScreen extends React.Component {
                 <IconButton
                   icon={this.state.loadingActions ? 'reload' : 'arrow-left'}
                   color={plantyColor}
-                  disabled={this.state.loadingActions}
+                  disabled={this.state.loadingActions || !this.state.streamUrl}
                   size={40}
                   onPress={() => {
                     this.sendAction('left')
@@ -539,7 +527,7 @@ class planterScreen extends React.Component {
                   icon={this.state.loadingActions ? 'reload' : 'camera'}
                   color={plantyColor}
                   size={40}
-                  disabled={this.state.loadingActions}
+                  disabled={this.state.loadingActions || !this.state.streamUrl}
                   // onPress={this.takeScreenShot}
 
                   // onPress={() => {
@@ -550,7 +538,7 @@ class planterScreen extends React.Component {
                   // }}
 
                   onPress={() => {
-                    this.sendAction()
+                    this.takePicture()
                       .then(r => console.log())
                       .catch(error => console.log(error));
                   }}
@@ -559,7 +547,7 @@ class planterScreen extends React.Component {
                   icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
                   size={40}
-                  disabled={this.state.loadingActions}
+                  disabled={this.state.loadingActions || !this.state.streamUrl}
                   onPress={() => {
                     this.sendAction('right')
                       .then(r => console.log())
@@ -570,17 +558,11 @@ class planterScreen extends React.Component {
               <Text style={styles.headerText}>Plants in Planter</Text>
             </PaperCard.Actions>
           </PaperCard>
-          {/*<PaperCard>*/}
-          {/*  <PaperCard.Title*/}
-          {/*    title={<Text style={styles.headerText}>Plants in Planter</Text>}*/}
-          {/*  />*/}
-          {/*</PaperCard>*/}
           <ScrollView style={styles.data}>
             <FlatList
               vertical={true}
               scrollEnabled={false}
               numColumns={3}
-              // style={{width: this.state.width, margin: 5}}
               data={this.state.plants}
               keyExtractor={this._keyExtractor}
               renderItem={this._renderItem}
@@ -590,12 +572,9 @@ class planterScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              // width: 50,
-
               backgroundColor: '#6f9e04',
               color: '#6f9e04',
               right: 0,
-              // top: height - 200,
               bottom: 10,
             }}
             large
@@ -613,8 +592,6 @@ class planterScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              // width: 50,
-
               backgroundColor: '#6f9e04',
               color: '#6f9e04',
               left: 0,
@@ -638,24 +615,31 @@ class planterScreen extends React.Component {
           <PaperCard>
             <PaperCard.Title
               title={'Planter:' + this.props.navigation.getParam('item').name}
+              subtitle={
+                'Status: ' +
+                this.props.navigation.getParam('item').planterStatus
+              }
             />
             <PaperCard.Content>
-              <Text>Planter is empty now, add some plants</Text>
+              {this.props.navigation.getParam('item').planterStatus ===
+              'pending' ? (
+                <Text>We are preparing your planter...</Text>
+              ) : (
+                <Text>Planter is empty now, add some plants</Text>
+              )}
             </PaperCard.Content>
           </PaperCard>
           <FAB
-            style={
-              //styles.fab
-              {
-                position: 'absolute',
-                margin: 16,
-                // width: 50,
-
-                backgroundColor: plantyColor,
-                color: plantyColor,
-                right: 0,
-                bottom: 10,
-              }
+            style={{
+              position: 'absolute',
+              margin: 16,
+              backgroundColor: plantyColor,
+              color: plantyColor,
+              right: 0,
+              bottom: 10,
+            }}
+            disabled={
+              this.props.navigation.getParam('item').planterStatus === 'pending'
             }
             large
             icon="plus"
@@ -668,13 +652,6 @@ class planterScreen extends React.Component {
             }
           />
         </View>
-
-        // <Text style={{flex: 1}}>No Plants in your garden</Text>
-        // <ActivityIndicator
-        //   style={{flex: 1}}
-        //   animating={true}
-        //   color={'#6f9e04'}
-        // />
       );
     }
   }

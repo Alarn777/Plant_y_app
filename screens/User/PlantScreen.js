@@ -79,12 +79,7 @@ class PlantScreen extends React.Component {
     // console.log('pressed');
     this.setState({deletingPlant: true});
 
-    // console.log(this.props.plantyData.myCognitoUser.username);
-    // console.log(this.props.navigation.getParam('item').name);
-    // console.log(this.props.navigation.getParam('planterName'));
-    // console.log(this.state.USER_TOKEN);
-    // console.log(this.state.plant.description);
-
+    // console.log(this.props.navigation.getParam('planterUUID'));
     // console.log(this.state.plant.UUID);
     // console.log(this.state.planterName);
     // console.log(this.props.plantyData.myCognitoUser.username);
@@ -92,12 +87,13 @@ class PlantScreen extends React.Component {
 
     await axios
       .post(
-        Consts.apigatewayRoute + '/removePlantFromPlanter',
+        Consts.apigatewayRoute + '/changeStatusOfPlant',
         {
           username: this.props.plantyData.myCognitoUser.username,
           plantUUID: this.state.plant.UUID,
           planterName: this.state.planterName,
-          // plantDescription: this.state.plant.description,
+          planterUUID: this.props.navigation.getParam('planterUUID'),
+          plantStatus: 'inactive',
           // plantGrowthPlanGroup: this.state.plant.growthPlanGroup,
           // plantSoil: this.state.plant.soil,
         },
@@ -152,8 +148,20 @@ class PlantScreen extends React.Component {
     const {navigation} = this.props;
     let item = navigation.getParam('item');
 
+    let color = 'black';
+    switch (navigation.getParam('item').plantStatus) {
+      case 'active':
+        color = 'green';
+        break;
+      case 'inactive':
+        color = 'red';
+        break;
+      case 'pending':
+        color = 'orange';
+    }
+
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Card
           header={() => {
             return <Text style={styles.mainText}>{item.name}</Text>;
@@ -186,11 +194,15 @@ class PlantScreen extends React.Component {
           <Text>{this.props.navigation.getParam('item').description}</Text>
           <Divider />
           <Text style={{marginTop: 10, fontWeight: 'bold'}}>
-            Appropriate soils:{' '}
+            Appropriate soils:
             {this.props.navigation.getParam('item').soil.type}
           </Text>
+          <Text style={{marginTop: 10, color: color}}>
+            Plant status:
+            {this.props.navigation.getParam('item').plantStatus}
+          </Text>
         </Card>
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -211,8 +223,8 @@ let styles = StyleSheet.create({
     // flex:1,
     margin: '1%',
     width: '98%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   mainText: {
     fontWeight: 'bold',

@@ -58,41 +58,41 @@ export const fetchPosts = posts => {
   };
 };
 
-export const fetchAllPosts = user => {
-  console.log(user.username);
-  console.log(user.signInUserSession.idToken.jwtToken);
-
-  // return dispatch => {
-  //   return axios
-  //     .post(
-  //       Consts.apigatewayRoute + '/getuserplanters',
-  //       {
-  //         username: this.props.authData.username,
-  //       },
-  //       {
-  //         headers: {Authorization: AuthStr},
-  //       },
-  //     )
-  //     .then(response => {
-  //       console.log(response.data);
-  //       // return {
-  //       //   planters: response.data.Items,
-  //       //   myCognitoUser: action.payload,
-  //       // };
-  //       dispatch(fetchPosts(response.data));
-  //
-  //       // this.dealWithPlantsData(response.data);
-  //     })
-  //     .catch(error => {
-  //       console.log('error ' + error);
-  //       throw error;
-  //     });
-  //   // return axios.get(apiUrl)
-  //   //     .then(response => {
-  //   //       dispatch(fetchPosts(response.data))
-  //   //     })
-  //   //     .catch(error => {
-  //   //       throw(error);
-  //   //     });
-  // };
-};
+// export const fetchAllPosts = user => {
+//   // console.log(user.username);
+//   // console.log(user.signInUserSession.idToken.jwtToken);
+//
+//   // return dispatch => {
+//   //   return axios
+//   //     .post(
+//   //       Consts.apigatewayRoute + '/getuserplanters',
+//   //       {
+//   //         username: this.props.authData.username,
+//   //       },
+//   //       {
+//   //         headers: {Authorization: AuthStr},
+//   //       },
+//   //     )
+//   //     .then(response => {
+//   //       console.log(response.data);
+//   //       // return {
+//   //       //   planters: response.data.Items,
+//   //       //   myCognitoUser: action.payload,
+//   //       // };
+//   //       dispatch(fetchPosts(response.data));
+//   //
+//   //       // this.dealWithPlantsData(response.data);
+//   //     })
+//   //     .catch(error => {
+//   //       console.log('error ' + error);
+//   //       throw error;
+//   //     });
+//   //   // return axios.get(apiUrl)
+//   //   //     .then(response => {
+//   //   //       dispatch(fetchPosts(response.data))
+//   //   //     })
+//   //   //     .catch(error => {
+//   //   //       throw(error);
+//   //   //     });
+//   // };
+// };
