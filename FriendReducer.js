@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
-import axios from 'axios';
 import Consts from './ENV_VARS';
-
+import {onMessage} from './FriendActions';
+const Sockette = require('sockette');
 const INITIAL_STATE = {
   // current: [],
   // possible: [],
@@ -26,6 +26,56 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         socket: null,
         myCognitoUser: myCognitoUser,
       };
+
+    case 'WS_CONNECT':
+      // if (socket !== null) {
+      //   socket.close();
+      // }
+
+      // connect to the remote host
+      let new_socket = new Sockette(Consts.apigatewaySocket, {
+        timeout: 5e3,
+        maxAttempts: 3,
+        onopen: e => console.log('Connected!', e),
+        onmessage: e => onMessage(e),
+        onreconnect: e => console.log('Reconnecting...', e),
+        onmaximum: e => console.log('Stop Attempting!', e),
+        onclose: e => console.log('Closed!', e),
+        onerror: e => console.log('Error:', e),
+      });
+
+      // websocket handlers
+      // socket.onmessage = onMessage(store);
+      // socket.onclose = onClose(store);
+      // socket.onopen = onOpen(store);
+      return {
+        streamUrl: streamUrl,
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
+        socket: new_socket,
+        myCognitoUser: myCognitoUser,
+      };
+
+    case 'WS_DISCONNECT':
+      if (socket !== null) {
+        socket.close();
+      }
+      // socket = null;
+      console.log('websocket closed');
+      return {
+        streamUrl: streamUrl,
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
+        socket: null,
+        myCognitoUser: myCognitoUser,
+      };
+
+    case 'NEW_MESSAGE':
+      console.log('sending a message', action.msg);
+      socket.send(
+        JSON.stringify({command: 'NEW_MESSAGE', message: action.msg}),
+      );
+      return state;
 
     // case 'REMOVE_EVENT':
     //   if (events.includes(action.payload)) {
@@ -64,52 +114,53 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     //   return {events, favorite_cleaners, socket};
     //
 
+    case 'DISPATCH_ACTION':
+      console.log(action.payload);
+      // let actions = action.payload.split('=');
+      //
+      // console.log(actions);
+
+      return {
+        // waterEnabled: false,
+        // lightEnabled: false,
+        // temperatureIncreased: false,
+        // temperatureDecreased: false,
+
+        streamUrl: streamUrl,
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
+        socket: socket,
+        myCognitoUser: myCognitoUser,
+      };
+
     case 'ADD_IMAGE':
       let newArr = [];
       if (!plantsImages) {
         newArr = [];
+        newArr.push(action.payload);
+        return {
+          streamUrl: streamUrl,
+          plantsImages: newArr,
+          avatarUrl: avatarUrl,
+          socket: socket,
+          myCognitoUser: myCognitoUser,
+        };
       } else {
         newArr = plantsImages;
       }
 
-      if (
-        newArr.indexOf(c => {
-          return c.name === action.payload.name;
-        }) < 0
-      ) {
-        newArr.push(action.payload);
-      }
+      newArr.push(action.payload);
+
       return {
-        // events: [],
-        // favorite_cleaners: [],
-        // socket: [],
         streamUrl: streamUrl,
         plantsImages: newArr,
         avatarUrl: avatarUrl,
         socket: socket,
         myCognitoUser: myCognitoUser,
       };
-    //
-    // case 'RELOAD_CLEANERS':
-    //   return {events, favorite_cleaners: [], socket};
 
     case 'ADD_USER':
-      // console.log(action.payload);
-      // return {myCognitoUser: tempMyCognitoUser};
-      // if (
-      //   myCognitoUsers.indexOf(c => {
-      //     return c.username === action.payload.username;
-      //   }) < 0
-      // ) {
-      //   myCognitoUsers.push(action.payload);
-      // }
-      // myCognitoUsers.push(action.payload);
-
-      // console.log(myCognitoUsers);
       return {
-        // events: [],
-        // favorite_cleaners: [],
-        // socket: [],
         streamUrl: streamUrl,
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
@@ -119,9 +170,6 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
 
     case 'ADD_AVATAR_LINK':
       return {
-        // events: [],
-        // favorite_cleaners: [],
-        // socket: [],
         streamUrl: streamUrl,
         plantsImages: plantsImages,
         avatarUrl: action.payload,
@@ -132,43 +180,14 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     case 'FETCH_POST':
       console.log(action.payload);
       return {
-        // events: [],
-        // favorite_cleaners: [],
-        // socket: [],
         streamUrl: streamUrl,
         socket: socket,
         planters: action.payload.Items,
         myCognitoUser: action.payload,
       };
-    // return action.Items;
 
     case 'LOAD_PLANTERS':
       console.log('LOLOAD_PLANTERS');
-      // axios
-      //   .post(
-      //     Consts.apigatewayRoute + '/getuserplanters',
-      //     {
-      //       username: this.props.authData.username,
-      //     },
-      //     {
-      //       headers: {Authorization: AuthStr},
-      //     },
-      //   )
-      //   .then(response => {
-      //     console.log(response.data);
-      //     return {
-      //       planters: response.data.Items,
-      //       myCognitoUser: action.payload,
-      //     };
-      //     // this.dealWithPlantsData(response.data);
-      //   })
-      //   .catch(error => {
-      //     console.log('error ' + error);
-      //     return {
-      //       planters: [],
-      //       myCognitoUser: action.payload,
-      //     };
-      //   });
       return state;
 
     default:

@@ -36,7 +36,6 @@ import ImagePicker from 'react-native-image-picker';
 import Consts from '../../ENV_VARS';
 import {Notifications} from 'react-native-notifications';
 import Amplify, {Storage} from 'aws-amplify';
-import {getWSService} from '../websocket';
 // global.Buffer = global.Buffer || require('buffer').Buffer;
 import Buffer from 'buffer';
 import connect from 'react-redux/lib/connect/connect';
@@ -311,7 +310,7 @@ class UserPage extends React.Component {
       type: 'image/jpg',
     })
       .then(data => {
-        console.log(data);
+        // console.log(data);
         // this.setState({testImgUrl: data});
       })
       .catch(error => console.log(error));
@@ -402,7 +401,7 @@ class UserPage extends React.Component {
           >
             Log Out
           </Button>
-          <Button onPress={this.loadTestImg}>test</Button>
+          {/*<Button onPress={this.loadTestImg}>test</Button>*/}
         </Card>
       </View>
     );

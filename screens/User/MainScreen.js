@@ -22,6 +22,7 @@ import {
   ActivityIndicator,
   Colors,
   Chip,
+  Searchbar,
 } from 'react-native-paper';
 
 import {withAuthenticator} from 'aws-amplify-react-native';
@@ -43,7 +44,9 @@ import {
   addSocket,
   addUser,
   addImage,
+  connectWS,
   fetchAllPosts,
+  dealWithMessage,
   cleanReduxState,
 } from '../../FriendActions';
 import {bindActionCreators} from 'redux';
@@ -97,6 +100,9 @@ class MainScreen extends React.Component {
       myCognitoUser: null,
       url: '',
       planterWasRemoved: false,
+      query: '',
+      allPlanters: [],
+      preloadImages: true,
     };
     this.loadPlanters = this.loadPlanters.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -125,6 +131,8 @@ class MainScreen extends React.Component {
   };
 
   preloadImages = () => {
+    if (!this.state.preloadImages) return;
+
     let allImages = ['mint', 'potato', 'sunflower', 'tomato', 'cucumber'];
 
     allImages.map(oneImage => {
@@ -134,19 +142,24 @@ class MainScreen extends React.Component {
       })
         .then(data => {
           // console.log(data);
+          // console.log(data);
 
           this.props.addImage({name: oneImage, URL: data});
           // this.setState({url: data});
           // this.props.AddAvatarLink(data);
           // this.setState({buttonMode: 'pick'});
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          console.log(error);
+        });
     });
+
+    this.setState({preloadImages: true});
   };
 
   dealWithData = user => {
     //add to redux
-    console.log(user);
+    // console.log(user);
     if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
 
     this.setState({user});
@@ -155,9 +168,29 @@ class MainScreen extends React.Component {
 
   dealWithPlantsData = plants => {
     if (plants.Items) {
-      this.setState({plants: plants.Items});
+      this.setState({plants: plants.Items, allPlanters: plants.Items});
     } else this.setState({plants: []});
   };
+
+  // reloadPlants = query => {
+  //   // this.state.allPlanters = this.state.plants;
+  //   if (this.state.query) console.log(true);
+  //
+  //   if (this.state.query !== '') {
+  //     let newPlants = [];
+  //     this.state.allPlanters.map(one => {
+  //       if (
+  //         one.name.includes(this.state.query) ||
+  //         one.name === this.state.query
+  //       ) {
+  //         newPlants.push(one);
+  //       }
+  //     });
+  //
+  //     this.setState({plants: newPlants});
+  //   } else this.setState({plants: this.state.allPlanters});
+  //   this.setState({query: query});
+  // };
 
   async fetchUser() {
     await Auth.currentAuthenticatedUser({
@@ -210,6 +243,10 @@ class MainScreen extends React.Component {
         .catch();
       this.props.navigation.setParams({planterWasRemoved: false});
     }
+    Auth.currentAuthenticatedUser()
+      .then()
+      // .then(data => console.log(data))
+      .catch(() => this.logOut());
   }
 
   componentDidMount(): void {
@@ -274,36 +311,39 @@ class MainScreen extends React.Component {
     //   console.log(message);
     // };
 
-    let socket = new Sockette(Consts.apigatewaySocket, {
-      timeout: 5e3,
-      maxAttempts: 3,
-      onopen: e => console.log('Connected!', e),
-      onmessage: e => this.showMessage(e),
-      onreconnect: e => console.log('Reconnecting...', e),
-      onmaximum: e => console.log('Stop Attempting!', e),
-      onclose: e => console.log('Closed!', e),
-      onerror: e => console.log('Error:', e),
-    });
+    // let socket = new Sockette(Consts.apigatewaySocket, {
+    //   timeout: 5e3,
+    //   maxAttempts: 3,
+    //   onopen: e => console.log('Connected!', e),
+    //   onmessage: e => this.props.dealWithMessage(e),
+    //   onreconnect: e => console.log('Reconnecting...', e),
+    //   onmaximum: e => console.log('Stop Attempting!', e),
+    //   onclose: e => console.log('Closed!', e),
+    //   onerror: e => console.log('Error:', e),
+    // });
 
-    this.props.addSocket(socket);
+    this.props.connectWS();
+
+    // this.props.addSocket(socket);
   }
 
   showMessage = e => {
+    // b; // this.props.dealWithMessage(e.data);
+    // console.log(e.data);
+
     this.loadPlanters()
       .then()
       .catch();
-
-    console.log(e.data);
   };
 
   logOut = () => {
     // console.log('log out in main');
     // this.props.onStateChange('signedOut');
-    try {
-      this.props.plantyData.websocket.close();
-    } catch (e) {
-      console.log(e);
-    }
+    // try {
+    //   this.props.plantyData.socket.close();
+    // } catch (e) {
+    //   console.log(e);
+    // }
     // const { onStateChange } = this.props;
     Auth.signOut()
       .then(() => {
@@ -314,9 +354,9 @@ class MainScreen extends React.Component {
       })
       .catch(e => console.log(e));
 
-    this.state.userLoggedIn = !this.state.userLoggedIn;
-    this.state.user = null;
-    this.setState({userLoggedIn: false});
+    // this.state.userLoggedIn = !this.state.userLoggedIn;
+    // this.state.user = null;
+    // this.setState({userLoggedIn: false});
   };
 
   onLayout(e) {
@@ -373,6 +413,10 @@ class MainScreen extends React.Component {
   };
 
   render() {
+    // console.log(this.props.plantyData);
+    // console.log(this.state.plants);
+    // console.log(this.state.allPlanters);
+
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <StatusBar translucent barStyle="dark-content" />
@@ -408,15 +452,25 @@ class MainScreen extends React.Component {
           />
           <PaperCard.Actions />
         </PaperCard>
+        {/*<Searchbar*/}
+        {/*  placeholder="Search..."*/}
+        {/*  onChangeText={query => {*/}
+        {/*    // this.setState({query: query});*/}
+        {/*    this.reloadPlants(query);*/}
+        {/*  }}*/}
+        {/*  value={this.state.query}*/}
+        {/*/>*/}
         <View style={styles.header}>
           <Text style={styles.headerText}>My garden</Text>
         </View>
+
         <ScrollView style={styles.data}>
           <FlatList
-            vertical={true}
+            // vertical={false}
+            // horizontal={true}
             scrollEnabled={false}
             numColumns={3}
-            // style={{width: this.state.width, margin: 5}}
+            // style={{height: 400, margin: 5}}
             data={this.state.plants}
             keyExtractor={this._keyExtractor}
             renderItem={this._renderItem}
@@ -441,26 +495,26 @@ class MainScreen extends React.Component {
             })
           }
         />
-        <FAB
-          style={{
-            position: 'absolute',
-            margin: 16,
-            backgroundColor: '#6f9e04',
-            color: '#6f9e04',
-            left: 0,
-            bottom: 10,
-          }}
-          large
-          icon="plus"
-          onPress={() => {
-            console.log(this.props.plantyData.socket);
+        {/*<FAB*/}
+        {/*  style={{*/}
+        {/*    position: 'absolute',*/}
+        {/*    margin: 16,*/}
+        {/*    backgroundColor: '#6f9e04',*/}
+        {/*    color: '#6f9e04',*/}
+        {/*    left: 0,*/}
+        {/*    bottom: 10,*/}
+        {/*  }}*/}
+        {/*  large*/}
+        {/*  icon="plus"*/}
+        {/*  onPress={() => {*/}
+        {/*    // console.log(this.props.plantyData.socket);*/}
 
-            this.props.plantyData.socket.json({
-              message: 'Hello from react',
-              action: 'message',
-            });
-          }}
-        />
+        {/*    this.props.plantyData.socket.json({*/}
+        {/*      message: 'Hello from react',*/}
+        {/*      action: 'message',*/}
+        {/*    });*/}
+        {/*  }}*/}
+        {/*/>*/}
       </View>
     );
     //   } else {
@@ -570,6 +624,8 @@ const mapDispatchToProps = dispatch =>
       AddAvatarLink,
       cleanReduxState,
       addSocket,
+      dealWithMessage,
+      connectWS,
     },
     dispatch,
   );

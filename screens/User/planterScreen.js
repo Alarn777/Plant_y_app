@@ -71,7 +71,7 @@ class planterScreen extends React.Component {
       loadBuffering: true,
       videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
       myCognitoUser: null,
-      loading: true,
+      loading: false,
       streamUrl: '',
       loadingActions: false,
     };
@@ -122,6 +122,13 @@ class planterScreen extends React.Component {
       this.props.navigation.setParams({plantWasAdded: false});
       this.props.navigation.setParams({plantWasRemoved: false});
     }
+    Auth.currentAuthenticatedUser()
+      .then()
+      // .then(data => console.log(data))
+      .catch(() => {
+        console.log('failed to get user');
+        this.props.navigation.getParam('logOut')();
+      });
   }
 
   componentWillUnmount(): void {}
@@ -241,7 +248,7 @@ class planterScreen extends React.Component {
     if (plants) {
       this.setState({plants: plants});
     } else this.setState({plants: []});
-    this.setState({loading: false});
+    // this.setState({loading: false});
   };
 
   async sendAction(action) {

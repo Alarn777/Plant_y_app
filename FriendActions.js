@@ -58,41 +58,47 @@ export const fetchPosts = posts => {
   };
 };
 
-// export const fetchAllPosts = user => {
-//   // console.log(user.username);
-//   // console.log(user.signInUserSession.idToken.jwtToken);
-//
-//   // return dispatch => {
-//   //   return axios
-//   //     .post(
-//   //       Consts.apigatewayRoute + '/getuserplanters',
-//   //       {
-//   //         username: this.props.authData.username,
-//   //       },
-//   //       {
-//   //         headers: {Authorization: AuthStr},
-//   //       },
-//   //     )
-//   //     .then(response => {
-//   //       console.log(response.data);
-//   //       // return {
-//   //       //   planters: response.data.Items,
-//   //       //   myCognitoUser: action.payload,
-//   //       // };
-//   //       dispatch(fetchPosts(response.data));
-//   //
-//   //       // this.dealWithPlantsData(response.data);
-//   //     })
-//   //     .catch(error => {
-//   //       console.log('error ' + error);
-//   //       throw error;
-//   //     });
-//   //   // return axios.get(apiUrl)
-//   //   //     .then(response => {
-//   //   //       dispatch(fetchPosts(response.data))
-//   //   //     })
-//   //   //     .catch(error => {
-//   //   //       throw(error);
-//   //   //     });
-//   // };
+export const dealWithMessage = message => {
+  return {
+    type: 'DISPATCH_ACTION',
+    message,
+  };
+};
+
+// export const onOpen = store => event => {
+//   console.log('websocket open', event.target.url);
+//   store.dispatch(actions.wsConnected(event.target.url));
 // };
+
+// export const onClose = store => () => {
+//   store.dispatch(actions.wsDisconnected());
+// };
+
+export const disconnectWS = data => {
+  return {
+    type: 'WS_DISCONNECT',
+    data,
+  };
+};
+
+export const connectWS = data => {
+  return {
+    type: 'WS_CONNECT',
+    data,
+  };
+};
+
+export const onMessage = event => {
+  console.log('receiving server message');
+  // console.log(event);
+
+  let job = event.data.split('=');
+  console.log(job);
+
+  // switch (payload.type) {
+  //   case 'update_game_players':
+  //     store.dispatch(updateGame(payload.game, payload.current_player));
+  //     break;
+  //   default:
+  //     break;
+};
