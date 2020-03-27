@@ -47,7 +47,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import SafeAreaView from 'react-native-safe-area-view';
 import Consts from '../../ENV_VARS';
 import axios from 'axios';
-import {AddAvatarLink} from '../../FriendActions';
+import {addAction, AddAvatarLink, sendMessage} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
 import Chip from 'react-native-paper/src/components/Chip';
 
@@ -71,8 +71,8 @@ class AdjustPlanterConditions extends React.Component {
       waterTurnedOn: false,
       lightTurnedOn: false,
     };
-    // this.dealWithData = this.dealWithData.bind(this);
-    // this.fetchUser = this.fetchUser.bind(this);
+
+    // this.props.addAction(this.socketAction);
   }
   componentDidMount(): void {
     // console.log(this.state.user);
@@ -81,6 +81,10 @@ class AdjustPlanterConditions extends React.Component {
   adjustValueOnPlanter() {
     //do request to AWS lambda
   }
+
+  socketAction = () => {
+    console.log('socket action in adjust plants');
+  };
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
@@ -391,6 +395,10 @@ class AdjustPlanterConditions extends React.Component {
           onValueChange={() => {
             let action = !this.state.waterTurnedOn ? 'on' : 'off';
 
+            // let message = 'job=water=action=' + action;
+            // console.log(message);
+            // this.props.sendMessage(message);
+            // console.log(this.props.plantyData.socket);
             this.props.plantyData.socket.json({
               message: 'job=water=action=' + action,
               action: 'message',
@@ -496,6 +504,8 @@ class AdjustPlanterConditions extends React.Component {
   };
 
   render() {
+    console.log(this.props.plantyData);
+
     if (this.state.manualMode) {
       return (
         <KeyboardAwareScrollView style={{margin: '1%', width: '98%'}}>
@@ -670,6 +680,7 @@ class AdjustPlanterConditions extends React.Component {
               </Dialog.Actions>
             </Dialog>
           </Portal>
+          <View style={styles.container} />
         </KeyboardAwareScrollView>
       </View>
     );
@@ -711,6 +722,8 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       AddAvatarLink,
+      sendMessage,
+      addAction,
     },
     dispatch,
   );

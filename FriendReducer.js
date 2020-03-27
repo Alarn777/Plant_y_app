@@ -1,13 +1,29 @@
 import {combineReducers} from 'redux';
 import Consts from './ENV_VARS';
-import {onMessage} from './FriendActions';
+import {onMessage, reconnect} from './FriendActions';
 const Sockette = require('sockette');
+
 const INITIAL_STATE = {
   // current: [],
   // possible: [],
   // favorite_cleaners: [],
   // cleaners: [],
-  plantyData: [],
+  // plantyData: [],
+
+  streamUrl: null,
+  plantsImages: [],
+  avatarUrl: '',
+  socket: null,
+  myCognitoUser: null,
+  controls: {
+    waterEnabled: false,
+    lightEnabled: false,
+    temperatureIncreased: false,
+    temperatureDecreased: false,
+  },
+
+  socketActions: [],
+
   // events: [],
   // socket: [],
   // myCognitoUser: {},
@@ -15,7 +31,17 @@ const INITIAL_STATE = {
 };
 
 const cleanerReducer = (state = INITIAL_STATE, action) => {
-  const {myCognitoUser, avatarUrl, plantsImages, streamUrl, socket} = state;
+  // console.log(state);
+
+  const {
+    myCognitoUser,
+    avatarUrl,
+    plantsImages,
+    streamUrl,
+    socket,
+    controls,
+    socketActions,
+  } = state;
 
   switch (action.type) {
     case 'CLEAN_STATE':
@@ -25,6 +51,13 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         avatarUrl: '',
         socket: null,
         myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: false,
+          lightEnabled: false,
+          temperatureIncreased: false,
+          temperatureDecreased: false,
+        },
+        socketActions: [],
       };
 
     case 'WS_CONNECT':
@@ -40,7 +73,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         onmessage: e => onMessage(e),
         onreconnect: e => console.log('Reconnecting...', e),
         onmaximum: e => console.log('Stop Attempting!', e),
-        onclose: e => console.log('Closed!', e),
+        onclose: e => reconnect(e),
         onerror: e => console.log('Error:', e),
       });
 
@@ -54,6 +87,13 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         avatarUrl: avatarUrl,
         socket: new_socket,
         myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
       };
 
     case 'WS_DISCONNECT':
@@ -68,13 +108,21 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         avatarUrl: avatarUrl,
         socket: null,
         myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
       };
 
     case 'NEW_MESSAGE':
-      console.log('sending a message', action.msg);
-      socket.send(
-        JSON.stringify({command: 'NEW_MESSAGE', message: action.msg}),
-      );
+      console.log(action.message);
+
+      // console.log('sending a message', action.payload);
+      // socket.send(JSON.stringify({action: 'message', message: action.payload}));
+      socket.json({action: 'message', message: action.message});
       return state;
 
     // case 'REMOVE_EVENT':
@@ -85,6 +133,29 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     //     }
     //   }
 
+    case 'ACTION':
+      //parce action here'
+
+      console.log('in reducer action');
+      console.log(action);
+
+      socketActions.map(one => one());
+
+      return {
+        streamUrl: streamUrl,
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
+        socket: socket,
+        myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
+      };
+
     case 'ADD_SOCKET':
       return {
         streamUrl: streamUrl,
@@ -92,6 +163,13 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         avatarUrl: avatarUrl,
         socket: action.payload,
         myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
       };
 
     case 'ADD_STREAM_URL':
@@ -101,6 +179,13 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         avatarUrl: avatarUrl,
         socket: socket,
         myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
       };
 
     // case 'REMOVE_CLEANER':
@@ -115,16 +200,19 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     //
 
     case 'DISPATCH_ACTION':
-      console.log(action.payload);
+      // console.log(action.payload);
       // let actions = action.payload.split('=');
       //
       // console.log(actions);
 
       return {
-        // waterEnabled: false,
-        // lightEnabled: false,
-        // temperatureIncreased: false,
-        // temperatureDecreased: false,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
 
         streamUrl: streamUrl,
         plantsImages: plantsImages,
@@ -144,6 +232,13 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
           avatarUrl: avatarUrl,
           socket: socket,
           myCognitoUser: myCognitoUser,
+          controls: {
+            waterEnabled: controls.waterEnabled,
+            lightEnabled: controls.lightEnabled,
+            temperatureIncreased: controls.temperatureIncreased,
+            temperatureDecreased: controls.temperatureDecreased,
+          },
+          socketActions: socketActions,
         };
       } else {
         newArr = plantsImages;
@@ -157,15 +252,30 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         avatarUrl: avatarUrl,
         socket: socket,
         myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
       };
 
     case 'ADD_USER':
+      console.log(state);
       return {
         streamUrl: streamUrl,
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: socket,
         myCognitoUser: action.payload,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
       };
 
     case 'ADD_AVATAR_LINK':
@@ -175,6 +285,13 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         avatarUrl: action.payload,
         socket: socket,
         myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
       };
 
     case 'FETCH_POST':
@@ -190,10 +307,50 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
       console.log('LOLOAD_PLANTERS');
       return state;
 
+    case 'ADD_ACTION':
+      let newActionsArr = [];
+      if (!socketActions) {
+        newActionsArr = [];
+        newActionsArr.push(action.payload);
+        return {
+          streamUrl: streamUrl,
+          plantsImages: plantsImages,
+          avatarUrl: avatarUrl,
+          socket: socket,
+          myCognitoUser: myCognitoUser,
+          controls: {
+            waterEnabled: controls.waterEnabled,
+            lightEnabled: controls.lightEnabled,
+            temperatureIncreased: controls.temperatureIncreased,
+            temperatureDecreased: controls.temperatureDecreased,
+          },
+          socketActions: newActionsArr,
+        };
+      } else {
+        newActionsArr = socketActions;
+      }
+      socketActions.push(action.payload);
+      return {
+        streamUrl: streamUrl,
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
+        socket: socket,
+        myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
+      };
+
     default:
       return state;
   }
 };
+
+// export default cleanerReducer;
 
 export default combineReducers({
   plantyData: cleanerReducer,

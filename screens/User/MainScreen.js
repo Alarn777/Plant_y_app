@@ -46,11 +46,14 @@ import {
   addImage,
   connectWS,
   fetchAllPosts,
+  addAction,
   dealWithMessage,
   cleanReduxState,
 } from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 const Sockette = require('sockette');
+import WS from '../../websocket';
+
 import {w3cwebsocket as W3CWebSocket} from 'websocket';
 // const ws = new Sockette('ws://localhost:3000', {
 //   timeout: 5e3,
@@ -109,6 +112,12 @@ class MainScreen extends React.Component {
     this.dealWithData = this.dealWithData.bind(this);
     this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
+
+    WS.onMessage(data => {
+      console.log('GOT', data);
+      // or something else or use redux
+      // dispatch({type: 'MyType', payload: data});
+    });
   }
 
   static navigationOptions = ({navigation}) => {
@@ -322,18 +331,18 @@ class MainScreen extends React.Component {
     //   onerror: e => console.log('Error:', e),
     // });
 
-    this.props.connectWS();
+    // this.props.connectWS();
 
-    // this.props.addSocket(socket);
+    // this.props.addAction(this.showMessage);
   }
 
   showMessage = e => {
     // b; // this.props.dealWithMessage(e.data);
     // console.log(e.data);
-
-    this.loadPlanters()
-      .then()
-      .catch();
+    console.log('socket action in main screen');
+    // this.loadPlanters()
+    //   .then()
+    //   .catch();
   };
 
   logOut = () => {
@@ -413,7 +422,7 @@ class MainScreen extends React.Component {
   };
 
   render() {
-    // console.log(this.props.plantyData);
+    // console.log(this.props);
     // console.log(this.state.plants);
     // console.log(this.state.allPlanters);
 
@@ -495,113 +504,8 @@ class MainScreen extends React.Component {
             })
           }
         />
-        {/*<FAB*/}
-        {/*  style={{*/}
-        {/*    position: 'absolute',*/}
-        {/*    margin: 16,*/}
-        {/*    backgroundColor: '#6f9e04',*/}
-        {/*    color: '#6f9e04',*/}
-        {/*    left: 0,*/}
-        {/*    bottom: 10,*/}
-        {/*  }}*/}
-        {/*  large*/}
-        {/*  icon="plus"*/}
-        {/*  onPress={() => {*/}
-        {/*    // console.log(this.props.plantyData.socket);*/}
-
-        {/*    this.props.plantyData.socket.json({*/}
-        {/*      message: 'Hello from react',*/}
-        {/*      action: 'message',*/}
-        {/*    });*/}
-        {/*  }}*/}
-        {/*/>*/}
       </View>
     );
-    //   } else {
-    //     return (
-    //       <View style={styles.container} onLayout={this.onLayout}>
-    //         <PaperCard>
-    //           <TouchableOpacity
-    //             onPress={() =>
-    //               this.props.navigation.navigate('UserPage', {
-    //                 user: this.state.user,
-    //               })
-    //             }>
-    //             <PaperCard.Title
-    //               title={'Welcome home,' + this.state.username}
-    //               // subtitle="Card Subtitle"
-    //               left={props => (
-    //                 <Avatar.Icon
-    //                   {...props}
-    //                   style={{backgroundColor: plantyColor}}
-    //                   icon="account"
-    //                 />
-    //               )}
-    //             />
-    //           </TouchableOpacity>
-    //           <PaperCard.Content />
-    //           <PaperCard.Cover
-    //             source={{
-    //               uri:
-    //                 'https://lh3.googleusercontent.com/proxy/PoGeIblQn392nWEhprouNyYclQo5K1D7FzmTiiEqes1iTpOgvurxMyVV1xxu1yWw7qTqUQP-pS8XxSPsx3g9uIkM_3CM1HxVcoUJUy7NnmAK31FF8w',
-    //             }}
-    //           />
-    //           <PaperCard.Actions>
-    //             {/*<Button>Cancel</Button>*/}
-    //             {/*<Button>Ok</Button>*/}
-    //           </PaperCard.Actions>
-    //         </PaperCard>
-    //         <View style={styles.header}>
-    //           <Text style={styles.headerText}>My garden</Text>
-    //         </View>
-    //         <ScrollView style={styles.data}>
-    //           {/*<FlatList*/}
-    //           {/*  vertical={true}*/}
-    //           {/*  scrollEnabled={false}*/}
-    //           {/*  numColumns={3}*/}
-    //           {/*  style={{width: this.state.width, margin: 5}}*/}
-    //           {/*  data={this.state.plants}*/}
-    //           {/*  keyExtractor={this._keyExtractor}*/}
-    //           {/*  renderItem={this._renderItem}*/}
-    //           {/*/>*/}
-    //           <Text style={{alignSelf: 'center', flex: 1}}>
-    //             No Planters in your garden, maybe add some?
-    //           </Text>
-    //         </ScrollView>
-    //         <FAB
-    //           style={
-    //             //styles.fab
-    //             {
-    //               position: 'absolute',
-    //               margin: 16,
-    //               // width: 50,
-    //
-    //               backgroundColor: '#6f9e04',
-    //               color: '#6f9e04',
-    //               right: 0,
-    //               bottom: 10,
-    //             }
-    //           }
-    //           large
-    //           icon="plus"
-    //           onPress={() =>
-    //             this.props.navigation.navigate('addPlanterScreen', {
-    //               user_token: this.state.USER_TOKEN,
-    //               user: this.state.user,
-    //             })
-    //           }
-    //         />
-    //       </View>
-    //
-    //       // <Text style={{flex: 1}}>No Plants in your garden</Text>
-    //       // <ActivityIndicator
-    //       //   style={{flex: 1}}
-    //       //   animating={true}
-    //       //   color={'#6f9e04'}
-    //       // />
-    //     );
-    //   }
-    // }
   }
 }
 
@@ -626,6 +530,7 @@ const mapDispatchToProps = dispatch =>
       addSocket,
       dealWithMessage,
       connectWS,
+      addAction,
     },
     dispatch,
   );

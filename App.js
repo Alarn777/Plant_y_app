@@ -55,7 +55,12 @@ import AdjustPlantConditions from './screens/User/AdjustPlanterConditions';
 import addPlanterScreen from './screens/User/addPlanterScreen';
 import planterImagesGallery from './screens/User/planterImagesGallery';
 import Picture from './screens/User/Picture';
+import WS from './websocket';
 const store = createStore(Reducer);
+
+// const store = createStore(Reducer);
+
+// const store = configureStore();
 
 const AppNavigator = createStackNavigator(
   {
@@ -144,6 +149,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+
+    WS.init();
   }
   static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
