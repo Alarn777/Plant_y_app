@@ -47,6 +47,7 @@ import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
 import RNFS from 'react-native-fs';
 import Buffer from 'buffer';
+import WS from '../../websocket';
 
 const plantyColor = '#6f9e04';
 
@@ -101,6 +102,7 @@ class planterScreen extends React.Component {
         <HeaderBackButton
           title="My Garden"
           onPress={() => {
+            WS.closeSocket();
             navigation.goBack();
           }}
         />
@@ -141,6 +143,14 @@ class planterScreen extends React.Component {
   }
 
   componentDidMount(): void {
+    Auth.currentAuthenticatedUser()
+      .then()
+      // .then(data => console.log(data))
+      .catch(() => {
+        console.log('failed to get user');
+        this.props.navigation.getParam('logOut')();
+      });
+
     this.loadUrl()
       .then()
       .catch(e => console.log(e));
@@ -242,6 +252,7 @@ class planterScreen extends React.Component {
         this.dealWithPlantsData(response.data);
       })
       .catch(error => {
+        // this.setState({loading: false});
         console.log('error ' + error);
       });
   }
@@ -254,6 +265,13 @@ class planterScreen extends React.Component {
   };
 
   async sendAction(action) {
+    switch (action) {
+      case 'left':
+        break;
+      case 'right':
+        break;
+    }
+
     this.setState({loadingActions: true});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
@@ -527,9 +545,15 @@ class planterScreen extends React.Component {
                   disabled={this.state.loadingActions || !this.state.streamUrl}
                   size={40}
                   onPress={() => {
-                    this.sendAction('left')
-                      .then(r => console.log())
-                      .catch(error => console.log(error));
+                    WS.sendMessage(
+                      'FROM_CLIENT;' +
+                        this.props.navigation.getParam('item').UUID +
+                        ';MOVE_CAMERA_LEFT',
+                    );
+
+                    // this.sendAction('left')
+                    //   .then(r => console.log())
+                    //   .catch(error => console.log(error));
                   }}
                 />
                 <IconButton
@@ -558,9 +582,15 @@ class planterScreen extends React.Component {
                   size={40}
                   disabled={this.state.loadingActions || !this.state.streamUrl}
                   onPress={() => {
-                    this.sendAction('right')
-                      .then(r => console.log())
-                      .catch(error => console.log(error));
+                    WS.sendMessage(
+                      'FROM_CLIENT;' +
+                        this.props.navigation.getParam('item').UUID +
+                        ';MOVE_CAMERA_RIGHT',
+                    );
+
+                    // this.sendAction('right')
+                    //   .then(r => console.log())
+                    //   .catch(error => console.log(error));
                   }}
                 />
               </View>

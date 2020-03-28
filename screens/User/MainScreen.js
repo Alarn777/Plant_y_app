@@ -106,6 +106,8 @@ class MainScreen extends React.Component {
     this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
 
+    WS.init();
+
     WS.onMessage(data => {
       console.log('GOT in main screen', data);
       // or something else or use redux
@@ -281,7 +283,9 @@ class MainScreen extends React.Component {
       .then()
       .catch(e => console.log(e));
 
-    if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
+    // if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
+
+    this.props.addUser(user);
 
     let userAvatarKey = 'user_avatars/' + user.username + '_avatar.jpeg';
 
@@ -349,8 +353,9 @@ class MainScreen extends React.Component {
     // const { onStateChange } = this.props;
     Auth.signOut()
       .then(() => {
-        this.props.onStateChange('signedOut');
         this.props.cleanReduxState();
+        this.props.onStateChange('signedOut');
+        // this.props.cleanReduxState();
         this.props.navigation.goBack();
         // onStateChange('signedOut');
       })
@@ -381,13 +386,14 @@ class MainScreen extends React.Component {
           header={() => {
             return (
               <TouchableOpacity
-                onPress={() =>
+                onPress={() => {
+                  WS.init();
                   this.props.navigation.navigate('planterScreen', {
                     item: item,
                     user_token: this.state.USER_TOKEN,
                     loadPlanters: this.loadPlanters,
-                  })
-                }>
+                  });
+                }}>
                 <Image
                   style={styles.headerImage}
                   source={require('../../assets/greenhouse.png')}
@@ -400,13 +406,14 @@ class MainScreen extends React.Component {
           index={item.UUID}
           key={item.UUID}>
           <TouchableOpacity
-            onPress={() =>
+            onPress={() => {
+              WS.init();
               this.props.navigation.navigate('planterScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
                 loadPlanters: this.loadPlanters,
-              })
-            }>
+              });
+            }}>
             <Text style={styles.partyText}>{item.name}</Text>
           </TouchableOpacity>
         </Card>

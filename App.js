@@ -149,8 +149,6 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-
-    WS.init();
   }
   static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
@@ -213,3 +211,13 @@ export default withAuthenticator(App, false, [
   // <Greetings/>,
   <RequireNewPassword />,
 ]);
+
+// if command=="UV_LAMP_ON": uvOn()
+// elif command=="UV_LAMP_OFF": uvOff()
+// elif command=="ADD_WATER": addWater()
+// elif command=="MOVE_CAMERA_RIGHT": cameraMove("R")
+// elif command=="MOVE_CAMERA_LEFT": cameraMove("L")
+// elif command=="VIDEO_STREAM_ON": videoStreamOn()
+// elif command=="VIDEO_STREAM_OFF": videoStreamOff()
+// else:
+// print("Unknown Command: {0}".format(command))

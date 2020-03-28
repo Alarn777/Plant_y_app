@@ -40,6 +40,7 @@ import Consts from '../../ENV_VARS';
 import {bindActionCreators} from 'redux';
 import {addSocket, addUser, loadPlanters} from '../../FriendActions';
 import {connect} from 'react-redux';
+import WS from '../../websocket';
 
 const logger = new Logger('SignIn');
 
@@ -79,7 +80,6 @@ class SignIn extends AuthPiece {
         }
         //create table for user
         // console.log(user.signInUserSession.idToken.jwtToken);
-
         const AuthStr = 'Bearer '.concat(
           user.signInUserSession.idToken.jwtToken,
         );

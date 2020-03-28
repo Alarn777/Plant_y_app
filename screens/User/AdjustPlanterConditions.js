@@ -71,11 +71,32 @@ class AdjustPlanterConditions extends React.Component {
       deletingPlanter: false,
       waterTurnedOn: false,
       lightTurnedOn: false,
+      loadingLightTurnedOn: false,
+      waterAdded: false,
+      loadingAddingWater: false,
     };
 
     WS.onMessage(data => {
       console.log('GOT in adjust screen', data);
 
+      let instructions = data.data.split(';');
+      // "FROM_PLANTER;e0221623-fb88-4fbd-b524-6f0092463c93;WATER_ADDED"
+      if (instructions.length > 2)
+        switch (instructions[2]) {
+          case 'WATER_ADDED':
+            this.setState({waterAdded: true, loadingAddingWater: false});
+            break;
+          case 'UV_LAMP_IS_ON':
+            this.setState({lightTurnedOn: true, loadingLightTurnedOn: false});
+            break;
+          case 'UV_LAMP_IS_OFF':
+            this.setState({lightTurnedOn: false, loadingLightTurnedOn: false});
+            break;
+          case 'FAILED':
+            alert('Failed to communicate with server');
+            this.forceUpdate();
+            break;
+        }
       // or something else or use redux
       // dispatch({type: 'MyType', payload: data});
     });
@@ -395,14 +416,13 @@ class AdjustPlanterConditions extends React.Component {
         <Chip style={{backgroundColor: 'white'}} icon="water-pump">
           Turn on water supply
         </Chip>
-        {/*<Text style={styles.actionsText}>Turn on water supply</Text>*/}
         <Button
           mode="outlined"
+          loading={this.state.loadingAddingWater}
           onPress={() => {
+            this.setState({loadingAddingWater: true});
             WS.sendMessage(
-              'FROM_CLIENT;' +
-                this.state.item.name.toLowerCase() +
-                ';ADD_WATER',
+              'FROM_CLIENT;' + this.state.item.UUID + ';ADD_WATER',
             );
           }}>
           Add water
@@ -452,23 +472,40 @@ class AdjustPlanterConditions extends React.Component {
           // padding: 8,
         }}>
         <Chip style={{backgroundColor: 'white'}} icon="ceiling-light">
-          Turn on light
+          Toggle light
         </Chip>
-        <Switch
-          value={this.state.lightTurnedOn}
-          onValueChange={() => {
+        <Button
+          mode="outlined"
+          loading={this.state.loadingLightTurnedOn}
+          onPress={() => {
             let action = !this.state.lightTurnedOn ? 'on' : 'off';
-
+            this.setState({loadingLightTurnedOn: true});
             WS.sendMessage(
               'FROM_CLIENT;' +
-                this.state.item.name.toLowerCase() +
+                this.state.item.UUID +
                 ';UV_LAMP_' +
                 action.toUpperCase(),
             );
+          }}>
+          {this.state.lightTurnedOn ? 'on' : 'off'}
+        </Button>
 
-            this.setState({lightTurnedOn: !this.state.lightTurnedOn});
-          }}
-        />
+        {/*<Switch*/}
+        {/*  disabled={true}*/}
+        {/*  value={this.state.lightTurnedOn}*/}
+        {/*  onValueChange={() => {*/}
+        {/*    let action = !this.state.lightTurnedOn ? 'on' : 'off';*/}
+
+        {/*    WS.sendMessage(*/}
+        {/*      'FROM_CLIENT;' +*/}
+        {/*        this.state.item.UUID +*/}
+        {/*        ';UV_LAMP_' +*/}
+        {/*        action.toUpperCase(),*/}
+        {/*    );*/}
+
+        {/*    // this.setState({lightTurnedOn: !this.state.lightTurnedOn});*/}
+        {/*  }}*/}
+        {/*/>*/}
       </View>
     );
   };
@@ -499,25 +536,15 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             marginBottom: 10,
             marginTop: 10,
-            // padding: 8,
           }}>
           <FAB
             style={styles.fab}
             small
             icon="minus"
             onPress={() => {
-              // this.props.plantyData.socket.json({
-              //   message: 'job=temperature=action=minus',
-              //   action: 'message',
-              // });
-
               WS.sendMessage(
-                'FROM_CLIENT;' +
-                  this.state.item.name.toLowerCase() +
-                  ';INCREASE_TEMP',
+                'FROM_CLIENT;' + this.state.item.UUID + ';INCREASE_TEMP',
               );
-
-              // this.forceUpdate();
               // this.setState({lightTurnedOn: !this.state.lightTurnedOn});
             }}
           />
@@ -527,18 +554,10 @@ class AdjustPlanterConditions extends React.Component {
             small
             icon="plus"
             onPress={() => {
-              // this.props.plantyData.socket.json({
-              //   message: 'job=temperature=action=plus',
-              //   action: 'message',
-              // });
-
               WS.sendMessage(
-                'FROM_CLIENT;' +
-                  this.state.item.name.toLowerCase() +
-                  ';DECREASE_TEMP',
+                'FROM_CLIENT;' + this.state.item.UUID + ';DECREASE_TEMP',
               );
 
-              // this.forceUpdate();
               // this.setState({lightTurnedOn: !this.state.lightTurnedOn});
             }}
           />
@@ -553,20 +572,20 @@ class AdjustPlanterConditions extends React.Component {
     if (this.state.manualMode) {
       return (
         <KeyboardAwareScrollView style={{margin: '1%', width: '98%'}}>
-          <Portal>
-            <Snackbar
-              style={{position: 'absolute', bottom: 15, borderRadius: 5}}
-              visible={this.state.lightTurnedOn}
-              onDismiss={() => this.setState({lightTurnedOn: false})}
-              action={{
-                label: 'Undo',
-                onPress: () => {
-                  // Do something
-                },
-              }}>
-              Hey there! I'm a Snackbar.
-            </Snackbar>
-          </Portal>
+          {/*<Portal>*/}
+          {/*  <Snackbar*/}
+          {/*    style={{position: 'absolute', bottom: 15, borderRadius: 5}}*/}
+          {/*    visible={this.state.lightTurnedOn}*/}
+          {/*    onDismiss={() => this.setState({lightTurnedOn: false})}*/}
+          {/*    action={{*/}
+          {/*      label: 'Undo',*/}
+          {/*      onPress: () => {*/}
+          {/*        // Do something*/}
+          {/*      },*/}
+          {/*    }}>*/}
+          {/*    Hey there! I'm a Snackbar.*/}
+          {/*  </Snackbar>*/}
+          {/*</Portal>*/}
           <PaperCard>
             <PaperCard.Title
               title={'Planter: ' + this.state.item.name}
@@ -641,6 +660,23 @@ class AdjustPlanterConditions extends React.Component {
                 <Button onPress={this._hideDialog}>Delete</Button>
                 <Button onPress={() => this.setState({modalVisible: false})}>
                   Cancel
+                </Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
+          <Portal>
+            <Dialog
+              visible={this.state.waterAdded}
+              onDismiss={() => this.setState({waterAdded: false})}>
+              <Dialog.Title>
+                Water was added to planter {this.state.item.name}
+              </Dialog.Title>
+              <Dialog.Content>
+                <Paragraph>It will live now</Paragraph>
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button onPress={() => this.setState({waterAdded: false})}>
+                  OK
                 </Button>
               </Dialog.Actions>
             </Dialog>

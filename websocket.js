@@ -4,7 +4,9 @@ import ReconnectingWebSocket from 'react-native-reconnecting-websocket';
 
 export default class WS {
   static init() {
-    this.ws = new ReconnectingWebSocket(Const.apigatewaySocket);
+    if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
+      this.ws = new ReconnectingWebSocket(Const.apigatewaySocket);
+    }
     this.ws.onclose = WS.displayAlert;
   }
 
@@ -18,6 +20,14 @@ export default class WS {
 
   static displayAlert(message) {
     console.log(message);
+    if (!this.ws) {
+      this.ws = new ReconnectingWebSocket(Const.apigatewaySocket);
+    }
+    this.ws.reconnect();
+  }
+
+  static closeSocket() {
+    this.ws.close();
   }
 
   static onClose(handler) {
