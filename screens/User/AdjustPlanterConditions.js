@@ -50,6 +50,7 @@ import axios from 'axios';
 import {addAction, AddAvatarLink, sendMessage} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
 import Chip from 'react-native-paper/src/components/Chip';
+import WS from '../../websocket';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -72,7 +73,12 @@ class AdjustPlanterConditions extends React.Component {
       lightTurnedOn: false,
     };
 
-    // this.props.addAction(this.socketAction);
+    WS.onMessage(data => {
+      console.log('GOT in adjust screen', data);
+
+      // or something else or use redux
+      // dispatch({type: 'MyType', payload: data});
+    });
   }
   componentDidMount(): void {
     // console.log(this.state.user);
@@ -390,23 +396,45 @@ class AdjustPlanterConditions extends React.Component {
           Turn on water supply
         </Chip>
         {/*<Text style={styles.actionsText}>Turn on water supply</Text>*/}
-        <Switch
-          value={this.state.waterTurnedOn}
-          onValueChange={() => {
-            let action = !this.state.waterTurnedOn ? 'on' : 'off';
+        <Button
+          mode="outlined"
+          onPress={() => {
+            WS.sendMessage(
+              'FROM_CLIENT;' +
+                this.state.item.name.toLowerCase() +
+                ';ADD_WATER',
+            );
+          }}>
+          Add water
+        </Button>
+        {/*<Switch*/}
+        {/*  value={this.state.waterTurnedOn}*/}
+        {/*  onValueChange={() => {*/}
+        {/*    let action = !this.state.waterTurnedOn ? 'on' : 'off';*/}
 
-            // let message = 'job=water=action=' + action;
-            // console.log(message);
-            // this.props.sendMessage(message);
-            // console.log(this.props.plantyData.socket);
-            this.props.plantyData.socket.json({
-              message: 'job=water=action=' + action,
-              action: 'message',
-            });
+        {/*    // let message = 'job=water=action=' + action;*/}
+        {/*    // console.log(message);*/}
+        {/*    // this.props.sendMessage(message);*/}
+        {/*    // console.log(this.props.plantyData.socket);*/}
 
-            this.setState({waterTurnedOn: !this.state.waterTurnedOn});
-          }}
-        />
+        {/*    from_client;*/}
+        {/*    planterUUID;*/}
+        {/*    UV_LAMP_OFF;*/}
+        {/*    WS.sendMessage(*/}
+        {/*      'from_client;' +*/}
+        {/*        this.state.item.name.toLowerCase() +*/}
+        {/*        '=job=water=action=' +*/}
+        {/*        action,*/}
+        {/*    );*/}
+
+        {/*    // this.props.plantyData.socket.json({*/}
+        {/*    //   message: 'job=water=action=' + action,*/}
+        {/*    //   action: 'message',*/}
+        {/*    // });*/}
+
+        {/*    // this.setState({waterTurnedOn: !this.state.waterTurnedOn});*/}
+        {/*  }}*/}
+        {/*/>*/}
       </View>
     );
   };
@@ -431,10 +459,12 @@ class AdjustPlanterConditions extends React.Component {
           onValueChange={() => {
             let action = !this.state.lightTurnedOn ? 'on' : 'off';
 
-            this.props.plantyData.socket.json({
-              message: 'job=light=action=' + action,
-              action: 'message',
-            });
+            WS.sendMessage(
+              'FROM_CLIENT;' +
+                this.state.item.name.toLowerCase() +
+                ';UV_LAMP_' +
+                action.toUpperCase(),
+            );
 
             this.setState({lightTurnedOn: !this.state.lightTurnedOn});
           }}
@@ -476,11 +506,18 @@ class AdjustPlanterConditions extends React.Component {
             small
             icon="minus"
             onPress={() => {
-              this.props.plantyData.socket.json({
-                message: 'job=temperature=action=minus',
-                action: 'message',
-              });
-              this.forceUpdate();
+              // this.props.plantyData.socket.json({
+              //   message: 'job=temperature=action=minus',
+              //   action: 'message',
+              // });
+
+              WS.sendMessage(
+                'FROM_CLIENT;' +
+                  this.state.item.name.toLowerCase() +
+                  ';INCREASE_TEMP',
+              );
+
+              // this.forceUpdate();
               // this.setState({lightTurnedOn: !this.state.lightTurnedOn});
             }}
           />
@@ -490,11 +527,18 @@ class AdjustPlanterConditions extends React.Component {
             small
             icon="plus"
             onPress={() => {
-              this.props.plantyData.socket.json({
-                message: 'job=temperature=action=plus',
-                action: 'message',
-              });
-              this.forceUpdate();
+              // this.props.plantyData.socket.json({
+              //   message: 'job=temperature=action=plus',
+              //   action: 'message',
+              // });
+
+              WS.sendMessage(
+                'FROM_CLIENT;' +
+                  this.state.item.name.toLowerCase() +
+                  ';DECREASE_TEMP',
+              );
+
+              // this.forceUpdate();
               // this.setState({lightTurnedOn: !this.state.lightTurnedOn});
             }}
           />
@@ -504,7 +548,7 @@ class AdjustPlanterConditions extends React.Component {
   };
 
   render() {
-    console.log(this.props.plantyData);
+    // console.log(this.props.plantyData);
 
     if (this.state.manualMode) {
       return (

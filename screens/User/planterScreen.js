@@ -74,6 +74,7 @@ class planterScreen extends React.Component {
       loading: false,
       streamUrl: '',
       loadingActions: false,
+      loadingPlanters: false,
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -221,6 +222,7 @@ class planterScreen extends React.Component {
   };
 
   async loadPlants() {
+    this.setState({loading: true});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -248,7 +250,7 @@ class planterScreen extends React.Component {
     if (plants) {
       this.setState({plants: plants});
     } else this.setState({plants: []});
-    // this.setState({loading: false});
+    this.setState({loading: false});
   };
 
   async sendAction(action) {

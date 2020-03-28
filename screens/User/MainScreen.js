@@ -73,13 +73,6 @@ import SocketIOClient from 'socket.io-client';
 // import Amplify, {Storage} from 'aws-amplify-react-native';
 import Amplify, {Storage} from 'aws-amplify';
 
-// import AWS from 'aws-sdk-react-native';
-// const credentials = new AWS.Crendentials({
-//   accessKeyId: 'AKIAUVUXKW347CV4UK4P',
-//   secretAccessKey: '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',
-// });
-// const s3 = new AWS.S3({credentials, signatureVersion: 'v4', region: ''});
-
 const plantyColor = '#6f9e04';
 
 class MainScreen extends React.Component {
@@ -114,7 +107,7 @@ class MainScreen extends React.Component {
     this.onLayout = this.onLayout.bind(this);
 
     WS.onMessage(data => {
-      console.log('GOT', data);
+      console.log('GOT in main screen', data);
       // or something else or use redux
       // dispatch({type: 'MyType', payload: data});
     });
