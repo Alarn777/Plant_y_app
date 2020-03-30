@@ -1,26 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
-import {Provider} from 'react-redux';
-import {bindActionCreators, createStore} from 'redux';
-import {createAppContainer} from 'react-navigation';
-import {createStackNavigator, HeaderBackButton} from 'react-navigation-stack';
-import {Image, Text, TouchableOpacity, View, Dimensions} from 'react-native';
+import {bindActionCreators} from 'redux';
+
+import {HeaderBackButton} from 'react-navigation-stack';
+import {Image, View, Dimensions} from 'react-native';
 import {Auth} from 'aws-amplify';
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart,
-} from 'react-native-chart-kit';
+import {LineChart} from 'react-native-chart-kit';
 import {
   Avatar,
   Card as PaperCard,
@@ -29,19 +13,17 @@ import {
   FAB,
   ActivityIndicator,
 } from 'react-native-paper';
-import {Icon} from '@ui-kitten/components';
-import socketIO from 'socket.io-client';
+
 import ImagePicker from 'react-native-image-picker';
-// import RNFetchBlob from 'react-native-fetch-blob';
+
 import Consts from '../../ENV_VARS';
-import {Notifications} from 'react-native-notifications';
-import Amplify, {Storage} from 'aws-amplify';
-// global.Buffer = global.Buffer || require('buffer').Buffer;
+import {Storage} from 'aws-amplify';
+
 import Buffer from 'buffer';
 import connect from 'react-redux/lib/connect/connect';
-import {AddAvatarLink, addSocket, cleanReduxState} from '../../FriendActions';
+import {AddAvatarLink, cleanReduxState} from '../../FriendActions';
 import ImageResizer from 'react-native-image-resizer';
-// li RNFS = require('react-native-fs');
+
 import RNFS from 'react-native-fs';
 
 const plantyColor = '#6f9e04';
@@ -63,41 +45,11 @@ class UserPage extends React.Component {
     };
   }
 
-  componentDidMount(): void {
-    // console.log(this.props.plantyData.avatarUrl);
-    // let a = this.props.navigation.getParam('logOut');
-    // // console.log(a);
-    // console.log('didmount');
-    // Storage.get('Test_avatar.jpg', {
-    //   level: 'public',
-    //   type: 'image/jpg',
-    // })
-    //   .then(data => {
-    //     console.log(data);
-    //     // this.setState({url: data});
-    //     // this.props.AddAvatarLink(data);
-    //     // this.setState({buttonMode: 'pick'});
-    //   })
-    //   .catch(error => console.log(error));
-    // let userAvatarKey = this.state.user.username + '_avatar.jpg';
-    //
-    // Storage.get(userAvatarKey, {
-    //   level: 'public',
-    //   type: 'image/jpg',
-    //   // bucket: 'plant-pictures-planty',
-    //   // region: 'eu',
-    // })
-    //   .then(data => {
-    //     // console.log(data);
-    //     this.setState({url: data});
-    //   })
-    //   .catch(error => console.log(error));
-  }
+  componentDidMount(): void {}
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -128,12 +80,11 @@ class UserPage extends React.Component {
           style={{
             position: 'absolute',
             margin: 16,
-            // width: 50,
 
             backgroundColor: '#6f9e04',
             color: '#6f9e04',
             right: 120,
-            // top: height - 200,
+
             bottom: -10,
           }}
           large
@@ -151,31 +102,28 @@ class UserPage extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              // width: 50,
 
               backgroundColor: '#6f9e04',
               color: '#6f9e04',
               right: 120,
-              // top: height - 200,
+
               bottom: -10,
             }}
             large
             icon="cloud-upload-outline"
             onPress={() => {
               this.resize();
-              // this.uploadImage();
             }}
           />
           <FAB
             style={{
               position: 'absolute',
               margin: 16,
-              // width: 50,
 
               backgroundColor: '#6f9e04',
               color: '#6f9e04',
               left: 120,
-              // top: height - 200,
+
               bottom: -10,
             }}
             large
@@ -196,7 +144,6 @@ class UserPage extends React.Component {
     if (this.state.buttonMode === 'loading') {
       return (
         <ActivityIndicator
-          // style={{flex: 1}}
           size="huge"
           color={plantyColor}
           style={{position: 'relative', top: -140}}
@@ -213,8 +160,6 @@ class UserPage extends React.Component {
       },
     };
     ImagePicker.launchCamera(options, response => {
-      // console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -252,13 +197,10 @@ class UserPage extends React.Component {
 
     RNFS.readFile(this.state.fileUri, 'base64')
       .then(fileData => {
-        // console.log(fileData);
         const bufferedImageData = new Buffer.Buffer(fileData, 'base64');
 
         let userAvatarKey =
           'user_avatars/' + this.state.user.username + '_avatar.jpeg';
-
-        // console.log(userAvatarKey);
 
         Storage.put(userAvatarKey, bufferedImageData, {
           contentType: 'image/jpg',
@@ -270,8 +212,6 @@ class UserPage extends React.Component {
               type: 'image/jpeg',
             })
               .then(data => {
-                // console.log(data);
-                // this.setState({url: data});
                 this.props.AddAvatarLink(data);
                 this.setState({buttonMode: 'pick'});
               })
@@ -280,44 +220,9 @@ class UserPage extends React.Component {
           .catch(err => console.log(err));
       })
       .catch(error => console.log(error));
-
-    // const bufferedImageData = new Buffer.Buffer(this.state.fileData, 'base64');
-    //
-    // let userAvatarKey = this.state.user.username + '_avatar.jpg';
-    // Storage.put(userAvatarKey, bufferedImageData, {
-    //   contentType: 'image/jpg',
-    //   level: 'public',
-    // })
-    //   .then(result => {
-    //     Storage.get(userAvatarKey, {
-    //       level: 'public',
-    //       type: 'image/jpg',
-    //     })
-    //       .then(data => {
-    //         // console.log(data);
-    //         // this.setState({url: data});
-    //         this.props.AddAvatarLink(data);
-    //         this.setState({buttonMode: 'pick'});
-    //       })
-    //       .catch(error => console.log(error));
-    //   })
-    //   .catch(err => console.log(err));
-  };
-
-  loadTestImg = () => {
-    Storage.get('test/plant.JPG', {
-      level: 'public',
-      type: 'image/jpg',
-    })
-      .then(data => {
-        // console.log(data);
-        // this.setState({testImgUrl: data});
-      })
-      .catch(error => console.log(error));
   };
 
   render() {
-    // console.log(this.state.user);
     return (
       <View>
         <Card>

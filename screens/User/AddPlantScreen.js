@@ -19,10 +19,6 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {addSocket, addUser, loadPlanters} from '../../FriendActions';
 
-// import RNAmazonKinesis from 'react-native-amazon-kinesis';
-
-// import {LivePlayer} from "react-native-live-stream";
-
 class AddPlantScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -36,7 +32,6 @@ class AddPlantScreen extends React.Component {
       addingPlantText: 'Add to my garden',
       addingPlantDisabled: false,
       planterName: this.props.navigation.getParam('planterName'),
-      // planterToAddTo: this.props.navigation.getParam('planterToAddTo'),
     };
 
     this.dealWithUrlData = this.dealWithUrlData.bind(this);
@@ -45,24 +40,10 @@ class AddPlantScreen extends React.Component {
 
   componentDidMount(): void {
     this.setState({plant: this.props.navigation.getParam('item')});
-
-    // console.log(this.props);
   }
-
-  dealWithUrlData = url => {
-    // this.setState({URL: url.HLSStreamingSessionURL});
-    this.successAdding();
-    this.forceUpdate();
-  };
 
   async addPlantToMyGarden() {
     this.setState({addingPlant: true});
-
-    // console.log(this.props.plantyData.myCognitoUser.username);
-    // console.log(this.props.navigation.getParam('item').name);
-    // console.log(this.props.navigation.getParam('planterName'));
-    // console.log(this.state.USER_TOKEN);
-    // console.log(this.state.plant.description);
 
     const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
 
@@ -86,7 +67,6 @@ class AddPlantScreen extends React.Component {
         // If request is good...
         // console.log(response.data);
         this.successAdding();
-        // this.dealWithUrlData(response.data);
       })
       .catch(error => {
         console.log('error ' + error);
@@ -160,7 +140,6 @@ class AddPlantScreen extends React.Component {
             style={{alignSelf: 'center', margin: 5, height: 200, width: 200}}
             source={{uri: item.pic}}
           />
-          {/*<Image style={styles.headerImage} source={{uri: item.pic}} />*/}
           <Text style={styles.mainText}>About</Text>
           <Text
             style={{
@@ -178,8 +157,6 @@ class AddPlantScreen extends React.Component {
     );
   }
 }
-
-// export default AddPlantScreen;
 
 const mapStateToProps = state => {
   const {plantyData} = state;
@@ -229,19 +206,3 @@ let styles = StyleSheet.create({
     height: 100,
   },
 });
-
-// const mapStateToProps = state => {
-//     return {
-//         places: state.places.places
-//     }
-// }
-//
-// const mapDispatchToProps = dispatch => {
-//     return {
-//         add: (name) => {
-//             dispatch(addPlace(name))
-//         }
-//     }
-// }
-//
-// export default connect(mapStateToProps, mapDispatchToProps)(App)

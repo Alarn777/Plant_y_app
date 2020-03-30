@@ -45,34 +45,13 @@ import {
   addUser,
   addImage,
   connectWS,
-  fetchAllPosts,
   addAction,
   dealWithMessage,
   cleanReduxState,
 } from '../../FriendActions';
 import {bindActionCreators} from 'redux';
-const Sockette = require('sockette');
 import WS from '../../websocket';
-
-import {w3cwebsocket as W3CWebSocket} from 'websocket';
-// const ws = new Sockette('ws://localhost:3000', {
-//   timeout: 5e3,
-//   maxAttempts: 3,
-//   onopen: e => console.log('Connected!', e),
-//   onmessage: e => console.log('Received:', e),
-//   onreconnect: e => console.log('Reconnecting...', e),
-//   onmaximum: e => console.log('Stop Attempting!', e),
-//   onclose: e => console.log('Closed!', e),
-//   onerror: e => console.log('Error:', e),
-// });
-
-import SocketIOClient from 'socket.io-client';
-// import {idPattern} from 'react-native-svg/\lib/typescript/lib/util';
-
-// import Amplify from 'aws-amplify';
-// import Amplify, {Storage} from 'aws-amplify-react-native';
-import Amplify, {Storage} from 'aws-amplify';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {Storage} from 'aws-amplify';
 
 const plantyColor = '#6f9e04';
 
@@ -88,7 +67,6 @@ class MainScreen extends React.Component {
       height: 0,
       plants: [],
       parties: [],
-      // logOut: this.props.navigation.getParam('logOut'),
       places: null,
       change: false,
       user: null,
@@ -111,10 +89,7 @@ class MainScreen extends React.Component {
 
     WS.onMessage(data => {
       console.log('GOT in main screen', data);
-      // or something else or use redux
       let instructions = data.data.split(';');
-      // "FROM_PLANTER;e0221623-fb88-4fbd-b524-6f0092463c93;WATER_ADDED"
-      //"FROM_WEB;none;UPDATE_STATE"
       if (instructions.length > 2)
         switch (instructions[2]) {
           case 'UPDATE_STATE':
@@ -131,7 +106,6 @@ class MainScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -158,13 +132,7 @@ class MainScreen extends React.Component {
         type: 'image/jpg',
       })
         .then(data => {
-          // console.log(data);
-          // console.log(data);
-
           this.props.addImage({name: oneImage, URL: data});
-          // this.setState({url: data});
-          // this.props.AddAvatarLink(data);
-          // this.setState({buttonMode: 'pick'});
         })
         .catch(error => {
           console.log(error);
@@ -175,8 +143,6 @@ class MainScreen extends React.Component {
   };
 
   dealWithData = user => {
-    //add to redux
-    // console.log(user);
     if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
 
     this.setState({user});
@@ -188,26 +154,6 @@ class MainScreen extends React.Component {
       this.setState({plants: plants.Items, allPlanters: plants.Items});
     } else this.setState({plants: []});
   };
-
-  // reloadPlants = query => {
-  //   // this.state.allPlanters = this.state.plants;
-  //   if (this.state.query) console.log(true);
-  //
-  //   if (this.state.query !== '') {
-  //     let newPlants = [];
-  //     this.state.allPlanters.map(one => {
-  //       if (
-  //         one.name.includes(this.state.query) ||
-  //         one.name === this.state.query
-  //       ) {
-  //         newPlants.push(one);
-  //       }
-  //     });
-  //
-  //     this.setState({plants: newPlants});
-  //   } else this.setState({plants: this.state.allPlanters});
-  //   this.setState({query: query});
-  // };
 
   async fetchUser() {
     await Auth.currentAuthenticatedUser({
@@ -435,7 +381,7 @@ class MainScreen extends React.Component {
   };
 
   render() {
-    console.log(new Date().getTime());
+    // console.log(new Date().getTime());
     // console.log(this.state.plants);
     // console.log(this.state.allPlanters);
 
@@ -502,8 +448,8 @@ class MainScreen extends React.Component {
           style={{
             position: 'absolute',
             margin: 16,
-            backgroundColor: '#6f9e04',
-            color: '#6f9e04',
+            backgroundColor: plantyColor,
+            color: plantyColor,
             right: 0,
             bottom: 10,
           }}

@@ -8,10 +8,8 @@
 
 import React from 'react';
 import {StyleSheet} from 'react-native';
-// import {Provider} from 'react-redux';
-import {bindActionCreators, createStore} from 'redux';
-import {createAppContainer} from 'react-navigation';
-import {createStackNavigator, HeaderBackButton} from 'react-navigation-stack';
+import {bindActionCreators} from 'redux';
+import {HeaderBackButton} from 'react-navigation-stack';
 import {Image, TouchableOpacity, View, Dimensions} from 'react-native';
 import {Auth} from 'aws-amplify';
 import {
@@ -44,16 +42,15 @@ import {
   Title,
   Headline,
   Caption,
+  Chip,
 } from 'react-native-paper';
-import {Layout, Modal} from '@ui-kitten/components';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import SafeAreaView from 'react-native-safe-area-view';
 import Consts from '../../ENV_VARS';
 import axios from 'axios';
 import {addAction, AddAvatarLink, sendMessage} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
-import Chip from 'react-native-paper/src/components/Chip';
 import WS from '../../websocket';
+import Carousel, {Pagination} from 'react-native-snap-carousel';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -68,15 +65,69 @@ const data = {
 };
 
 const chartConfig = {
-  backgroundGradientFrom: '#1E2923',
-  backgroundGradientFromOpacity: 0,
-  backgroundGradientTo: '#08130D',
-  backgroundGradientToOpacity: 0.5,
-  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-  strokeWidth: 2, // optional, default 3
-  barPercentage: 0.5,
+  backgroundGradientFrom: plantyColor,
+  decimalPlaces: 2, // optional, defaults to 2dp
+  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
 };
 
+const dayData = {
+  // labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+  labels: [
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+  ],
+  datasets: [
+    {
+      //data: [20, 45, 28, 80, 99, 43, 80, 99, 43, 12],
+      data: [
+        20,
+        45,
+        28,
+        80,
+        99,
+        43,
+        80,
+        99,
+        43,
+        12,
+        20,
+        45,
+        28,
+        80,
+        99,
+        43,
+        80,
+        99,
+        43,
+        12,
+      ],
+    },
+  ],
+};
 class AdjustPlanterConditions extends React.Component {
   constructor(props) {
     super(props);
@@ -88,10 +139,13 @@ class AdjustPlanterConditions extends React.Component {
       toEdit: '',
       temperature: '24',
       temperatureMax: '35',
+      currTemperature: '',
       uv: '1000',
       uvMax: '2000',
+      currUV: '',
       humidity: '50',
       humidityMax: '100',
+      currHumidity: '',
       manualMode: false,
       deletingPlanter: false,
       waterTurnedOn: false,
@@ -99,13 +153,19 @@ class AdjustPlanterConditions extends React.Component {
       loadingLightTurnedOn: false,
       waterAdded: false,
       loadingAddingWater: false,
+      entries: [
+        {title: 'temperature', currTemperature: '10'},
+        {title: 'uv', currUV: '2'},
+        {title: 'humidity', currHumidity: '2'},
+      ],
+      activeSlide: 0,
+      setScrollViewRef: null,
     };
 
     WS.onMessage(data => {
-      console.log('GOT in adjust screen', data);
+      console.log('GOT in adjust screen', data.data);
 
       let instructions = data.data.split(';');
-      // "FROM_PLANTER;e0221623-fb88-4fbd-b524-6f0092463c93;WATER_ADDED"
       if (instructions.length > 2)
         switch (instructions[2]) {
           case 'WATER_ADDED':
@@ -121,22 +181,49 @@ class AdjustPlanterConditions extends React.Component {
             alert('Failed to communicate with server');
             this.forceUpdate();
             break;
+          case 'MEASUREMENTS':
+            if (this.state.item.UUID === instructions[1]) {
+              this.setState({
+                entries: [
+                  {
+                    title: 'temperature',
+                    currTemperature: instructions[3].split(':')[1],
+                  },
+                  {title: 'uv', currUV: instructions[4].split(':')[1]},
+                  {
+                    title: 'humidity',
+                    currHumidity: instructions[5].split(':')[1],
+                  },
+                ],
+              });
+
+              this.setState({
+                currTemperature: instructions[3].split(':')[1],
+                currUV: instructions[4].split(':')[1],
+                currHumidity: instructions[5].split(':')[1],
+              });
+            }
+
+            break;
         }
-      // or something else or use redux
-      // dispatch({type: 'MyType', payload: data});
     });
   }
   componentDidMount(): void {
-    // console.log(this.state.user);
+    console.log('did mount');
+    console.log(this.scrollViewRef);
+
+    this.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
+
+    // this.forceUpdate();
   }
+
+  setScrollViewRef = element => {
+    this.scrollViewRef = element;
+  };
 
   adjustValueOnPlanter() {
     //do request to AWS lambda
   }
-
-  socketAction = () => {
-    console.log('socket action in adjust plants');
-  };
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
@@ -169,7 +256,6 @@ class AdjustPlanterConditions extends React.Component {
     this.setState({deletingPlanter: true});
 
     console.log('In deleting Planter');
-    // console.log(this.props.navigation);
     const AuthStr = 'Bearer '.concat(
       this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
     );
@@ -305,7 +391,7 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             padding: 8,
           }}>
-          <Text style={styles.humidityMax}>Current humidity:</Text>
+          <Text style={styles.humidityMax}>Max humidity:</Text>
           <TextInput
             style={{
               width: 100,
@@ -534,7 +620,7 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             padding: 8,
           }}>
-          <Text style={styles.actionsText}>Current UV:</Text>
+          <Text style={styles.actionsText}>Max UV:</Text>
           <TextInput
             style={{
               width: 100,
@@ -627,9 +713,9 @@ class AdjustPlanterConditions extends React.Component {
           loading={this.state.loadingAddingWater}
           onPress={() => {
             this.setState({loadingAddingWater: true});
-            // WS.sendMessage(
-            //   'FROM_CLIENT;' + this.state.item.UUID + ';ADD_WATER',
-            // );
+            WS.sendMessage(
+              'FROM_CLIENT;' + this.state.item.UUID + ';ADD_WATER',
+            );
           }}>
           Add
         </Button>
@@ -683,7 +769,7 @@ class AdjustPlanterConditions extends React.Component {
         <Button
           // mode="outlined"
           icon={'lightbulb'}
-          color={!this.state.lightTurnedOn ? 'gray' : 'yellow'}
+          color={!this.state.lightTurnedOn ? 'gray' : '#ffea00'}
           loading={this.state.loadingLightTurnedOn}
           onPress={() => {
             let action = !this.state.lightTurnedOn ? 'on' : 'off';
@@ -781,6 +867,141 @@ class AdjustPlanterConditions extends React.Component {
       </View>
     );
   };
+
+  _renderCarouselItem({item, index}) {
+    // console.log(item);
+
+    switch (item.title) {
+      case 'temperature':
+        return (
+          <View>
+            <View style={styles.conditionsText}>
+              <Text style={styles.actionsText}>Current Temperature:</Text>
+              <Text style={styles.actionsText}>
+                {item.currTemperature + ' C'}
+              </Text>
+            </View>
+            <Divider />
+            <Paragraph
+              style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
+              Temperature over this day
+            </Paragraph>
+            <LineChart
+              data={dayData}
+              width={Dimensions.get('window').width - 40} // from react-native
+              height={220}
+              fromZero={true}
+              yAxisSuffix="C"
+              yAxisInterval={1} // optional, defaults to 1
+              chartConfig={chartConfig}
+              style={styles.chart}
+            />
+            <Divider />
+            <Paragraph
+              style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
+              Temperature over the week
+            </Paragraph>
+            <BarChart
+              data={data}
+              width={Dimensions.get('window').width - 40} // from react-native
+              height={220}
+              // yAxisLabel="$"
+              yAxisSuffix="C"
+              fromZero={true}
+              yAxisInterval={1} // optional, defaults to 1
+              chartConfig={chartConfig}
+              bezier
+              style={styles.chart}
+            />
+          </View>
+        );
+      case 'humidity':
+        return (
+          <View>
+            <View style={styles.conditionsText}>
+              <Text style={styles.actionsText}>Current Humidity:</Text>
+              <Text style={styles.actionsText}>
+                {item.currHumidity * 100 + ' %'}
+              </Text>
+            </View>
+            <Divider />
+            <Paragraph
+              style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
+              Humidity over this day
+            </Paragraph>
+            <LineChart
+              data={dayData}
+              width={Dimensions.get('window').width - 40} // from react-native
+              height={220}
+              fromZero={true}
+              yAxisSuffix="C"
+              yAxisInterval={1} // optional, defaults to 1
+              chartConfig={chartConfig}
+              style={styles.chart}
+            />
+            <Divider />
+            <Paragraph
+              style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
+              Humidity over the week
+            </Paragraph>
+            <BarChart
+              data={data}
+              width={Dimensions.get('window').width - 40} // from react-native
+              height={220}
+              // yAxisLabel="$"
+              yAxisSuffix="C"
+              fromZero={true}
+              yAxisInterval={1} // optional, defaults to 1
+              chartConfig={chartConfig}
+              bezier
+              style={styles.chart}
+            />
+          </View>
+        );
+      case 'uv':
+        return (
+          <View>
+            <View style={styles.conditionsText}>
+              <Text style={styles.actionsText}>Current UV:</Text>
+              <Text style={styles.actionsText}>{item.currUV}</Text>
+              {/*{//' + mlw/sqcm'}*/}
+            </View>
+            <Divider />
+            <Paragraph
+              style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
+              UV over this day
+            </Paragraph>
+            <LineChart
+              data={dayData}
+              width={Dimensions.get('window').width - 40} // from react-native
+              height={220}
+              fromZero={true}
+              yAxisSuffix="C"
+              yAxisInterval={1} // optional, defaults to 1
+              chartConfig={chartConfig}
+              style={styles.chart}
+            />
+            <Divider />
+            <Paragraph
+              style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
+              UV over the week
+            </Paragraph>
+            <BarChart
+              data={data}
+              width={Dimensions.get('window').width - 40} // from react-native
+              height={220}
+              // yAxisLabel="$"
+              yAxisSuffix="C"
+              fromZero={true}
+              yAxisInterval={1} // optional, defaults to 1
+              chartConfig={chartConfig}
+              bezier
+              style={styles.chart}
+            />
+          </View>
+        );
+    }
+  }
 
   render() {
     // console.log(this.props.plantyData);
@@ -929,6 +1150,7 @@ class AdjustPlanterConditions extends React.Component {
       return (
         <View style={{margin: '1%', width: '98%'}}>
           <KeyboardAwareScrollView
+            innerRef={this.setScrollViewRef}
             extraScrollHeight={30}
             // contentContainerStyle={{
             //   flex: 1,
@@ -959,102 +1181,136 @@ class AdjustPlanterConditions extends React.Component {
                 // subtitle="Conditions of the planter"
               />
               <PaperCard.Content>
-                <Paragraph style={{fontWeight: 'bold', fontSize: 15}}>
-                  Temperature over the week
-                </Paragraph>
-                <BarChart
-                  data={data}
-                  width={Dimensions.get('window').width - 40} // from react-native
-                  height={220}
-                  // yAxisLabel="$"
-                  yAxisSuffix="C"
-                  fromZero={true}
-                  yAxisInterval={1} // optional, defaults to 1
-                  chartConfig={{
-                    // backgroundColor: plantyColor,
-                    backgroundGradientFrom: plantyColor,
-                    // backgroundGradientTo: '#ffa726',
-                    decimalPlaces: 1, // optional, defaults to 2dp
-                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                    barPercentage: 0.8,
-                  }}
-                  bezier
-                  style={{
-                    marginVertical: 8,
-                    borderRadius: 10,
-                  }}
+                <Carousel
+                  // ref={c => {
+                  //   this._carousel = c;
+                  // }}
+                  loop={true}
+                  autoplay={true}
+                  autoplayDelay={500}
+                  autoplayInterval={5000}
+                  data={this.state.entries}
+                  renderItem={this._renderCarouselItem}
+                  sliderWidth={Dimensions.get('window').width - 40}
+                  itemWidth={Dimensions.get('window').width - 40}
+                  onSnapToItem={index => this.setState({activeSlide: index})}
                 />
-                <View style={styles.conditionsText}>
-                  <Text style={styles.actionsText}>Current Temperature:</Text>
-                  <Text style={styles.actionsText}>
-                    {this.state.temperature + ' C'}
-                  </Text>
-                </View>
-                <Divider />
-                <Paragraph style={{fontWeight: 'bold', fontSize: 15}}>
-                  Humidity over the week
-                </Paragraph>
-                <BarChart
-                  data={data}
-                  width={Dimensions.get('window').width - 40} // from react-native
-                  height={220}
-                  // yAxisLabel="$"
-                  yAxisSuffix="C"
-                  fromZero={true}
-                  yAxisInterval={1} // optional, defaults to 1
-                  chartConfig={{
-                    // backgroundColor: plantyColor,
-                    backgroundGradientFrom: plantyColor,
-                    // backgroundGradientTo: '#ffa726',
-                    decimalPlaces: 1, // optional, defaults to 2dp
-                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                    barPercentage: 0.8,
+                <Pagination
+                  dotsLength={3}
+                  // onSnapToItem={index => this.setState({activeSlide: index})}
+                  activeDotIndex={this.state.activeSlide}
+                  // containerStyle={{backgroundColor: 'rgba(0, 0, 0, 0.75)'}}
+                  dotStyle={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    marginHorizontal: 8,
+                    backgroundColor: plantyColor,
                   }}
-                  bezier
-                  style={{
-                    marginVertical: 8,
-                    borderRadius: 10,
-                  }}
+                  inactiveDotStyle={
+                    {
+                      // Define styles for inactive dots here
+                    }
+                  }
+                  inactiveDotOpacity={0.4}
+                  inactiveDotScale={0.6}
                 />
 
-                <View style={styles.conditionsText}>
-                  <Text style={styles.actionsText}>Current Humidity:</Text>
-                  <Text style={styles.actionsText}>
-                    {this.state.humidity + ' %'}
-                  </Text>
-                </View>
-                <Divider />
-                <Paragraph style={{fontWeight: 'bold', fontSize: 15}}>
-                  UV over the week
-                </Paragraph>
-                <BarChart
-                  data={data}
-                  width={Dimensions.get('window').width - 40} // from react-native
-                  height={220}
-                  // yAxisLabel="$"
-                  yAxisSuffix="C"
-                  fromZero={true}
-                  yAxisInterval={1} // optional, defaults to 1
-                  chartConfig={{
-                    // backgroundColor: plantyColor,
-                    backgroundGradientFrom: plantyColor,
-                    // backgroundGradientTo: '#ffa726',
-                    decimalPlaces: 1, // optional, defaults to 2dp
-                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                    barPercentage: 0.8,
-                  }}
-                  bezier
-                  style={{
-                    marginVertical: 8,
-                    borderRadius: 10,
-                  }}
-                />
-                <View style={styles.conditionsText}>
-                  <Text style={styles.actionsText}>Current UV:</Text>
-                  <Text style={styles.actionsText}>
-                    {this.state.uv + ' Lumens'}
-                  </Text>
-                </View>
+                {/*<Paragraph style={{fontWeight: 'bold', fontSize: 15}}>*/}
+                {/*  Temperature over the week*/}
+                {/*</Paragraph>*/}
+                {/*<BarChart*/}
+                {/*  data={data}*/}
+                {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+                {/*  height={220}*/}
+                {/*  // yAxisLabel="$"*/}
+                {/*  yAxisSuffix="C"*/}
+                {/*  fromZero={true}*/}
+                {/*  yAxisInterval={1} // optional, defaults to 1*/}
+                {/*  chartConfig={{*/}
+                {/*    // backgroundColor: plantyColor,*/}
+                {/*    backgroundGradientFrom: plantyColor,*/}
+                {/*    // backgroundGradientTo: '#ffa726',*/}
+                {/*    decimalPlaces: 1, // optional, defaults to 2dp*/}
+                {/*    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,*/}
+                {/*    barPercentage: 0.8,*/}
+                {/*  }}*/}
+                {/*  bezier*/}
+                {/*  style={{*/}
+                {/*    marginVertical: 8,*/}
+                {/*    borderRadius: 10,*/}
+                {/*  }}*/}
+                {/*/>*/}
+                {/*<View style={styles.conditionsText}>*/}
+                {/*  <Text style={styles.actionsText}>Current Temperature:</Text>*/}
+                {/*  <Text style={styles.actionsText}>*/}
+                {/*    {this.state.currTemperature + ' C'}*/}
+                {/*  </Text>*/}
+                {/*</View>*/}
+                {/*<Divider />*/}
+                {/*<Paragraph style={{fontWeight: 'bold', fontSize: 15}}>*/}
+                {/*  Humidity over the week*/}
+                {/*</Paragraph>*/}
+                {/*<BarChart*/}
+                {/*  data={data}*/}
+                {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+                {/*  height={220}*/}
+                {/*  // yAxisLabel="$"*/}
+                {/*  yAxisSuffix="C"*/}
+                {/*  fromZero={true}*/}
+                {/*  yAxisInterval={1} // optional, defaults to 1*/}
+                {/*  chartConfig={{*/}
+                {/*    // backgroundColor: plantyColor,*/}
+                {/*    backgroundGradientFrom: plantyColor,*/}
+                {/*    // backgroundGradientTo: '#ffa726',*/}
+                {/*    decimalPlaces: 1, // optional, defaults to 2dp*/}
+                {/*    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,*/}
+                {/*    barPercentage: 0.8,*/}
+                {/*  }}*/}
+                {/*  bezier*/}
+                {/*  style={{*/}
+                {/*    marginVertical: 8,*/}
+                {/*    borderRadius: 10,*/}
+                {/*  }}*/}
+                {/*/>*/}
+
+                {/*<View style={styles.conditionsText}>*/}
+                {/*  <Text style={styles.actionsText}>Current Humidity:</Text>*/}
+                {/*  <Text style={styles.actionsText}>*/}
+                {/*    {this.state.currHumidity * 100 + ' %'}*/}
+                {/*  </Text>*/}
+                {/*</View>*/}
+                {/*<Divider />*/}
+                {/*<Paragraph style={{fontWeight: 'bold', fontSize: 15}}>*/}
+                {/*  UV over the week*/}
+                {/*</Paragraph>*/}
+                {/*<BarChart*/}
+                {/*  data={data}*/}
+                {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+                {/*  height={220}*/}
+                {/*  // yAxisLabel="$"*/}
+                {/*  yAxisSuffix="C"*/}
+                {/*  fromZero={true}*/}
+                {/*  yAxisInterval={1} // optional, defaults to 1*/}
+                {/*  chartConfig={{*/}
+                {/*    // backgroundColor: plantyColor,*/}
+                {/*    backgroundGradientFrom: plantyColor,*/}
+                {/*    // backgroundGradientTo: '#ffa726',*/}
+                {/*    decimalPlaces: 1, // optional, defaults to 2dp*/}
+                {/*    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,*/}
+                {/*    barPercentage: 0.8,*/}
+                {/*  }}*/}
+                {/*  bezier*/}
+                {/*  style={{*/}
+                {/*    marginVertical: 8,*/}
+                {/*    borderRadius: 10,*/}
+                {/*  }}*/}
+                {/*/>*/}
+                {/*<View style={styles.conditionsText}>*/}
+                {/*  <Text style={styles.actionsText}>Current UV:</Text>*/}
+                {/*  <Text style={styles.actionsText}>{this.state.currUV}</Text>*/}
+                {/*  /!*{//' + mlw/sqcm'}*!/*/}
+                {/*</View>*/}
 
                 <Button
                   icon="delete"
@@ -1099,6 +1355,10 @@ class AdjustPlanterConditions extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  chart: {
+    marginVertical: 8,
+    borderRadius: 10,
+  },
   container: {
     // minHeight: 500,
     padding: 25,
@@ -1121,9 +1381,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: 8,
+    // padding: 8,
+    // fontWeight: 'bold',
   },
   actionsText: {
+    fontWeight: 'bold',
     marginTop: 7,
     marginBottom: 7,
   },

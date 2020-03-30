@@ -1,20 +1,15 @@
 import React from 'react';
 import {Image, View, FlatList, StyleSheet, ScrollView} from 'react-native';
-import Video from 'react-native-video';
-import {Icon, Text, Card} from '@ui-kitten/components';
+import {Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import {Button, Divider, FAB} from 'react-native-paper';
-//redusx
+//redux
 import {connect} from 'react-redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import {IconButton} from 'react-native-paper';
 import {bindActionCreators} from 'redux';
 import {AddAvatarLink} from '../../FriendActions';
 
-// import RNAmazonKinesis from 'react-native-amazon-kinesis';
-
-// import {LivePlayer} from "react-native-live-stream";
 const plantyColor = '#6f9e04';
 
 class PlantScreen extends React.Component {
@@ -22,18 +17,18 @@ class PlantScreen extends React.Component {
     super(props);
     this.state = {
       plant: this.props.navigation.getParam('item'),
-      // deletingPlantIcon:'delete',
+
       USER_TOKEN: this.props.navigation.getParam('user_token'),
       URL: '',
       planterName: this.props.navigation.getParam('planterName'),
       loadBuffering: false,
       loading: false,
       adjustments: false,
-      // deletingPlant:false,
+
       deletingPlantText: 'Remove',
       deletingPlant: false,
       deletingPlanticon: 'delete',
-      // deletingPlantText: 'Failed to delete',
+
       deletingPlantDisabled: false,
     };
   }
@@ -41,7 +36,6 @@ class PlantScreen extends React.Component {
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -66,23 +60,11 @@ class PlantScreen extends React.Component {
     };
   };
 
-  UNSAFE_componentWillMount(): void {
-    // this.loadUrl().then(r => console.log());
-  }
-
-  componentDidMount(): void {
-    // console.log(this.state.plant);
-    // console.log(this.state.USER_TOKEN);
-  }
+  componentDidMount(): void {}
 
   async removePlantFromPlanter() {
-    // console.log('pressed');
     this.setState({deletingPlant: true});
 
-    // console.log(this.props.navigation.getParam('planterUUID'));
-    // console.log(this.state.plant.UUID);
-    // console.log(this.state.planterName);
-    // console.log(this.props.plantyData.myCognitoUser.username);
     const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
 
     await axios
@@ -94,8 +76,6 @@ class PlantScreen extends React.Component {
           planterName: this.state.planterName,
           planterUUID: this.props.navigation.getParam('planterUUID'),
           plantStatus: 'inactive',
-          // plantGrowthPlanGroup: this.state.plant.growthPlanGroup,
-          // plantSoil: this.state.plant.soil,
         },
 
         {
@@ -103,18 +83,12 @@ class PlantScreen extends React.Component {
         },
       )
       .then(response => {
-        // If request is good...
-        // console.log(response.data);
         this.successDeleting();
-        // this.dealWithUrlData(response.data);
       })
       .catch(error => {
         console.log('error ' + error);
         this.failureDeleting();
       });
-
-    // setTimeout(this.successAdding, 1000);
-    // this.props.navigation.goBack();
   }
 
   successDeleting = () => {
@@ -125,8 +99,6 @@ class PlantScreen extends React.Component {
       deletingPlantDisabled: true,
     });
     setTimeout(this.goBack, 1200);
-
-    // this.props.navigation.getParam('loadPlanters')();
   };
 
   goBack = () => {
@@ -180,7 +152,6 @@ class PlantScreen extends React.Component {
                   this.removePlantFromPlanter()
                     .then()
                     .catch();
-                  // navigation.goBack();
                 }}>
                 {this.state.deletingPlantText}
               </Button>
@@ -220,11 +191,8 @@ let styles = StyleSheet.create({
     height: 200,
   },
   container: {
-    // flex:1,
     margin: '1%',
     width: '98%',
-    // justifyContent: 'center',
-    // alignItems: 'center',
   },
   mainText: {
     fontWeight: 'bold',
@@ -232,7 +200,6 @@ let styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    // borderColor:'#6f9e04',
     backgroundColor: plantyColor,
     color: plantyColor,
     borderColor: plantyColor,
@@ -258,19 +225,3 @@ const mapDispatchToProps = dispatch =>
   );
 
 export default connect(mapStateToProps, mapDispatchToProps)(PlantScreen);
-
-// const mapStateToProps = state => {
-//     return {
-//         places: state.places.places
-//     }
-// }
-//
-// const mapDispatchToProps = dispatch => {
-//     return {
-//         add: (name) => {
-//             dispatch(addPlace(name))
-//         }
-//     }
-// }
-//
-// export default connect(mapStateToProps, mapDispatchToProps)(App)

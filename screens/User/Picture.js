@@ -205,10 +205,7 @@ class Picture extends React.Component {
                 marginBottom: 10,
                 // margin: 10,
                 position: 'relative',
-                // left: (this.state.width + 350 / 200) * this.state.healthStatus,
                 left: ((this.state.width - 65) / 100) * this.state.healthStatus,
-                // left: 0,
-                // right: -100,
                 color: 'black',
                 // left: 0,
                 backgroundColor: 'transparent',
@@ -216,14 +213,7 @@ class Picture extends React.Component {
               |
             </Text>
           </LinearGradient>
-          <View
-            style={{
-              // flex:
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-              padding: 8,
-            }}>
+          <View style={styles.sickHealthy}>
             <Text>Sick</Text>
             <Text>Healthy</Text>
           </View>
@@ -232,16 +222,9 @@ class Picture extends React.Component {
   };
 
   render() {
-    const {navigation} = this.props;
-
     return (
       <View style={styles.container}>
         <PaperCard style={{height: '100%'}}>
-          {/*<PaperCard.Title title="Card Title" subtitle="Card Subtitle" left={(props) => <Avatar.Icon {...props} icon="folder" />} />*/}
-          {/*<PaperCard.Cover*/}
-          {/*  style={{height: '70%', resizeMode: 'contain'}}*/}
-          {/*  source={{uri: this.props.navigation.getParam('picture').url}}*/}
-          {/*/>*/}
           <PaperCard.Content style={{marginTop: 10}}>
             <Image
               style={{height: '70%', resizeMode: 'contain'}}
@@ -252,7 +235,6 @@ class Picture extends React.Component {
               icon={this.state.testingPlanticon}
               style={{margin: 10}}
               loading={this.state.testingPlant}
-              // disabled={this.state.testingPlantDisabled}
               mode="outlined"
               backgroundColor="#6f9e04"
               color="#6f9e04"
@@ -265,7 +247,6 @@ class Picture extends React.Component {
             </Button>
             <Button
               icon="delete"
-              // mode="outlined"
               style={{margin: 10}}
               loading={this.state.deletingPic}
               mode="outlined"
@@ -285,9 +266,29 @@ class Picture extends React.Component {
   }
 }
 
-// export default PlantScreen;
+const mapStateToProps = state => {
+  const {plantyData} = state;
+
+  return {plantyData};
+};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      AddAvatarLink,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(Picture);
 
 let styles = StyleSheet.create({
+  sickHealthy: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: 8,
+  },
   backgroundVideo: {
     // position: 'absolute',
     top: 0,
@@ -300,9 +301,6 @@ let styles = StyleSheet.create({
   container: {
     // flex:1,
     margin: '1%',
-    // width: '98%',
-    // justifyContent: 'center',
-    // alignItems: 'center',
   },
   mainText: {
     fontWeight: 'bold',
@@ -320,9 +318,6 @@ let styles = StyleSheet.create({
     height: 100,
   },
   linearGradient: {
-    // flex: 1,
-    // paddingLeft: 15,
-    // paddingRight: 15,
     borderRadius: 5,
   },
   buttonText: {
@@ -335,19 +330,3 @@ let styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 });
-
-const mapStateToProps = state => {
-  const {plantyData} = state;
-
-  return {plantyData};
-};
-
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(
-    {
-      AddAvatarLink,
-    },
-    dispatch,
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(Picture);

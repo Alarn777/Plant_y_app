@@ -7,9 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import {Auth} from 'aws-amplify';
-import data from '../../ENV_VARS';
-import Amplify, {Storage} from 'aws-amplify';
+import {Auth, Storage} from 'aws-amplify';
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
 import {Icon, Text, Card, Spinner} from '@ui-kitten/components';
@@ -37,7 +35,6 @@ import {
   VerifyContact,
   Greetings,
 } from '../Auth';
-import AmplifyTheme from '../AmplifyTheme';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import Video from 'react-native-video';
@@ -125,27 +122,12 @@ class planterScreen extends React.Component {
       this.props.navigation.setParams({plantWasAdded: false});
       this.props.navigation.setParams({plantWasRemoved: false});
     }
-    Auth.currentAuthenticatedUser()
-      .then()
-      // .then(data => console.log(data))
-      .catch(() => {
-        console.log('failed to get user');
-        this.props.navigation.getParam('logOut')();
-      });
-  }
-
-  componentWillUnmount(): void {}
-
-  UNSAFE_componentWillMount(): void {
-    // this.loadUrl()
-    //   .then(() => this.forceUpdate())
-    //   .catch();
   }
 
   componentDidMount(): void {
     Auth.currentAuthenticatedUser()
       .then()
-      // .then(data => console.log(data))
+      .then(data => console.log(data))
       .catch(() => {
         console.log('failed to get user');
         this.props.navigation.getParam('logOut')();
@@ -184,9 +166,6 @@ class planterScreen extends React.Component {
             console.log(response.data);
 
             this.addUrl(response.data.HLSStreamingSessionURL);
-            // this.setState({videoUrl: this.props.plantyData.streamUrl});
-            // this.setState({videoUrl: response.data.HLSStreamingSessionURL});
-            // this.setState({videoUrl: response.data.HLSStreamingSessionURL});
           } else {
             console.log('NOT SETTING URL');
             console.log(response.data);
@@ -195,16 +174,6 @@ class planterScreen extends React.Component {
         } else {
           console.log('No stream data URL');
           console.log(response);
-
-          // this.setState({videoUrl: ''});
-          // this.props.addStreamUrl(null);
-
-          // this.setState({videoUrl: response.data.HLSStreamingSessionURL});
-          // else this.setState({videoUrl: this.props.plantyData.streamUrl});
-
-          // this.setState({
-          //   videoErrorObj: {videoErrorFlag: false, videoErrorMessage: ''},
-          // });
         }
       })
       .catch(error => {
@@ -223,12 +192,6 @@ class planterScreen extends React.Component {
     console.log(url);
     this.props.addStreamUrl(url);
     this.setState({streamUrl: this.props.plantyData.streamUrl});
-
-    this.btnRef = React.createRef();
-
-    this.forceUpdate();
-    this.forceUpdate();
-    this.forceUpdate();
   };
 
   async loadPlants() {
@@ -252,7 +215,6 @@ class planterScreen extends React.Component {
         this.dealWithPlantsData(response.data);
       })
       .catch(error => {
-        // this.setState({loading: false});
         console.log('error ' + error);
       });
   }
@@ -321,41 +283,6 @@ class planterScreen extends React.Component {
         console.log('error ' + error);
       });
   }
-
-  uploadImage = uri => {
-    this.setState({loadingActions: true});
-    let timestamp = new Date().toISOString();
-    timestamp = timestamp.replace('.', '');
-
-    RNFS.readFile(uri, 'base64')
-      .then(fileData => {
-        const bufferedImageData = new Buffer.Buffer(fileData, 'base64');
-        let uploadedImageKey =
-          this.props.plantyData.myCognitoUser.username +
-          '/' +
-          this.props.navigation.getParam('item').name +
-          '/' +
-          timestamp +
-          '_capture.jpg';
-
-        Storage.put(uploadedImageKey, bufferedImageData, {
-          contentType: 'image/jpg',
-          level: 'public',
-        })
-          .then(result => {
-            console.log(result);
-            this.setState({loadingActions: false});
-          })
-          .catch(error => {
-            console.log(error);
-            this.setState({loadingActions: false});
-          });
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({loadingActions: false});
-      });
-  };
 
   onLayout(e) {
     this.setState({
@@ -482,6 +409,8 @@ class planterScreen extends React.Component {
   };
 
   render() {
+    console.log(this.props.plantyData.myCognitoUser);
+
     if (this.state.loading) {
       return (
         // <View>
@@ -494,9 +423,7 @@ class planterScreen extends React.Component {
       );
     }
 
-    let height = this.state.height;
     if (this.state.plants.length > 0) {
-      // let refToCapture = this.btnRef;
       return (
         <View style={styles.container} onLayout={this.onLayout}>
           <PaperCard>
@@ -550,10 +477,6 @@ class planterScreen extends React.Component {
                         this.props.navigation.getParam('item').UUID +
                         ';MOVE_CAMERA_LEFT',
                     );
-
-                    // this.sendAction('left')
-                    //   .then(r => console.log())
-                    //   .catch(error => console.log(error));
                   }}
                 />
                 <IconButton
@@ -561,15 +484,6 @@ class planterScreen extends React.Component {
                   color={plantyColor}
                   size={40}
                   disabled={this.state.loadingActions || !this.state.streamUrl}
-                  // onPress={this.takeScreenShot}
-
-                  // onPress={() => {
-                  //   console.log('capture');
-                  //   this.btnRef.current.capture().then(uri => {
-                  //     this.uploadImage(uri);
-                  //   });
-                  // }}
-
                   onPress={() => {
                     this.takePicture()
                       .then(r => console.log())
@@ -587,10 +501,6 @@ class planterScreen extends React.Component {
                         this.props.navigation.getParam('item').UUID +
                         ';MOVE_CAMERA_RIGHT',
                     );
-
-                    // this.sendAction('right')
-                    //   .then(r => console.log())
-                    //   .catch(error => console.log(error));
                   }}
                 />
               </View>
@@ -621,7 +531,6 @@ class planterScreen extends React.Component {
             onPress={() =>
               this.props.navigation.navigate('AllAvailablePlants', {
                 user_token: this.state.USER_TOKEN,
-                // item: this.props.navigation.getParam('item'),
                 planterName: this.props.navigation.getParam('item').name,
                 loadPlanters: this.props.navigation.getParam('loadPlanters'),
               })
@@ -770,12 +679,9 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     flex: 1,
-    // margin: 10,
     height: 100,
-    // width: 100,
   },
   backgroundVideo: {
-    // position: 'absolute',
     top: 0,
     left: 0,
     bottom: 0,

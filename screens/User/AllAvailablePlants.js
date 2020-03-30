@@ -14,7 +14,6 @@ import PropTypes from 'prop-types';
 import {Icon, Text, Card, Button} from '@ui-kitten/components';
 import {ActivityIndicator, FAB} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   withAuthenticator,
   //Greetings,
@@ -30,7 +29,6 @@ import {
   VerifyContact,
   Greetings,
 } from '../Auth';
-import AmplifyTheme from '../AmplifyTheme';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import {HeaderBackButton} from 'react-navigation-stack';
@@ -70,12 +68,7 @@ class AllAvailablePlants extends React.Component {
   };
 
   dealWithPlantsData = plants => {
-    // console.log(plants.Items);
-    // this.setState({loading: false});
     this.setState({loading: false, plants: plants.Items});
-    // plants.Items.map(plant => this.state.plants.push(plant))
-    //   // this.setState({plants})
-    // this.setState({change:false})
   };
 
   async fetchUser() {
@@ -114,18 +107,6 @@ class AllAvailablePlants extends React.Component {
     // }).catch(error => console.log(error))
   }
 
-  UNSAFE_componentWillMount() {
-    // this.fetchUser()
-    //   .then(() => {
-    //     this.props.navigation.setParams({logOut: this.logOut});
-    //
-    //     this.props.navigation.setParams({
-    //       userLoggedIn: this.state.userLoggedIn,
-    //     });
-    //   })
-    //   .catch(e => console.log(e));
-  }
-
   componentDidMount(): void {
     const {authState, authData} = this.props;
     const user = authData;
@@ -147,7 +128,6 @@ class AllAvailablePlants extends React.Component {
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -191,12 +171,8 @@ class AllAvailablePlants extends React.Component {
       ) {
         url = this.props.plantyData.plantsImages[i].URL;
       }
-      // console.log(this.props.plantyData.plantsImages[i].name);
     }
-    // console.log(url);
     item.pic = url;
-
-    // console.log(item);
 
     return (
       <View>
@@ -211,9 +187,7 @@ class AllAvailablePlants extends React.Component {
                     planterName: this.props.navigation.getParam('planterName'),
                   })
                 }>
-                {/*url*/}
                 <Image style={styles.headerImage} source={{uri: url}} />
-                {/*<Image style={styles.headerImage} source={{uri: item.pic}} />*/}
               </TouchableOpacity>
             );
           }}
@@ -222,7 +196,6 @@ class AllAvailablePlants extends React.Component {
           key={item.UUID}>
           <TouchableOpacity
             onPress={() => {
-              // console.log(this.props.navigation);
               this.props.navigation.navigate('AddPlantScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
@@ -240,18 +213,14 @@ class AllAvailablePlants extends React.Component {
   render() {
     if (this.state.loading) {
       return (
-        // <View>
         <ActivityIndicator
-          // style={{flex: 1}}
           size="large"
           color={plantyColor}
           style={{top: this.state.height / 2 - 50}}
         />
-        // </View>
       );
     }
 
-    let height = this.state.height;
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <View style={styles.header}>
@@ -276,17 +245,6 @@ AllAvailablePlants.propTypes = {
   addEvent: PropTypes.func,
 };
 
-// export default withAuthenticator(AllAvailablePlants, false, [
-//   <SignIn />,
-//   <ConfirmSignIn />,
-//   <VerifyContact />,
-//   <SignUp />,
-//   <ConfirmSignUp />,
-//   <ForgotPassword />,
-//   <Greetings />,
-//   <RequireNewPassword />,
-// ]);
-
 const mapStateToProps = state => {
   const {plantyData} = state;
 
@@ -297,8 +255,6 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       addUser,
-      // fetchAllPosts,
-      // addSocket,
       addImage,
       AddAvatarLink,
     },
@@ -337,9 +293,6 @@ const styles = StyleSheet.create({
     height: 20,
     marginTop: 10,
     flexDirection: 'row',
-    // backgroundColor: '#66ffcc',
-    // height: '10%',
-    // borderRadius:5
   },
   partyText: {
     fontWeight: 'bold',
@@ -364,12 +317,4 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 100,
   },
-  // fab: {
-  //   position: 'absolute',
-  //   margin: 16,
-  //   right: 0,
-  //   top: this.state.height,
-  //   bottom: 0,
-  //   alignSelf: 'flex-end',
-  // },
 });

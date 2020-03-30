@@ -51,6 +51,7 @@
     "react-native-screens": "^2.0.0-alpha.22",
     "react-native-scripts": "^2.0.1",
     "react-native-simple-radio-button": "^2.7.4",
+    "react-native-snap-carousel": "^3.8.4",
     "react-native-svg": "^10.0.0",
     "react-native-touch-id": "^4.4.1",
     "react-native-vector-icons": "^6.6.0",

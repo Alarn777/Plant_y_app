@@ -1,4 +1,3 @@
-import {v4 as uuidv4} from 'uuid';
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {Layout, Select, Text} from '@ui-kitten/components';
@@ -10,8 +9,8 @@ const data = [
   {text: 'Subarctic'},
   {text: 'Highland'},
 ];
-import {createStackNavigator, HeaderBackButton} from 'react-navigation-stack';
-import {Image, TouchableOpacity, View, Dimensions} from 'react-native';
+import {HeaderBackButton} from 'react-navigation-stack';
+import {Image, View, Dimensions} from 'react-native';
 import {
   Avatar,
   Card as PaperCard,
@@ -191,15 +190,11 @@ class addPlanterScreen extends React.Component {
 
   render() {
     let loading = this.state.addingPlanter;
-    const {navigation} = this.props;
     let allActionsDisabled = this.state.allActions;
     return (
       <View>
         <PaperCard style={{margin: '1%', width: '98%'}}>
-          <PaperCard.Title
-            title={'Create Planter'}
-            // subtitle="Card Subtitle"
-          />
+          <PaperCard.Title title={'Create Planter'} />
           <PaperCard.Content>
             <Text style={styles.simpleText}>Name</Text>
             <TextInput
@@ -215,7 +210,6 @@ class addPlanterScreen extends React.Component {
             />
             {this.renderErrorMsg()}
             <Text style={styles.simpleText}>Description</Text>
-            {/*<Text style={styles.simpleText} />*/}
             <TextInput
               style={styles.textInput}
               mode={'outlined'}
@@ -229,7 +223,6 @@ class addPlanterScreen extends React.Component {
               <Select
                 disabled={allActionsDisabled}
                 style={{
-                  // backgroundColor: 'black',
                   borderRadius: 4,
                   borderWidth: 0.5,
                   margin: 10,
@@ -253,7 +246,6 @@ class addPlanterScreen extends React.Component {
                   this.addPlanterToMyGarden()
                     .then()
                     .catch();
-                // navigation.goBack();
               }}>
               {this.state.addingPlanterText}
             </Button>
@@ -276,8 +268,6 @@ const styles = StyleSheet.create({
   },
   controlContainer: {
     borderRadius: 4,
-    // margin: 8,
-    // backgroundColor: '#3366FF',
   },
   textInput: {
     borderRadius: 4,

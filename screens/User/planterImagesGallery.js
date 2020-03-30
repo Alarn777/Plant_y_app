@@ -8,10 +8,10 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {Auth} from 'aws-amplify';
-import Amplify, {Storage} from 'aws-amplify';
+
+import {Storage} from 'aws-amplify';
 import PropTypes from 'prop-types';
-import {Icon, Text, Card, Button} from '@ui-kitten/components';
+
 import {
   ActivityIndicator,
   FAB,
@@ -21,12 +21,8 @@ import {
   Paragraph,
 } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  withAuthenticator,
-  //Greetings,
-  Loading,
-} from 'aws-amplify-react-native';
+
+import {withAuthenticator, Loading} from 'aws-amplify-react-native';
 import {
   ConfirmSignIn,
   ConfirmSignUp,
@@ -57,13 +53,7 @@ class planterImagesGallery extends React.Component {
       user: null,
       pictures: [],
       picWasRemoved: false,
-      // USER_TOKEN: this.props.navigation.getParam('user_token'),
-      // planterToAddTo: this.props.navigation.getParam('planterName'),
     };
-    // this.loadPlants = this.loadPlants.bind(this);
-    // this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
-    // this.dealWithData = this.dealWithData.bind(this);
-    // this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
   }
 
@@ -72,14 +62,10 @@ class planterImagesGallery extends React.Component {
     prevState: Readonly<S>,
     snapshot: SS,
   ): void {
-    if (
-      // this.props.navigation.getParam('plantWasRemoved') ||
-      this.props.navigation.getParam('picWasRemoved')
-    ) {
+    if (this.props.navigation.getParam('picWasRemoved')) {
       this.listPicturesData()
         .then()
         .catch();
-      // this.props.navigation.setParams({plantWasAdded: false});
       this.props.navigation.setParams({picWasRemoved: false});
     }
   }
@@ -97,7 +83,6 @@ class planterImagesGallery extends React.Component {
   }
 
   async preloadImages(images_array) {
-    // let allImages = ['mint', 'potato', 'sunflower', 'tomato', 'cucumber'];
     console.log('Now loading');
     console.log(images_array);
 
@@ -107,13 +92,6 @@ class planterImagesGallery extends React.Component {
         type: 'image/jpg',
       })
         .then(data => {
-          // console.log(data);
-          // new_img_array.push({
-          //   UUID: oneImage.eTag,
-          //   url: data,
-          //   lastModified: oneImage.lastModified,
-          //   size: oneImage.size,
-          // });
           let obj = {
             UUID: oneImage.eTag,
             url: data,
@@ -121,52 +99,16 @@ class planterImagesGallery extends React.Component {
             size: oneImage.size,
             key: oneImage.key,
           };
-          // this.props.addImage({name: oneImage, URL: data});
-          // this.setState({url: data});
-          // this.props.AddAvatarLink(data);
-          // this.setState({buttonMode: 'pick'});
-          // console.log(obj);
+
           this.setState(prevState => ({
             pictures: [...prevState.pictures, obj],
           }));
-
-          // this.setState({pictures: [...this.state.pictures, obj]});
         })
         .catch(error => console.log(error));
-      // console.log(new_img_array);
-      // console.log(this.state.pictures);
-      // this.setState({images: new_img_array});
     });
   }
 
   componentDidMount(): void {
-    // let USER_TOKEN = this.props.plantyData.myCognitoUser.username;
-
-    // let bucketUrl =
-    //   this.props.plantyData.myCognitoUser.username +
-    //   '/' +
-    //   this.state.planter.name;
-    //
-    // Storage.list(bucketUrl, {level: 'public'})
-    //   .then(result => {
-    //     // console.log(result);
-    //     let res_arr = [];
-    //     result.map(one => {
-    //       if (one.key === bucketUrl + '/') {
-    //       } else res_arr.push(one);
-    //     });
-    //     this.preloadImages(res_arr)
-    //       .then(r => console.log())
-    //       .catch(error => console.log(error));
-    //     // this.setState({pictures: res_arr});
-    //   })
-    //   .catch(err => console.log(err));
-
-    // this.setState({userName: 'Guest'});
-
-    // this.preloadImages()
-    //   .then()
-    //   .catch(e => console.log(e));
     this.listPicturesData()
       .then()
       .catch();
@@ -182,7 +124,6 @@ class planterImagesGallery extends React.Component {
 
     Storage.list(bucketUrl, {level: 'public'})
       .then(result => {
-        // console.log(result);
         let res_arr = [];
         result.map(one => {
           if (one.key === bucketUrl + '/') {
@@ -191,15 +132,8 @@ class planterImagesGallery extends React.Component {
         this.preloadImages(res_arr)
           .then(r => console.log())
           .catch(error => console.log(error));
-        // this.setState({pictures: res_arr});
       })
       .catch(err => console.log(err));
-
-    // this.setState({userName: 'Guest'});
-
-    // this.preloadImages()
-    //   .then()
-    //   .catch(e => console.log(e));
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -263,18 +197,14 @@ class planterImagesGallery extends React.Component {
   render() {
     if (this.state.loading) {
       return (
-        // <View>
         <ActivityIndicator
-          // style={{flex: 1}}
           size="large"
           color={plantyColor}
           style={{top: this.state.height / 2 - 50}}
         />
-        // </View>
       );
     }
 
-    let height = this.state.height;
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <PaperCard>
@@ -305,17 +235,6 @@ planterImagesGallery.propTypes = {
   addEvent: PropTypes.func,
 };
 
-// export default withAuthenticator(AllAvailablePlants, false, [
-//   <SignIn />,
-//   <ConfirmSignIn />,
-//   <VerifyContact />,
-//   <SignUp />,
-//   <ConfirmSignUp />,
-//   <ForgotPassword />,
-//   <Greetings />,
-//   <RequireNewPassword />,
-// ]);
-
 const mapStateToProps = state => {
   const {plantyData} = state;
 
@@ -326,8 +245,6 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       addUser,
-      // fetchAllPosts,
-      // addSocket,
       addImage,
       AddAvatarLink,
     },
@@ -366,9 +283,6 @@ const styles = StyleSheet.create({
     height: 20,
     marginTop: 10,
     flexDirection: 'row',
-    // backgroundColor: '#66ffcc',
-    // height: '10%',
-    // borderRadius:5
   },
   partyText: {
     fontWeight: 'bold',
@@ -394,12 +308,4 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 100,
   },
-  // fab: {
-  //   position: 'absolute',
-  //   margin: 16,
-  //   right: 0,
-  //   top: this.state.height,
-  //   bottom: 0,
-  //   alignSelf: 'flex-end',
-  // },
 });

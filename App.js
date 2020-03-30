@@ -1,25 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import Reducer from './FriendReducer';
-import {
-  ApplicationProvider,
-  Button,
-  Icon,
-  IconRegistry,
-  Layout,
-  Text,
-} from '@ui-kitten/components';
+import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import {mapping, light as lightTheme} from '@eva-design/eva';
 import HomeScreenUser from './screens/User/MainScreen';
@@ -55,12 +40,7 @@ import AdjustPlantConditions from './screens/User/AdjustPlanterConditions';
 import addPlanterScreen from './screens/User/addPlanterScreen';
 import planterImagesGallery from './screens/User/planterImagesGallery';
 import Picture from './screens/User/Picture';
-import WS from './websocket';
 const store = createStore(Reducer);
-
-// const store = createStore(Reducer);
-
-// const store = configureStore();
 
 const AppNavigator = createStackNavigator(
   {
@@ -82,42 +62,42 @@ const AppNavigator = createStackNavigator(
       name: 'All Available Plants',
       screen: AllAvailablePlants,
       navigationOptions: {
-        gesturesEnabled: true,
+        gesturesEnabled: false,
       },
     },
     AddPlantScreen: {
       name: 'Add Plant',
       screen: AddPlantScreen,
       navigationOptions: {
-        gesturesEnabled: true,
+        gesturesEnabled: false,
       },
     },
     UserPage: {
       name: 'User Page',
       screen: UserPage,
       navigationOptions: {
-        gesturesEnabled: true,
+        gesturesEnabled: false,
       },
     },
     planterScreen: {
       name: 'Planter Screen',
       screen: planterScreen,
       navigationOptions: {
-        gesturesEnabled: true,
+        gesturesEnabled: false,
       },
     },
     AdjustPlantConditions: {
       name: 'Adjust Plant Conditions Screen',
       screen: AdjustPlantConditions,
       navigationOptions: {
-        gesturesEnabled: true,
+        gesturesEnabled: false,
       },
     },
     addPlanterScreen: {
       name: 'Add Planter Screen',
       screen: addPlanterScreen,
       navigationOptions: {
-        gesturesEnabled: true,
+        gesturesEnabled: false,
       },
     },
     planterImagesGallery: {
@@ -134,9 +114,6 @@ const AppNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
-
-    // Login,
-    // Register,
   },
   {
     initialRouteName: 'HomeScreenUser',
@@ -173,7 +150,6 @@ class App extends React.Component {
     await Auth.signOut()
       .then(data => console.log(data))
       .catch(err => console.log(err));
-    // this.rerender();
   };
 
   render() {
@@ -186,19 +162,6 @@ class App extends React.Component {
       </Provider>
     );
   }
-
-  // render(){
-  //     return (
-  //         <React.Fragment>
-  //             <Provider store={store}>
-  //                 {/*<IconRegistry icons={EvaIconsPack} />*/}
-  //                 <ApplicationProvider mapping={mapping} theme={lightTheme}>
-  //                     <AppContainer />
-  //                 </ApplicationProvider>
-  //             </Provider>
-  //         </React.Fragment>
-  //        )
-  // }
 }
 
 export default withAuthenticator(App, false, [
@@ -208,15 +171,9 @@ export default withAuthenticator(App, false, [
   <SignUp />,
   <ConfirmSignUp />,
   <ForgotPassword />,
-  // <Greetings/>,
   <RequireNewPassword />,
 ]);
 
-// if command=="UV_LAMP_ON": uvOn()
-// elif command=="UV_LAMP_OFF": uvOff()
-// elif command=="ADD_WATER": addWater()
-// elif command=="MOVE_CAMERA_RIGHT": cameraMove("R")
-// elif command=="MOVE_CAMERA_LEFT": cameraMove("L")
 // elif command=="VIDEO_STREAM_ON": videoStreamOn()
 // elif command=="VIDEO_STREAM_OFF": videoStreamOff()
 // else:
