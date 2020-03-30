@@ -41,6 +41,9 @@ import {
   Dialog,
   Portal,
   TouchableRipple,
+  Title,
+  Headline,
+  Caption,
 } from 'react-native-paper';
 import {Layout, Modal} from '@ui-kitten/components';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -55,6 +58,25 @@ import WS from '../../websocket';
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
 
+const data = {
+  labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+  datasets: [
+    {
+      data: [20, 45, 28, 80, 99, 43],
+    },
+  ],
+};
+
+const chartConfig = {
+  backgroundGradientFrom: '#1E2923',
+  backgroundGradientFromOpacity: 0,
+  backgroundGradientTo: '#08130D',
+  backgroundGradientToOpacity: 0.5,
+  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+  strokeWidth: 2, // optional, default 3
+  barPercentage: 0.5,
+};
+
 class AdjustPlanterConditions extends React.Component {
   constructor(props) {
     super(props);
@@ -65,8 +87,11 @@ class AdjustPlanterConditions extends React.Component {
       height: Dimensions.get('window').height,
       toEdit: '',
       temperature: '24',
+      temperatureMax: '35',
       uv: '1000',
+      uvMax: '2000',
       humidity: '50',
+      humidityMax: '100',
       manualMode: false,
       deletingPlanter: false,
       waterTurnedOn: false,
@@ -222,7 +247,7 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             padding: 8,
           }}>
-          <Text style={styles.actionsText}>Current humidity:</Text>
+          <Text style={styles.actionsText}>Min humidity:</Text>
           <TextInput
             style={{
               width: 100,
@@ -256,13 +281,73 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             padding: 8,
           }}>
-          <Text style={styles.actionsText}>Current humidity:</Text>
+          <Text style={styles.actionsText}>Min humidity:</Text>
           <Text style={styles.actionsText}> {this.state.humidity}</Text>
           <IconButton
             icon="pencil"
             color={plantyColor}
             size={20}
             onPress={() => this.setState({toEdit: 'humidity'})}
+          />
+        </View>
+      );
+    }
+  }
+
+  renderMaxHumidityInput() {
+    if (this.state.toEdit === 'humidityMax') {
+      return (
+        <View
+          style={{
+            // flex:
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            padding: 8,
+          }}>
+          <Text style={styles.humidityMax}>Current humidity:</Text>
+          <TextInput
+            style={{
+              width: 100,
+              height: 30,
+            }}
+            selectionColor={plantyColor}
+            underlineColor={plantyColor}
+            mode="outlined"
+            label="New"
+            value={this.state.humidityMax}
+            onChangeText={inputValue =>
+              this.setState({humidityMax: inputValue})
+            }
+          />
+          <IconButton
+            icon="check"
+            color={plantyColor}
+            size={20}
+            onPress={() => {
+              this.adjustValueOnPlanter();
+              this.setState({toEdit: ''});
+            }}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View
+          style={{
+            // flex:
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            padding: 8,
+          }}>
+          <Text style={styles.actionsText}>Max humidity:</Text>
+          <Text style={styles.actionsText}> {this.state.humidityMax}</Text>
+          <IconButton
+            icon="pencil"
+            color={plantyColor}
+            size={20}
+            onPress={() => this.setState({toEdit: 'humidityMax'})}
           />
         </View>
       );
@@ -280,7 +365,7 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             padding: 8,
           }}>
-          <Text style={styles.actionsText}>Current Temperature:</Text>
+          <Text style={styles.actionsText}>Min Temperature:</Text>
           <TextInput
             style={{
               width: 100,
@@ -313,13 +398,70 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             padding: 8,
           }}>
-          <Text style={styles.actionsText}>Current Temperature:</Text>
+          <Text style={styles.actionsText}>Min Temperature:</Text>
           <Text style={styles.actionsText}> {this.state.temperature}</Text>
           <IconButton
             icon="pencil"
             color={plantyColor}
             size={20}
             onPress={() => this.setState({toEdit: 'temp'})}
+          />
+        </View>
+      );
+    }
+  }
+
+  renderMaxTemperatureInput() {
+    if (this.state.toEdit === 'tempMax') {
+      return (
+        <View
+          style={{
+            // flex:
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            padding: 8,
+          }}>
+          <Text style={styles.actionsText}>Max Temperature:</Text>
+          <TextInput
+            style={{
+              width: 100,
+              height: 30,
+            }}
+            selectionColor={plantyColor}
+            underlineColor={plantyColor}
+            mode="outlined"
+            label="New"
+            value={this.state.temperatureMax}
+            onChangeText={inputValue =>
+              this.setState({temperatureMax: inputValue})
+            }
+          />
+          <IconButton
+            icon="check"
+            color={plantyColor}
+            size={20}
+            onPress={() => this.setState({toEdit: ''})}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View
+          style={{
+            // flex:
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            padding: 8,
+          }}>
+          <Text style={styles.actionsText}>Max Temperature:</Text>
+          <Text style={styles.actionsText}> {this.state.temperatureMax}</Text>
+          <IconButton
+            icon="pencil"
+            color={plantyColor}
+            size={20}
+            onPress={() => this.setState({toEdit: 'tempMax'})}
           />
         </View>
       );
@@ -337,7 +479,7 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             padding: 8,
           }}>
-          <Text style={styles.actionsText}>Current UV:</Text>
+          <Text style={styles.actionsText}>Min UV:</Text>
           <TextInput
             style={{
               width: 100,
@@ -368,13 +510,68 @@ class AdjustPlanterConditions extends React.Component {
             justifyContent: 'space-between',
             padding: 8,
           }}>
-          <Text style={styles.actionsText}>Current UV:</Text>
+          <Text style={styles.actionsText}>Min UV:</Text>
           <Text style={styles.actionsText}> {this.state.uv}</Text>
           <IconButton
             icon="pencil"
             color={plantyColor}
             size={20}
             onPress={() => this.setState({toEdit: 'uv'})}
+          />
+        </View>
+      );
+    }
+  }
+
+  renderMaxUVInput() {
+    if (this.state.toEdit === 'uvMax') {
+      return (
+        <View
+          style={{
+            // flex:
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            padding: 8,
+          }}>
+          <Text style={styles.actionsText}>Current UV:</Text>
+          <TextInput
+            style={{
+              width: 100,
+              height: 30,
+            }}
+            selectionColor={plantyColor}
+            underlineColor={plantyColor}
+            mode="outlined"
+            label="New"
+            value={this.state.uvMax}
+            onChangeText={inputValue => this.setState({uvMax: inputValue})}
+          />
+          <IconButton
+            icon="check"
+            color={plantyColor}
+            size={20}
+            onPress={() => this.setState({toEdit: ''})}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View
+          style={{
+            // flex:
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            padding: 8,
+          }}>
+          <Text style={styles.actionsText}>Max UV:</Text>
+          <Text style={styles.actionsText}> {this.state.uvMax}</Text>
+          <IconButton
+            icon="pencil"
+            color={plantyColor}
+            size={20}
+            onPress={() => this.setState({toEdit: 'uvMax'})}
           />
         </View>
       );
@@ -414,18 +611,27 @@ class AdjustPlanterConditions extends React.Component {
           marginTop: 10,
         }}>
         <Chip style={{backgroundColor: 'white'}} icon="water-pump">
-          Turn on water supply
+          Add water to the planter
         </Chip>
+        {/*<IconButton*/}
+        {/*  icon="camera"*/}
+        {/*  loading={true}*/}
+        {/*  color={plantyColor}*/}
+        {/*  size={20}*/}
+        {/*  onPress={() => console.log('Pressed')}*/}
+        {/*/>*/}
         <Button
-          mode="outlined"
+          // mode="outlined"
+          icon={'water'}
+          color={'#42a5f5'}
           loading={this.state.loadingAddingWater}
           onPress={() => {
             this.setState({loadingAddingWater: true});
-            WS.sendMessage(
-              'FROM_CLIENT;' + this.state.item.UUID + ';ADD_WATER',
-            );
+            // WS.sendMessage(
+            //   'FROM_CLIENT;' + this.state.item.UUID + ';ADD_WATER',
+            // );
           }}>
-          Add water
+          Add
         </Button>
         {/*<Switch*/}
         {/*  value={this.state.waterTurnedOn}*/}
@@ -475,7 +681,9 @@ class AdjustPlanterConditions extends React.Component {
           Toggle light
         </Chip>
         <Button
-          mode="outlined"
+          // mode="outlined"
+          icon={'lightbulb'}
+          color={!this.state.lightTurnedOn ? 'gray' : 'yellow'}
           loading={this.state.loadingLightTurnedOn}
           onPress={() => {
             let action = !this.state.lightTurnedOn ? 'on' : 'off';
@@ -548,7 +756,15 @@ class AdjustPlanterConditions extends React.Component {
               // this.setState({lightTurnedOn: !this.state.lightTurnedOn});
             }}
           />
-          <Text style={{padding: 10}}>12</Text>
+          <Text
+            style={{
+              padding: 10,
+              fontWeight: 'bold',
+              color: 'gray',
+              fontSize: 15,
+            }}>
+            12
+          </Text>
           <FAB
             style={styles.fab}
             small
@@ -600,6 +816,22 @@ class AdjustPlanterConditions extends React.Component {
               {/*<Text style={{fontWeight: 'bold'}}>*/}
               {/*  {this.state.item.climate}*/}
               {/*</Text>*/}
+              {/*{this.renderAutomation()}*/}
+              {/*<Text*/}
+              {/*  style={{*/}
+              {/*    marginTop: 10,*/}
+              {/*    borderColor: errorColor,*/}
+              {/*    borderWidth: 1,*/}
+              {/*    color: errorColor,*/}
+              {/*    padding: 10,*/}
+              {/*    borderRadius: 3,*/}
+              {/*  }}>*/}
+              {/*  {"Your actions will now influence the planter's condition"}*/}
+              {/*</Text>*/}
+            </PaperCard.Content>
+          </PaperCard>
+          <PaperCard style={{marginTop: 5}}>
+            <PaperCard.Content>
               {this.renderAutomation()}
               <Text
                 style={{
@@ -620,28 +852,38 @@ class AdjustPlanterConditions extends React.Component {
               // subtitle="Card Subtitle"
             />
             <PaperCard.Content>
-              {/*{this.renderAutomation()}*/}
-              {/*{this.renderTemperatureInput()}*/}
-              {/*{this.renderHumidityInput()}*/}
-
               {this.renderWaterControl()}
               <Divider />
               {this.renderLightControl()}
               <Divider />
               {this.renderTemperatureControl()}
-              <Button
-                icon="delete"
-                mode="outlined"
-                loading={this.state.deletingPlanter}
-                onPress={() => {
-                  this._showDialog();
+              <Divider />
+              {this.renderTemperatureInput()}
+              <Divider />
+              {this.renderMaxTemperatureInput()}
+              <Divider />
+              {this.renderHumidityInput()}
+              <Divider />
+              {this.renderMaxHumidityInput()}
+              <Divider />
+              {this.renderUVInput()}
+              <Divider />
+              {this.renderMaxUVInput()}
+              <Divider />
 
-                  // this.deletePlanter()
-                  //   .then(r => this.goBack())
-                  //   .catch(error => console.log(error));
-                }}>
-                Delete planter
-              </Button>
+              {/*<Button*/}
+              {/*  icon="delete"*/}
+              {/*  mode="outlined"*/}
+              {/*  loading={this.state.deletingPlanter}*/}
+              {/*  onPress={() => {*/}
+              {/*    this._showDialog();*/}
+
+              {/*    // this.deletePlanter()*/}
+              {/*    //   .then(r => this.goBack())*/}
+              {/*    //   .catch(error => console.log(error));*/}
+              {/*  }}>*/}
+              {/*  Delete planter*/}
+              {/*</Button>*/}
             </PaperCard.Content>
           </PaperCard>
           <Portal>
@@ -683,87 +925,176 @@ class AdjustPlanterConditions extends React.Component {
           </Portal>
         </KeyboardAwareScrollView>
       );
-    }
-
-    return (
-      <View style={{margin: '1%', width: '98%'}}>
-        <KeyboardAwareScrollView
-          extraScrollHeight={30}
-          // contentContainerStyle={{
-          //   flex: 1,
-          //   justifyContent: 'center',
-          //   alignItems: 'center',
-          //   height: '100%',
-          //   width: '100%',
-          // }}>
-        >
-          <PaperCard>
-            <PaperCard.Title
-              title={'Planter: ' + this.state.item.name}
-              subtitle={'Climate: ' + this.state.item.climate}
-            />
-            <PaperCard.Content>
-              <Text style={{marginBottom: 10}}>
-                {'Description: ' + this.state.item.description}
-              </Text>
-              {/*<Text>{'Climate: ' + this.state.item.climate}</Text>*/}
-              {/*<Text style={{fontWeight: 'bold'}}>*/}
-              {/*  {this.state.item.climate}*/}
-              {/*</Text>*/}
-              {this.renderAutomation()}
-            </PaperCard.Content>
-          </PaperCard>
-          <PaperCard style={{marginTop: 5}}>
-            <PaperCard.Title
-              title={'Actions'}
-              // subtitle="Card Subtitle"
-            />
-            <PaperCard.Content>
-              {/*{this.renderAutomation()}*/}
-              {this.renderTemperatureInput()}
-              <Divider />
-              {this.renderHumidityInput()}
-              <Divider />
-              {this.renderUVInput()}
-
-              <Button
-                icon="delete"
-                mode="outlined"
-                loading={this.state.deletingPlanter}
-                onPress={() => {
-                  this._showDialog();
-                  // this.deletePlanter()
-                  //   .then(r => this.goBack())
-                  //   .catch(error => console.log(error));
-                }}>
-                Delete planter
-              </Button>
-            </PaperCard.Content>
-          </PaperCard>
-          <Portal>
-            <Dialog
-              visible={this.state.modalVisible}
-              onDismiss={() => this.setState({modalVisible: false})}>
-              <Dialog.Title>
-                Delete planter {this.state.item.name}?
-              </Dialog.Title>
-              <Dialog.Content>
-                <Paragraph>
-                  This will permanently delete this planter from your account
+    } else {
+      return (
+        <View style={{margin: '1%', width: '98%'}}>
+          <KeyboardAwareScrollView
+            extraScrollHeight={30}
+            // contentContainerStyle={{
+            //   flex: 1,
+            //   justifyContent: 'center',
+            //   alignItems: 'center',
+            //   height: '100%',
+            //   width: '100%',
+            // }}>
+          >
+            <PaperCard>
+              <PaperCard.Title
+                title={'Planter: ' + this.state.item.name}
+                subtitle={'Climate: ' + this.state.item.climate}
+              />
+              <PaperCard.Content>
+                <Text style={{marginBottom: 10}}>
+                  {'Description: ' + this.state.item.description}
+                </Text>
+                {/*{this.renderAutomation()}*/}
+              </PaperCard.Content>
+            </PaperCard>
+            <PaperCard style={{marginTop: 5}}>
+              <PaperCard.Content>{this.renderAutomation()}</PaperCard.Content>
+            </PaperCard>
+            <PaperCard style={{marginTop: 5}}>
+              <PaperCard.Title
+                title={'Conditions'}
+                // subtitle="Conditions of the planter"
+              />
+              <PaperCard.Content>
+                <Paragraph style={{fontWeight: 'bold', fontSize: 15}}>
+                  Temperature over the week
                 </Paragraph>
-              </Dialog.Content>
-              <Dialog.Actions>
-                <Button onPress={this._hideDialog}>Delete</Button>
-                <Button onPress={() => this.setState({modalVisible: false})}>
-                  Cancel
+                <BarChart
+                  data={data}
+                  width={Dimensions.get('window').width - 40} // from react-native
+                  height={220}
+                  // yAxisLabel="$"
+                  yAxisSuffix="C"
+                  fromZero={true}
+                  yAxisInterval={1} // optional, defaults to 1
+                  chartConfig={{
+                    // backgroundColor: plantyColor,
+                    backgroundGradientFrom: plantyColor,
+                    // backgroundGradientTo: '#ffa726',
+                    decimalPlaces: 1, // optional, defaults to 2dp
+                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                    barPercentage: 0.8,
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 10,
+                  }}
+                />
+                <View style={styles.conditionsText}>
+                  <Text style={styles.actionsText}>Current Temperature:</Text>
+                  <Text style={styles.actionsText}>
+                    {this.state.temperature + ' C'}
+                  </Text>
+                </View>
+                <Divider />
+                <Paragraph style={{fontWeight: 'bold', fontSize: 15}}>
+                  Humidity over the week
+                </Paragraph>
+                <BarChart
+                  data={data}
+                  width={Dimensions.get('window').width - 40} // from react-native
+                  height={220}
+                  // yAxisLabel="$"
+                  yAxisSuffix="C"
+                  fromZero={true}
+                  yAxisInterval={1} // optional, defaults to 1
+                  chartConfig={{
+                    // backgroundColor: plantyColor,
+                    backgroundGradientFrom: plantyColor,
+                    // backgroundGradientTo: '#ffa726',
+                    decimalPlaces: 1, // optional, defaults to 2dp
+                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                    barPercentage: 0.8,
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 10,
+                  }}
+                />
+
+                <View style={styles.conditionsText}>
+                  <Text style={styles.actionsText}>Current Humidity:</Text>
+                  <Text style={styles.actionsText}>
+                    {this.state.humidity + ' %'}
+                  </Text>
+                </View>
+                <Divider />
+                <Paragraph style={{fontWeight: 'bold', fontSize: 15}}>
+                  UV over the week
+                </Paragraph>
+                <BarChart
+                  data={data}
+                  width={Dimensions.get('window').width - 40} // from react-native
+                  height={220}
+                  // yAxisLabel="$"
+                  yAxisSuffix="C"
+                  fromZero={true}
+                  yAxisInterval={1} // optional, defaults to 1
+                  chartConfig={{
+                    // backgroundColor: plantyColor,
+                    backgroundGradientFrom: plantyColor,
+                    // backgroundGradientTo: '#ffa726',
+                    decimalPlaces: 1, // optional, defaults to 2dp
+                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                    barPercentage: 0.8,
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 10,
+                  }}
+                />
+                <View style={styles.conditionsText}>
+                  <Text style={styles.actionsText}>Current UV:</Text>
+                  <Text style={styles.actionsText}>
+                    {this.state.uv + ' Lumens'}
+                  </Text>
+                </View>
+
+                <Button
+                  icon="delete"
+                  mode="outlined"
+                  loading={this.state.deletingPlanter}
+                  onPress={() => {
+                    this._showDialog();
+                    // this.deletePlanter()
+                    //   .then(r => this.goBack())
+                    //   .catch(error => console.log(error));
+                  }}>
+                  Delete planter
                 </Button>
-              </Dialog.Actions>
-            </Dialog>
-          </Portal>
-          <View style={styles.container} />
-        </KeyboardAwareScrollView>
-      </View>
-    );
+              </PaperCard.Content>
+            </PaperCard>
+            <Portal>
+              <Dialog
+                visible={this.state.modalVisible}
+                onDismiss={() => this.setState({modalVisible: false})}>
+                <Dialog.Title>
+                  Delete planter {this.state.item.name}?
+                </Dialog.Title>
+                <Dialog.Content>
+                  <Paragraph>
+                    This will permanently delete this planter from your account
+                  </Paragraph>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <Button onPress={this._hideDialog}>Delete</Button>
+                  <Button onPress={() => this.setState({modalVisible: false})}>
+                    Cancel
+                  </Button>
+                </Dialog.Actions>
+              </Dialog>
+            </Portal>
+            <View style={styles.container} />
+          </KeyboardAwareScrollView>
+        </View>
+      );
+    }
   }
 }
 
@@ -785,6 +1116,12 @@ const styles = StyleSheet.create({
     // // width: '95%',
     // height: 20,
     // padding: 10,
+  },
+  conditionsText: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: 8,
   },
   actionsText: {
     marginTop: 7,

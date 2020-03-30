@@ -72,6 +72,7 @@ import SocketIOClient from 'socket.io-client';
 // import Amplify from 'aws-amplify';
 // import Amplify, {Storage} from 'aws-amplify-react-native';
 import Amplify, {Storage} from 'aws-amplify';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const plantyColor = '#6f9e04';
 
@@ -111,7 +112,19 @@ class MainScreen extends React.Component {
     WS.onMessage(data => {
       console.log('GOT in main screen', data);
       // or something else or use redux
-      // dispatch({type: 'MyType', payload: data});
+      let instructions = data.data.split(';');
+      // "FROM_PLANTER;e0221623-fb88-4fbd-b524-6f0092463c93;WATER_ADDED"
+      //"FROM_WEB;none;UPDATE_STATE"
+      if (instructions.length > 2)
+        switch (instructions[2]) {
+          case 'UPDATE_STATE':
+            this.forceUpdate();
+            break;
+          case 'FAILED':
+            alert('Failed to communicate with server');
+            this.forceUpdate();
+            break;
+        }
     });
   }
 
@@ -422,7 +435,7 @@ class MainScreen extends React.Component {
   };
 
   render() {
-    // console.log(this.props);
+    console.log(new Date().getTime());
     // console.log(this.state.plants);
     // console.log(this.state.allPlanters);
 
@@ -504,6 +517,20 @@ class MainScreen extends React.Component {
             })
           }
         />
+        {/*<Portal>*/}
+        {/*  <Snackbar*/}
+        {/*    style={{position: 'absolute', bottom: 15, borderRadius: 5}}*/}
+        {/*    visible={this.state.lightTurnedOn}*/}
+        {/*    onDismiss={() => this.setState({lightTurnedOn: false})}*/}
+        {/*    action={{*/}
+        {/*      label: 'Undo',*/}
+        {/*      onPress: () => {*/}
+        {/*        // Do something*/}
+        {/*      },*/}
+        {/*    }}>*/}
+        {/*    Hey there! I'm a Snackbar.*/}
+        {/*  </Snackbar>*/}
+        {/*</Portal>*/}
       </View>
     );
   }
