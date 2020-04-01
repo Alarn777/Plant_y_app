@@ -1,13 +1,24 @@
 import Const from './ENV_VARS';
 // const Sockette = require('sockette');
-import ReconnectingWebSocket from 'react-native-reconnecting-websocket';
-
+// import ReconnectingWebSocket from 'react-native-reconnecting-websocket';
+// import WebSocket from 'WebSocket';
 export default class WS {
   static init() {
     if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
-      this.ws = new ReconnectingWebSocket(Const.apigatewaySocket);
+      this.ws = new WebSocket(Const.apigatewaySocket);
+      // this.ws.onopen = console.log('Socket is connected');
+      console.log(this.ws);
     }
-    this.ws.onclose = WS.displayAlert;
+    // this.ws.onclose = WS.displayAlert;
+    this.ws.onclose = function(e) {
+      console.log(
+        'Socket is closed. Reconnect will be attempted in 1 second.',
+        e.reason,
+      );
+      setTimeout(function() {
+        this.ws = new WebSocket(Const.apigatewaySocket);
+      }, 1000);
+    };
   }
 
   // static displayAlert() {
@@ -16,14 +27,6 @@ export default class WS {
 
   static onMessage(handler) {
     this.ws.addEventListener('message', handler);
-  }
-
-  static displayAlert(message) {
-    console.log(message);
-    if (!this.ws) {
-      this.ws = new ReconnectingWebSocket(Const.apigatewaySocket);
-    }
-    this.ws.reconnect();
   }
 
   static closeSocket() {

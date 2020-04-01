@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {bindActionCreators} from 'redux';
@@ -1185,10 +1177,10 @@ class AdjustPlanterConditions extends React.Component {
                   // ref={c => {
                   //   this._carousel = c;
                   // }}
-                  loop={true}
+                  loop={false}
                   autoplay={true}
                   autoplayDelay={500}
-                  autoplayInterval={5000}
+                  autoplayInterval={10000}
                   data={this.state.entries}
                   renderItem={this._renderCarouselItem}
                   sliderWidth={Dimensions.get('window').width - 40}
@@ -1360,32 +1352,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   container: {
-    // minHeight: 500,
     padding: 25,
   },
   modalContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    // width: 300,
-    // height: 500,
     padding: 30,
   },
-  modalText: {
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    // // width: '95%',
-    // height: 20,
-    // padding: 10,
-  },
+  modalText: {},
   conditionsText: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    // padding: 8,
-    // fontWeight: 'bold',
   },
   actionsText: {
-    fontWeight: 'bold',
     marginTop: 7,
     marginBottom: 7,
   },
@@ -1411,59 +1391,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(AdjustPlanterConditions);
-
-//graph
-
-//
-// <LineChart
-//     data={{
-//         labels: [
-//             'January',
-//             'February',
-//             'March',
-//             'April',
-//             'May',
-//             'June',
-//         ],
-//         datasets: [
-//             {
-//                 data: [
-//                     Math.random() * 100,
-//                     Math.random() * 100,
-//                     Math.random() * 100,
-//                     Math.random() * 100,
-//                     Math.random() * 100,
-//                     Math.random() * 100,
-//                 ],
-//             },
-//         ],
-//     }}
-//     width={Dimensions.get('window').width - 50} // from react-native
-//     height={210}
-//     yAxisLabel="$"
-//     yAxisSuffix="k"
-//     yAxisInterval={1} // optional, defaults to 1
-//     chartConfig={{
-//         // backgroundColor: '#e26a00',
-//         // backgroundGradientFrom: '#fb8c00',
-//         // backgroundGradientTo: '#ffa726',
-//         decimalPlaces: 2, // optional, defaults to 2dp
-//         color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-//         labelColor: (opacity = 1) =>
-//             `rgba(255, 255, 255, ${opacity})`,
-//         style: {
-//             borderRadius: 16,
-//         },
-//         propsForDots: {
-//             r: '6',
-//             strokeWidth: '2',
-//             // stroke: '#ffa726',
-//         },
-//     }}
-//     bezier
-//     style={{
-//         margin: 5,
-//         marginVertical: 8,
-//         borderRadius: 16,
-//     }}
-// />

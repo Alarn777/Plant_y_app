@@ -127,7 +127,7 @@ class planterScreen extends React.Component {
   componentDidMount(): void {
     Auth.currentAuthenticatedUser()
       .then()
-      .then(data => console.log(data))
+      .then()
       .catch(() => {
         console.log('failed to get user');
         this.props.navigation.getParam('logOut')();
@@ -189,13 +189,12 @@ class planterScreen extends React.Component {
   }
 
   addUrl = url => {
-    console.log(url);
     this.props.addStreamUrl(url);
     this.setState({streamUrl: this.props.plantyData.streamUrl});
   };
 
   async loadPlants() {
-    this.setState({loading: true});
+    this.setState({loading: true, plants: []});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -409,7 +408,7 @@ class planterScreen extends React.Component {
   };
 
   render() {
-    console.log(this.props.plantyData.myCognitoUser);
+    // console.log(this.props.plantyData.myCognitoUser);
 
     if (this.state.loading) {
       return (

@@ -34,7 +34,6 @@ class AddPlantScreen extends React.Component {
       planterName: this.props.navigation.getParam('planterName'),
     };
 
-    this.dealWithUrlData = this.dealWithUrlData.bind(this);
     this.addPlantToMyGarden = this.addPlantToMyGarden.bind(this);
   }
 

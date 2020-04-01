@@ -88,12 +88,14 @@ class MainScreen extends React.Component {
     WS.init();
 
     WS.onMessage(data => {
-      console.log('GOT in main screen', data);
+      console.log('GOT in main screen', data.data);
       let instructions = data.data.split(';');
       if (instructions.length > 2)
         switch (instructions[2]) {
           case 'UPDATE_STATE':
-            this.forceUpdate();
+            this.loadPlanters()
+              .then()
+              .catch();
             break;
           case 'FAILED':
             alert('Failed to communicate with server');
@@ -292,24 +294,7 @@ class MainScreen extends React.Component {
     // this.props.addAction(this.showMessage);
   }
 
-  showMessage = e => {
-    // b; // this.props.dealWithMessage(e.data);
-    // console.log(e.data);
-    console.log('socket action in main screen');
-    // this.loadPlanters()
-    //   .then()
-    //   .catch();
-  };
-
   logOut = () => {
-    // console.log('log out in main');
-    // this.props.onStateChange('signedOut');
-    // try {
-    //   this.props.plantyData.socket.close();
-    // } catch (e) {
-    //   console.log(e);
-    // }
-    // const { onStateChange } = this.props;
     Auth.signOut()
       .then(() => {
         this.props.cleanReduxState();
@@ -319,10 +304,6 @@ class MainScreen extends React.Component {
         // onStateChange('signedOut');
       })
       .catch(e => console.log(e));
-
-    // this.state.userLoggedIn = !this.state.userLoggedIn;
-    // this.state.user = null;
-    // this.setState({userLoggedIn: false});
   };
 
   onLayout(e) {
@@ -346,7 +327,7 @@ class MainScreen extends React.Component {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  WS.init();
+                  // WS.init();
                   this.props.navigation.navigate('planterScreen', {
                     item: item,
                     user_token: this.state.USER_TOKEN,
@@ -366,7 +347,7 @@ class MainScreen extends React.Component {
           key={item.UUID}>
           <TouchableOpacity
             onPress={() => {
-              WS.init();
+              // WS.init();
               this.props.navigation.navigate('planterScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
