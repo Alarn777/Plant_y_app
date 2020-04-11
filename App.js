@@ -40,6 +40,8 @@ import AdjustPlantConditions from './screens/User/AdjustPlanterConditions';
 import addPlanterScreen from './screens/User/addPlanterScreen';
 import planterImagesGallery from './screens/User/planterImagesGallery';
 import Picture from './screens/User/Picture';
+import GrowthPlan from './screens/User/growthPlan';
+
 const store = createStore(Reducer);
 
 const AppNavigator = createStackNavigator(
@@ -110,6 +112,13 @@ const AppNavigator = createStackNavigator(
     Picture: {
       name: 'Picture',
       screen: Picture,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
+    growthPlan: {
+      name: 'Picture',
+      screen: GrowthPlan,
       navigationOptions: {
         gesturesEnabled: false,
       },

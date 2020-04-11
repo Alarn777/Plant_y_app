@@ -1084,19 +1084,20 @@ class AdjustPlanterConditions extends React.Component {
               {this.renderMaxUVInput()}
               <Divider />
 
-              {/*<Button*/}
-              {/*  icon="delete"*/}
-              {/*  mode="outlined"*/}
-              {/*  loading={this.state.deletingPlanter}*/}
-              {/*  onPress={() => {*/}
-              {/*    this._showDialog();*/}
-
-              {/*    // this.deletePlanter()*/}
-              {/*    //   .then(r => this.goBack())*/}
-              {/*    //   .catch(error => console.log(error));*/}
-              {/*  }}>*/}
-              {/*  Delete planter*/}
-              {/*</Button>*/}
+              <Button
+                // icon="chart-bell-curve-cumulative"
+                mode="outlined"
+                // loading={this.state.deletingPlanter}
+                onPress={() => {
+                  this.props.navigation.navigate('growthPlan', {
+                    planter: this.state.item,
+                  });
+                  // this.deletePlanter()
+                  //   .then(r => this.goBack())
+                  //   .catch(error => console.log(error));
+                }}>
+                Edit growth plan
+              </Button>
             </PaperCard.Content>
           </PaperCard>
           <Portal>
