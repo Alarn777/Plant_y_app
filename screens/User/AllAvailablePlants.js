@@ -174,6 +174,8 @@ class AllAvailablePlants extends React.Component {
     }
     item.pic = url;
 
+    console.log(item.pic);
+
     return (
       <View>
         <Card
@@ -191,7 +193,7 @@ class AllAvailablePlants extends React.Component {
               </TouchableOpacity>
             );
           }}
-          style={{width: this.state.width / 3 - 5}}
+          style={{width: this.state.width / 3}}
           index={item.UUID}
           key={item.UUID}>
           <TouchableOpacity
@@ -229,7 +231,7 @@ class AllAvailablePlants extends React.Component {
         <ScrollView style={styles.data}>
           <FlatList
             numColumns={3}
-            style={{width: this.state.width, margin: 5}}
+            // style={{width: this.state.width, margin: 5}}
             data={this.state.plants}
             keyExtractor={this._keyExtractor}
             renderItem={this._renderItem}

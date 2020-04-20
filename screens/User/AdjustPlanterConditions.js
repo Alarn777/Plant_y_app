@@ -202,7 +202,7 @@ class AdjustPlanterConditions extends React.Component {
   }
   componentDidMount(): void {
     console.log('did mount');
-    console.log(this.scrollViewRef);
+    // console.log(this.scrollViewRef);
 
     this.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
 

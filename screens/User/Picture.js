@@ -11,7 +11,13 @@ import Video from 'react-native-video';
 import {Icon, Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-import {Button, Card as PaperCard, Divider, FAB} from 'react-native-paper';
+import {
+  Button,
+  Card as PaperCard,
+  Divider,
+  FAB,
+  ProgressBar,
+} from 'react-native-paper';
 //redusx
 import {connect} from 'react-redux';
 import {HeaderBackButton} from 'react-navigation-stack';
@@ -101,6 +107,10 @@ class Picture extends React.Component {
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
 
+    // this.setState({healthStatus: 100 - 60});
+    // this.successTesting();
+    // return;
+
     await axios
       .post(
         Consts.apigatewayRoute + '/testPlantPicture',
@@ -186,33 +196,51 @@ class Picture extends React.Component {
   };
 
   renderTestResults = () => {
+    // console.log(this.state.healthStatus * 0.01);
+
+    let color = plantyColor;
+
+    if (this.state.healthStatus < 50) {
+      color = 'red';
+    }
+
     if (!this.state.plant_tested) {
       return <View style={styles.linearGradient} />;
     } else
       return (
         <View>
-          <LinearGradient
-            start={{x: 0.3}}
-            end={{x: 0.7}}
-            colors={['red', 'yellow', plantyColor]}
-            style={styles.linearGradient}>
-            <Text
-              style={{
-                fontSize: 100,
-                fontFamily: 'Gill Sans',
-                textAlign: 'left',
-                marginTop: 10,
-                marginBottom: 10,
-                // margin: 10,
-                position: 'relative',
-                left: ((this.state.width - 65) / 100) * this.state.healthStatus,
-                color: 'black',
-                // left: 0,
-                backgroundColor: 'transparent',
-              }}>
-              |
-            </Text>
-          </LinearGradient>
+          <Text style={{color: 'red', margin: 9, height: 20}}>
+            Please tend to your plant!
+          </Text>
+
+          <ProgressBar
+            style={{margin: 9, height: 10}}
+            progress={this.state.healthStatus * 0.01}
+            color={color}
+          />
+
+          {/*<LinearGradient*/}
+          {/*  start={{x: 0.3}}*/}
+          {/*  end={{x: 0.7}}*/}
+          {/*  colors={['red', 'yellow', plantyColor]}*/}
+          {/*  style={styles.linearGradient}>*/}
+          {/*  <Text*/}
+          {/*    style={{*/}
+          {/*      fontSize: 100,*/}
+          {/*      fontFamily: 'Gill Sans',*/}
+          {/*      textAlign: 'left',*/}
+          {/*      marginTop: 10,*/}
+          {/*      marginBottom: 10,*/}
+          {/*      // margin: 10,*/}
+          {/*      position: 'relative',*/}
+          {/*      left: ((this.state.width - 65) / 100) * this.state.healthStatus,*/}
+          {/*      color: 'black',*/}
+          {/*      // left: 0,*/}
+          {/*      backgroundColor: 'transparent',*/}
+          {/*    }}>*/}
+          {/*    |*/}
+          {/*  </Text>*/}
+          {/*</LinearGradient>*/}
           <View style={styles.sickHealthy}>
             <Text>Sick</Text>
             <Text>Healthy</Text>
@@ -223,11 +251,11 @@ class Picture extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <PaperCard style={{height: '100%'}}>
+      <ScrollView style={styles.container}>
+        <PaperCard style={{height: this.state.height}}>
           <PaperCard.Content style={{marginTop: 10}}>
             <Image
-              style={{height: '70%', resizeMode: 'contain'}}
+              style={{height: '60%', resizeMode: 'contain'}}
               source={{uri: this.props.navigation.getParam('picture').url}}
             />
             {this.renderTestResults()}
@@ -261,7 +289,7 @@ class Picture extends React.Component {
             </Button>
           </PaperCard.Content>
         </PaperCard>
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -299,7 +327,8 @@ let styles = StyleSheet.create({
     height: 200,
   },
   container: {
-    // flex:1,
+    flex: 1,
+    // height: 1000,
     margin: '1%',
   },
   mainText: {
@@ -318,7 +347,7 @@ let styles = StyleSheet.create({
     height: 100,
   },
   linearGradient: {
-    borderRadius: 5,
+    // borderRadius: 5,
   },
   buttonText: {
     fontSize: 100,

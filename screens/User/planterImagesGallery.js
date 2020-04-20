@@ -83,7 +83,7 @@ class planterImagesGallery extends React.Component {
   }
 
   async preloadImages(images_array) {
-    console.log('Now loading');
+    console.log('Now loading images');
     console.log(images_array);
 
     await images_array.map(oneImage => {
@@ -142,7 +142,7 @@ class planterImagesGallery extends React.Component {
       headerTitle: (
         <Image
           resizeMode="contain"
-          style={{height: 40, width: 40}}
+          // style={{height: 40, width: 40}}
           source={require('../../assets/logo.png')}
         />
       ),
@@ -184,12 +184,34 @@ class planterImagesGallery extends React.Component {
             planterName: this.state.planter.name,
           })
         }
-        style={{width: this.state.width / 2 - 4}}
+        // style={{width: this.state.width / 2, backgroundColor: 'red'}}
         index={item.UUID}
         key={item.UUID}>
         <PaperCard>
-          <PaperCard.Cover style={{padding: 1}} source={{uri: item.url}} />
+          <Image
+            style={{width: this.state.width / 2 - 11, height: 200, margin: 5}}
+            source={{uri: item.url}}
+          />
         </PaperCard>
+      </TouchableOpacity>
+    );
+
+    return (
+      <TouchableOpacity
+        onPress={() =>
+          this.props.navigation.navigate('Picture', {
+            picture: item,
+            planterName: this.state.planter.name,
+          })
+        }
+        style={{width: this.state.width / 2, backgroundColor: 'red'}}
+        index={item.UUID}
+        key={item.UUID}>
+        <Image height={100} width={100} source={{uri: item.url}} />
+        {/*<PaperCard style={{width: this.state.width, height: 200}}>*/}
+        {/*<Image height={100} width={100} source={{uri: item.url}} />*/}
+        {/*<PaperCard.Cover style={{padding: 1}} source={{uri: item.url}} />*/}
+        {/*</PaperCard>*/}
       </TouchableOpacity>
     );
   };

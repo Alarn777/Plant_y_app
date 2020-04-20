@@ -345,7 +345,10 @@ class growthPlan extends React.Component {
     } else icon = 'numeric-' + oneWeek.phaseName.replace('Week ', '');
 
     return (
-      <List.Accordion style={styles.week} title={oneWeek.phaseName}>
+      <List.Accordion
+        key={oneWeek.name}
+        style={styles.week}
+        title={oneWeek.phaseName}>
         <List.Accordion style={styles.dayTime} title="Morning">
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
           <View style={styles.slider}>
@@ -697,7 +700,10 @@ class growthPlan extends React.Component {
             </Text>
           </PaperCard.Content>
         </PaperCard>
-        <ScrollView style={styles.data}>
+        <ScrollView
+          style={styles.data}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}>
           <PaperCard style={{width: this.state.width - 2}}>
             <PaperCard.Content>
               <TextInput

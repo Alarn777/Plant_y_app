@@ -2,11 +2,12 @@ import React from 'react';
 import {
   Image,
   View,
-  FlatList,
+  // FlatList,
   ScrollView,
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import {FlatList} from 'react-native-gesture-handler';
 import {Auth, Storage} from 'aws-amplify';
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
@@ -73,6 +74,7 @@ class planterScreen extends React.Component {
       streamUrl: '',
       loadingActions: false,
       loadingPlanters: false,
+      refreshingPlants: false,
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -123,6 +125,14 @@ class planterScreen extends React.Component {
       this.props.navigation.setParams({plantWasRemoved: false});
     }
   }
+
+  handleRefresh = () => {
+    console.log('refreshing plants');
+    this.setState({refreshingPlants: true});
+    // this.loadPlants()
+    //   .then()
+    //   .catch();
+  };
 
   componentDidMount(): void {
     Auth.currentAuthenticatedUser()
@@ -222,6 +232,8 @@ class planterScreen extends React.Component {
     if (plants) {
       this.setState({plants: plants});
     } else this.setState({plants: []});
+
+    this.setState({refreshingPlants: false});
     this.setState({loading: false});
   };
 
@@ -514,6 +526,12 @@ class planterScreen extends React.Component {
               data={this.state.plants}
               keyExtractor={this._keyExtractor}
               renderItem={this._renderItem}
+              refreshing={this.state.refreshingPlants}
+              // onRefresh={this.setState({refreshingPlants: true})}
+              // this.setState({refreshingPlants: true});
+              // this.handleRefresh();
+              /*}}*/
+              onRefresh={this.handleRefresh}
             />
           </ScrollView>
           <FAB

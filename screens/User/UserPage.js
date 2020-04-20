@@ -288,6 +288,7 @@ class UserPage extends React.Component {
             }}
           />
           <Button
+            style={{margin: 10}}
             icon="logout"
             mode="outlined"
             onPress={() => {
