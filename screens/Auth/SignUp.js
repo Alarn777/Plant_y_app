@@ -238,7 +238,7 @@ export default class SignUp extends AuthPiece {
           width: '100%',
         }}>
         <ImageBackground
-          source={require('../../assets/iphone11Wallpaper.jpg')}
+          source={require('../../assets/7dEVFqb.jpg')}
           style={{width: '100%', height: '100%'}}>
           {/*<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>*/}
           <View style={theme.section}>
@@ -248,7 +248,7 @@ export default class SignUp extends AuthPiece {
                 return field.key !== 'phone_number' ? (
                   <FormField
                     key={field.key}
-                    theme={theme}
+                    // theme={theme}
                     type={field.type}
                     secureTextEntry={field.type === 'password'}
                     onChangeText={text => {
@@ -316,7 +316,7 @@ export default class SignUp extends AuthPiece {
               <LinkCell
                 style={{color: '#6f9e04', alignContent: 'center'}}
                 onPress={() => this.changeState('signIn')}>
-                {I18n.get('Sign In')}
+                {I18n.get('Back to Sign In')}
               </LinkCell>
             </View>
             <ErrorRow theme={theme}>{this.state.error}</ErrorRow>

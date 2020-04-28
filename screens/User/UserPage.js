@@ -265,9 +265,9 @@ class UserPage extends React.Component {
             yAxisSuffix="k"
             yAxisInterval={1} // optional, defaults to 1
             chartConfig={{
-              // backgroundColor: '#e26a00',
-              // backgroundGradientFrom: '#fb8c00',
-              // backgroundGradientTo: '#ffa726',
+              backgroundColor: '#e26a00',
+              backgroundGradientFrom: plantyColor,
+              backgroundGradientTo: '#ffa726',
               decimalPlaces: 2, // optional, defaults to 2dp
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -329,6 +329,9 @@ const mapDispatchToProps = dispatch =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(UserPage);
 
 // export default UserPage;

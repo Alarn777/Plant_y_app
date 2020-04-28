@@ -12,10 +12,11 @@ import {Auth} from 'aws-amplify';
 
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
-import {Icon, Text, Card, Button} from '@ui-kitten/components';
+import {Icon, Text, Card} from '@ui-kitten/components';
 import {
   FAB,
   Title,
+  Button,
   Card as PaperCard,
   Paragraph,
   Avatar,
@@ -23,6 +24,7 @@ import {
   Colors,
   Chip,
   Searchbar,
+  IconButton,
 } from 'react-native-paper';
 
 import {withAuthenticator} from 'aws-amplify-react-native';
@@ -370,31 +372,52 @@ class MainScreen extends React.Component {
       <View style={styles.container} onLayout={this.onLayout}>
         <StatusBar translucent barStyle="dark-content" />
         <PaperCard>
-          <TouchableOpacity
-            onPress={() =>
-              this.props.navigation.navigate('UserPage', {
-                user: this.state.user,
-                logOut: this.logOut,
-              })
-            }>
-            <PaperCard.Title
-              title={'Welcome home,' + this.state.username}
-              // subtitle="Card Subtitle"
-              left={props => (
-                // <Avatar.Icon
-                //   {...props}
-                //   style={{backgroundColor: plantyColor}}
-                //   icon="account"
-                // />
-                <Avatar.Image
-                  // style={{alignSelf: 'center', backgroundColor: 'lightgray'}}
-                  {...props}
-                  // size={200}
-                  source={{uri: this.props.plantyData.avatarUrl}}
-                />
-              )}
-            />
-          </TouchableOpacity>
+          {/*<TouchableOpacity*/}
+          {/*  onPress={() =>*/}
+          {/*    this.props.navigation.navigate('UserPage', {*/}
+          {/*      user: this.state.user,*/}
+          {/*      logOut: this.logOut,*/}
+          {/*    })*/}
+          {/*  }>*/}
+          <PaperCard.Title
+            title={'Welcome home,' + this.state.username}
+            // subtitle="Card Subtitle"
+            left={props => (
+              // <Avatar.Icon
+              //   {...props}
+              //   style={{backgroundColor: plantyColor}}
+              //   icon="account"
+              // />
+              <Avatar.Image
+                // style={{alignSelf: 'center', backgroundColor: 'lightgray'}}
+                {...props}
+                // size={200}
+                source={{uri: this.props.plantyData.avatarUrl}}
+              />
+            )}
+            right={props => (
+              // <Avatar.Icon
+              //   {...props}
+              //   style={{backgroundColor: plantyColor}}
+              //   icon="account"
+              // />
+              <IconButton
+                // style={{alignSelf: 'center', backgroundColor: 'lightgray'}}
+                {...props}
+                style={{backgroundColor: 'white'}}
+                // small
+                icon="settings"
+                color={plantyColor}
+                onPress={() =>
+                  this.props.navigation.navigate('UserPage', {
+                    user: this.state.user,
+                    logOut: this.logOut,
+                  })
+                }
+              />
+            )}
+          />
+          {/*</TouchableOpacity>*/}
           <PaperCard.Content />
           <PaperCard.Cover
             source={require('../../assets/background_image.jpeg')}
@@ -429,13 +452,15 @@ class MainScreen extends React.Component {
           style={{
             position: 'absolute',
             margin: 16,
-            backgroundColor: plantyColor,
+            // backgroundColor: plantyColor,
+            backgroundColor: 'white',
             color: plantyColor,
             right: 0,
             bottom: 10,
           }}
           large
           icon="plus"
+          color={plantyColor}
           onPress={() =>
             this.props.navigation.navigate('addPlanterScreen', {
               user_token: this.state.USER_TOKEN,
@@ -443,6 +468,10 @@ class MainScreen extends React.Component {
               loadPlanters: this.loadPlanters,
             })
           }
+        />
+        <Image
+          style={{position: 'absolute', bottom: -10, left: -10, zIndex: -10}}
+          source={require('../../assets/grass.png')}
         />
         {/*<Portal>*/}
         {/*  <Snackbar*/}

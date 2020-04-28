@@ -86,7 +86,7 @@ export default class RequireNewPassword extends AuthPiece {
           <Header theme={theme}>{I18n.get('Change Password')}</Header>
           <View style={theme.sectionBody}>
             <FormField
-              theme={theme}
+              // theme={theme}
               onChangeText={text => this.setState({password: text})}
               label={I18n.get('Password')}
               placeholder={I18n.get('Enter your password')}

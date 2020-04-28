@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {Auth, Storage} from 'aws-amplify';
@@ -46,6 +47,7 @@ import {HeaderBackButton} from 'react-navigation-stack';
 import RNFS from 'react-native-fs';
 import Buffer from 'buffer';
 import WS from '../../websocket';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const plantyColor = '#6f9e04';
 
@@ -539,11 +541,13 @@ class planterScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              backgroundColor: '#6f9e04',
+              // backgroundColor: '#6f9e04',
+              backgroundColor: 'white',
               color: '#6f9e04',
               right: 0,
               bottom: 10,
             }}
+            color={plantyColor}
             large
             icon="plus"
             onPress={() =>
@@ -558,13 +562,15 @@ class planterScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              backgroundColor: '#6f9e04',
+              // backgroundColor: '#6f9e04',
+              backgroundColor: 'white',
               color: '#6f9e04',
               left: 0,
               bottom: 14,
             }}
             label="Adjust Conditions"
             lage
+            color={plantyColor}
             icon="pencil"
             onPress={() =>
               this.props.navigation.navigate('AdjustPlantConditions', {
@@ -573,50 +579,59 @@ class planterScreen extends React.Component {
               })
             }
           />
+          <Image
+            style={{position: 'absolute', bottom: 0, zIndex: -10}}
+            source={require('../../assets/grass.png')}
+          />
         </View>
       );
     } else {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
-          <PaperCard>
-            <PaperCard.Title
-              title={'Planter:' + this.props.navigation.getParam('item').name}
-              subtitle={
-                'Status: ' +
-                this.props.navigation.getParam('item').planterStatus
+          <ImageBackground
+            source={require('../../assets/field_sky_grass_summer.jpg')}
+            style={{width: '100%', height: '100%'}}>
+            <PaperCard>
+              <PaperCard.Title
+                title={'Planter:' + this.props.navigation.getParam('item').name}
+                subtitle={
+                  'Status: ' +
+                  this.props.navigation.getParam('item').planterStatus
+                }
+              />
+              <PaperCard.Content>
+                {this.props.navigation.getParam('item').planterStatus ===
+                'pending' ? (
+                  <Text>We are preparing your planter...</Text>
+                ) : (
+                  <Text>Planter is empty now, add some plants</Text>
+                )}
+              </PaperCard.Content>
+            </PaperCard>
+            <FAB
+              style={{
+                position: 'absolute',
+                margin: 16,
+                backgroundColor: plantyColor,
+                color: plantyColor,
+                right: 0,
+                bottom: 10,
+              }}
+              disabled={
+                this.props.navigation.getParam('item').planterStatus ===
+                'pending'
+              }
+              large
+              icon="plus"
+              onPress={() =>
+                this.props.navigation.navigate('AllAvailablePlants', {
+                  user_token: this.state.USER_TOKEN,
+                  planterName: this.props.navigation.getParam('item').name,
+                  loadPlanters: this.props.navigation.getParam('loadPlanters'),
+                })
               }
             />
-            <PaperCard.Content>
-              {this.props.navigation.getParam('item').planterStatus ===
-              'pending' ? (
-                <Text>We are preparing your planter...</Text>
-              ) : (
-                <Text>Planter is empty now, add some plants</Text>
-              )}
-            </PaperCard.Content>
-          </PaperCard>
-          <FAB
-            style={{
-              position: 'absolute',
-              margin: 16,
-              backgroundColor: plantyColor,
-              color: plantyColor,
-              right: 0,
-              bottom: 10,
-            }}
-            disabled={
-              this.props.navigation.getParam('item').planterStatus === 'pending'
-            }
-            large
-            icon="plus"
-            onPress={() =>
-              this.props.navigation.navigate('AllAvailablePlants', {
-                user_token: this.state.USER_TOKEN,
-                planterName: this.props.navigation.getParam('item').name,
-                loadPlanters: this.props.navigation.getParam('loadPlanters'),
-              })
-            }
-          />
+          </ImageBackground>
         </View>
       );
     }

@@ -141,9 +141,15 @@ export const ErrorRow = props => {
   if (!props.children) return null;
   return (
     <View
-      style={{flexDirection: 'row', justifyContent: 'center', width: '99%'}}>
-      <Icon name="warning" color={errorIconColor} />
-      <Text style={{margin: 3, color: 'red'}}>{props.children}</Text>
+      style={{
+        padding: 10,
+        backgroundColor: errorIconColor,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        // width: '99%',
+      }}>
+      <Icon name="warning" color={'white'} />
+      <Text style={{margin: 3, color: 'white'}}>{props.children}</Text>
     </View>
   );
 };

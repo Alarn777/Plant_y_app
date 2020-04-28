@@ -99,14 +99,14 @@ export default class ForgotPassword extends AuthPiece {
         {/*>*/}
         <View style={theme.sectionBody}>
           <FormField
-            theme={theme}
+            // theme={theme}
             onChangeText={text => this.setState({code: text})}
             label={I18n.get('Confirmation Code')}
             placeholder={I18n.get('Enter your confirmation code')}
             required={true}
           />
           <FormField
-            theme={theme}
+            // theme={theme}
             onChangeText={text => this.setState({password: text})}
             label={I18n.get('Password')}
             placeholder={I18n.get('Enter your new password')}
@@ -119,6 +119,13 @@ export default class ForgotPassword extends AuthPiece {
             onPress={this.submit}
             disabled={!(this.state.code && this.state.password)}
           />
+          <View style={theme.sectionFooter}>
+            <LinkCell
+              // theme={theme}
+              onPress={() => this.changeState('signIn')}>
+              {I18n.get('Back to Sign In')}
+            </LinkCell>
+          </View>
         </View>
         {/*</ImageBackground>*/}
       </KeyboardAwareScrollView>
@@ -138,7 +145,7 @@ export default class ForgotPassword extends AuthPiece {
           width: '100%',
         }}>
         <ImageBackground
-          source={require('../../assets/iphone11Wallpaper.jpg')}
+          source={require('../../assets/7dEVFqb.jpg')}
           style={{width: '100%', height: '100%'}}>
           <View style={theme.section}>
             <Header theme={theme}>{I18n.get('Forgot Password')}</Header>
@@ -153,7 +160,7 @@ export default class ForgotPassword extends AuthPiece {
             </View>
             <View style={theme.sectionFooter}>
               <LinkCell
-                theme={theme}
+                // theme={theme}
                 onPress={() => this.changeState('signIn')}>
                 {I18n.get('Back to Sign In')}
               </LinkCell>

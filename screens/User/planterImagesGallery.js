@@ -247,6 +247,10 @@ class planterImagesGallery extends React.Component {
             renderItem={this._renderItem}
           />
         </ScrollView>
+        <Image
+          style={{position: 'absolute', bottom: -1, zIndex: -10}}
+          source={require('../../assets/grass.png')}
+        />
       </View>
     );
   }

@@ -54,6 +54,7 @@ class SignIn extends AuthPiece {
       password: null,
       error: null,
       loginigIn: false,
+      redFields: false,
     };
 
     this.checkContact = this.checkContact.bind(this);
@@ -105,7 +106,9 @@ class SignIn extends AuthPiece {
           });
       })
       .catch(err => {
+        // this.setState({error: true});
         console.log(err);
+        this.setState({redFields: true});
         this.setState({loginigIn: false});
         this.error(err);
       });
@@ -114,8 +117,15 @@ class SignIn extends AuthPiece {
   showComponent(theme) {
     return (
       <View>
-        <StatusBar translucent barStyle="dark-content" />
-
+        <StatusBar
+          // backgroundColor={'red'}
+          translucent
+          barStyle="dark-content"
+        />
+        {/*<View style={{height: 45, backgroundColor: 'white'}} >*/}
+        {/*</View>*/}
+        {/*<TextInput />*/}
+        {/*<Button> asdasd</Button>*/}
         {/*<SafeAreaView style={{flex: 0, color: 'gray', backgroundColor: 'red'}}>*/}
         <KeyboardAwareScrollView
           extraScrollHeight={30}
@@ -128,24 +138,24 @@ class SignIn extends AuthPiece {
           }}>
           {/*<SafeAreaView style={{flex: 1}}>*/}
           <ImageBackground
-            source={require('../../assets/iphone11Wallpaper.jpg')}
+            source={require('../../assets/7dEVFqb.jpg')}
             style={{width: '100%', height: '100%'}}>
             <View style={theme.section}>
               <Image
                 // resizeMode="contain"
-                resizeMode="stretch"
+                resizeMode="contain"
                 style={{
                   alignSelf: 'center',
-                  flex: 1,
-                  height: 40,
-                  width: 340,
-                  marginBottom: 20,
+                  // flex: 1,
+                  height: 250,
+                  width: 390,
+                  marginBottom: '21%',
                 }}
                 source={require('../../assets/logo.png')}
               />
               {/*<Header theme={theme}>{I18n.get("Welcome to Plant'y")}</Header>*/}
 
-              <View style={theme.sectionBody}>
+              <View>
                 {/*{this.renderUsernameField(theme)}*/}
                 <FormField
                   // theme={theme}
@@ -181,11 +191,13 @@ class SignIn extends AuthPiece {
                   mode="contained"
                   style={{padding: 10}}
                   backgroundColor="#6f9e04"
+                  // backgroundColor={''}
                   color="#6f9e04"
                   onPress={this.signIn}>
                   {I18n.get('Sign In').toUpperCase()}
                 </Button>
               </View>
+
               <View style={theme.sectionFooter}>
                 <LinkCell
                   // theme={theme}
@@ -194,7 +206,7 @@ class SignIn extends AuthPiece {
                   {I18n.get('Forgot Password')}
                 </LinkCell>
                 <LinkCell
-                  theme={theme}
+                  // theme={theme}
                   onPress={() => this.changeState('signUp')}>
                   {I18n.get('Sign Up')}
                 </LinkCell>

@@ -19,6 +19,7 @@ import Amplify, {Auth} from 'aws-amplify';
 import awsConfig from './aws-exports';
 
 Amplify.configure(awsConfig);
+
 import {
   withAuthenticator,
   // Greetings,
@@ -117,7 +118,7 @@ const AppNavigator = createStackNavigator(
       },
     },
     growthPlan: {
-      name: 'Picture',
+      name: 'GrowthPlan',
       screen: GrowthPlan,
       navigationOptions: {
         gesturesEnabled: false,

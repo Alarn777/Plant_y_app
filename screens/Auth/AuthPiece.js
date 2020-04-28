@@ -58,7 +58,7 @@ export default class AuthPiece extends React.Component {
     if (usernameAttributes === 'email') {
       return (
         <FormField
-          theme={theme}
+          // theme={theme}
           onChangeText={text => this.setState({email: text})}
           label={I18n.get('Email')}
           placeholder={I18n.get('Enter your email')}
@@ -68,7 +68,7 @@ export default class AuthPiece extends React.Component {
     } else if (usernameAttributes === 'phone_number') {
       return (
         <PhoneField
-          theme={theme}
+          // theme={theme}
           key={'phone_number'}
           onChangeText={text => this.setState({phone_number: text})}
           label={I18n.get('Phone Number')}
@@ -81,7 +81,7 @@ export default class AuthPiece extends React.Component {
       return (
         // <View />
         <FormField
-          theme={theme}
+          // theme={theme}
           onChangeText={text => this.setState({username: text})}
           label={I18n.get(this.getUsernameLabel())}
           placeholder={I18n.get('Enter your username')}
