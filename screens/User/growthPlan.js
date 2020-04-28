@@ -94,10 +94,11 @@ class growthPlan extends React.Component {
 
   componentDidMount(): void {
     this.loadGrowthPlan()
-      .then()
-      .catch();
-    this.loadAllGrowthPlans()
-      .then()
+      .then(
+        this.loadAllGrowthPlans()
+          .then()
+          .catch(),
+      )
       .catch();
   }
 
@@ -153,6 +154,7 @@ class growthPlan extends React.Component {
         // this.dealWithPlanData(response.data);
         this.setState({savingPlan: false});
         this.loadGrowthPlan();
+
         // console.log('Good fetch');
       })
       .catch(error => {
@@ -181,6 +183,7 @@ class growthPlan extends React.Component {
         },
       )
       .then(response => {
+        console.log(response.data);
         this.setState({growthPlan: response.data, loading: false});
         // this.dealWithPlanData(response.data);
       })
@@ -207,7 +210,6 @@ class growthPlan extends React.Component {
         },
       )
       .then(response => {
-        console.log(response);
         this._hideDialog();
         this.setState({okLoading: false});
         this.loadAllGrowthPlans()
@@ -238,8 +240,9 @@ class growthPlan extends React.Component {
         },
       )
       .then(response => {
-        console.log(response.data.Items);
-
+        // console.log(response.data.Items);
+        // console.log(this.state.growthPlan);
+        this.setState({makePublicActive: true});
         for (let i = 0; i < response.data.Items.length; i++) {
           if (
             response.data.Items[i].growthPlanGroup ===
@@ -251,7 +254,7 @@ class growthPlan extends React.Component {
 
         // this.setState({growthPlan: response.data, loading: false});
         // this.dealWithPlanData(response.data);
-        console.log('Good fetch');
+        // console.log('Good fetch');
       })
       .catch(error => {
         console.log(error);
@@ -789,7 +792,11 @@ class growthPlan extends React.Component {
               loading={this.state.savingPlan}
               onPress={() => {
                 this.saveGrowthPlan()
-                  .then()
+                  .then(
+                    this.loadAllGrowthPlans()
+                      .then()
+                      .catch(),
+                  )
                   .catch();
               }}>
               Save growth plan

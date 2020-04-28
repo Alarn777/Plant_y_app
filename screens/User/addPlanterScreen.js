@@ -25,6 +25,9 @@ import {
 } from 'react-native-paper';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
+import {bindActionCreators} from 'redux';
+import {addAction, AddAvatarLink, sendMessage} from '../../FriendActions';
+import connect from 'react-redux/lib/connect/connect';
 
 const plantyColor = '#6f9e04';
 
@@ -35,6 +38,7 @@ class addPlanterScreen extends React.Component {
       planterName: '',
       planterDescription: '',
       selectedOption: {text: 'Humid'},
+      selectedGrowthPlanOption: {text: ''},
       visible: false,
       nameError: false,
       checked: 'first',
@@ -45,12 +49,50 @@ class addPlanterScreen extends React.Component {
       addingPlanterText: 'Add to my garden',
       addingPlanterDisabled: false,
       allActions: false,
+      growthPlans: [],
+      growthPlansOptions: [],
     };
     // this.dealWithData = this.dealWithData.bind(this);
     // this.createPlanter = this.createPlanter.bind(this);
   }
   componentDidMount(): void {
     // console.log(this.state.user);
+    this.loadAllGrowthPlans()
+      .then()
+      .catch();
+  }
+
+  async loadAllGrowthPlans() {
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+      .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/loadGrowthPlans',
+        {},
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        // console.log(response.data.Items);
+        this.setState({growthPlans: response.data.Items});
+
+        let data1 = [];
+        for (let i = 0; i < response.data.Items.length; i++) {
+          data1.push({text: response.data.Items[i].growthPlanGroup});
+        }
+
+        // console.log(data1);
+
+        this.setState({growthPlansOptions: data1});
+
+        // console.log('Good fetch');
+      })
+      .catch(error => {
+        console.log(error);
+        // this.setState({growthPlan: {}, loading: false});
+      });
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -80,6 +122,10 @@ class addPlanterScreen extends React.Component {
     };
   };
 
+  setSelectedGrowthPlanOption = val => {
+    this.setState({selectedGrowthPlanOption: val});
+  };
+
   setSelectedOption = val => {
     console.log(val);
     // console.log(val);
@@ -96,6 +142,16 @@ class addPlanterScreen extends React.Component {
     // console.log(this.state.selectedOption['text']);
     // console.log(this.state.USER_TOKEN);
 
+    let growthPlan = {};
+
+    this.state.growthPlans.map(one => {
+      if (one.growthPlanGroup === this.state.selectedGrowthPlanOption.text) {
+        growthPlan = one;
+      }
+    });
+
+    console.log(growthPlan);
+
     const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
     await axios
       .post(
@@ -105,6 +161,7 @@ class addPlanterScreen extends React.Component {
           planterName: this.state.planterName,
           planterDescription: this.state.planterDescription,
           planterClimate: this.state.selectedOption['text'],
+          growthPlan: growthPlan,
         },
         {
           headers: {Authorization: AuthStr},
@@ -233,6 +290,21 @@ class addPlanterScreen extends React.Component {
                 onSelect={this.setSelectedOption}
               />
             </View>
+            <Text style={styles.simpleText}>Growth Plan</Text>
+            <View style={styles.controlContainer}>
+              <Select
+                disabled={allActionsDisabled}
+                style={{
+                  borderRadius: 4,
+                  borderWidth: 0.5,
+                  margin: 10,
+                  borderColor: plantyColor,
+                }}
+                data={this.state.growthPlansOptions}
+                selectedOption={this.state.selectedGrowthPlanOption}
+                onSelect={this.setSelectedGrowthPlanOption}
+              />
+            </View>
             <Button
               icon={this.state.addingPlanterIcon}
               style={{margin: 10}}
@@ -275,4 +347,22 @@ const styles = StyleSheet.create({
   },
 });
 
-export default addPlanterScreen;
+// export default addPlanterScreen;
+
+const mapStateToProps = state => {
+  const {plantyData} = state;
+
+  return {plantyData};
+};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      AddAvatarLink,
+      sendMessage,
+      addAction,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(addPlanterScreen);
