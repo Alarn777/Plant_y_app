@@ -281,6 +281,7 @@ class planterScreen extends React.Component {
           username: this.props.authData.username,
           planter: this.props.navigation.getParam('item').name,
           url: this.props.plantyData.streamUrl,
+          configuration: 'normal',
         },
         {
           headers: {Authorization: AuthStr},

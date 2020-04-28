@@ -142,7 +142,7 @@ class planterImagesGallery extends React.Component {
       headerTitle: (
         <Image
           resizeMode="contain"
-          // style={{height: 40, width: 40}}
+          style={{height: 40, width: 40}}
           source={require('../../assets/logo.png')}
         />
       ),

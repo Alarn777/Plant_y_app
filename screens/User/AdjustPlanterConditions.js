@@ -131,7 +131,7 @@ class AdjustPlanterConditions extends React.Component {
       toEdit: '',
       temperature: '24',
       temperatureMax: '35',
-      currTemperature: '',
+      currTemperature: '10',
       uv: '1000',
       uvMax: '2000',
       currUV: '',
@@ -829,9 +829,10 @@ class AdjustPlanterConditions extends React.Component {
             icon="minus"
             onPress={() => {
               WS.sendMessage(
-                'FROM_CLIENT;' + this.state.item.UUID + ';INCREASE_TEMP',
+                'FROM_CLIENT;' + this.state.item.UUID + ';DECREASE_TEMP',
               );
-              // this.setState({lightTurnedOn: !this.state.lightTurnedOn});
+              let newTemp = parseInt(this.state.currTemperature) - 1;
+              this.setState({currTemperature: newTemp.toString()});
             }}
           />
           <Text
@@ -841,7 +842,7 @@ class AdjustPlanterConditions extends React.Component {
               color: 'gray',
               fontSize: 15,
             }}>
-            12
+            {this.state.currTemperature}
           </Text>
           <FAB
             style={styles.fab}
@@ -849,8 +850,10 @@ class AdjustPlanterConditions extends React.Component {
             icon="plus"
             onPress={() => {
               WS.sendMessage(
-                'FROM_CLIENT;' + this.state.item.UUID + ';DECREASE_TEMP',
+                'FROM_CLIENT;' + this.state.item.UUID + ';INCREASE_TEMP',
               );
+              let newTemp = parseInt(this.state.currTemperature) + 1;
+              this.setState({currTemperature: newTemp.toString()});
 
               // this.setState({lightTurnedOn: !this.state.lightTurnedOn});
             }}
@@ -1071,17 +1074,17 @@ class AdjustPlanterConditions extends React.Component {
               <Divider />
               {this.renderTemperatureControl()}
               <Divider />
-              {this.renderTemperatureInput()}
-              <Divider />
-              {this.renderMaxTemperatureInput()}
-              <Divider />
-              {this.renderHumidityInput()}
-              <Divider />
-              {this.renderMaxHumidityInput()}
-              <Divider />
-              {this.renderUVInput()}
-              <Divider />
-              {this.renderMaxUVInput()}
+              {/*{this.renderTemperatureInput()}*/}
+              {/*<Divider />*/}
+              {/*{this.renderMaxTemperatureInput()}*/}
+              {/*<Divider />*/}
+              {/*{this.renderHumidityInput()}*/}
+              {/*<Divider />*/}
+              {/*{this.renderMaxHumidityInput()}*/}
+              {/*<Divider />*/}
+              {/*{this.renderUVInput()}*/}
+              {/*<Divider />*/}
+              {/*{this.renderMaxUVInput()}*/}
               <Divider />
 
               <Button

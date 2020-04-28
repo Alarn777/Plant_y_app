@@ -24,6 +24,8 @@ import {
   TextInput,
   Button,
   Text,
+  Portal,
+  Dialog,
 } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -70,6 +72,9 @@ class growthPlan extends React.Component {
       growthPlanName: '',
       errorInName: false,
       errorText: '',
+      visible: false,
+      makePublicActive: true,
+      okLoading: false,
     };
     this.onLayout = this.onLayout.bind(this);
   }
@@ -91,7 +96,14 @@ class growthPlan extends React.Component {
     this.loadGrowthPlan()
       .then()
       .catch();
+    this.loadAllGrowthPlans()
+      .then()
+      .catch();
   }
+
+  _showDialog = () => this.setState({visible: true});
+
+  _hideDialog = () => this.setState({visible: false});
 
   async saveGrowthPlan() {
     //validations
@@ -171,11 +183,79 @@ class growthPlan extends React.Component {
       .then(response => {
         this.setState({growthPlan: response.data, loading: false});
         // this.dealWithPlanData(response.data);
-        console.log('Good fetch');
       })
       .catch(error => {
         this.setState({growthPlan: {}, loading: false});
         console.log('error ' + error);
+      });
+  }
+
+  async publishPlan() {
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+      .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/publishGrowthPlan',
+        {
+          growthPlanGroup: this.state.growthPlan.growthPlanGroup,
+          phases: this.state.growthPlan.phases,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        console.log(response);
+        this._hideDialog();
+        this.setState({okLoading: false});
+        this.loadAllGrowthPlans()
+          .then()
+          .catch();
+      })
+      .catch(error => {
+        this.setState({growthPlan: {}, loading: false});
+        this._hideDialog();
+        this.setState({okLoading: false});
+        this.loadAllGrowthPlans()
+          .then()
+          .catch();
+      });
+  }
+
+  async loadAllGrowthPlans() {
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+      .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/loadGrowthPlans',
+        {},
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        console.log(response.data.Items);
+
+        for (let i = 0; i < response.data.Items.length; i++) {
+          if (
+            response.data.Items[i].growthPlanGroup ===
+            this.state.growthPlan.growthPlanGroup
+          ) {
+            this.setState({makePublicActive: false});
+          }
+        }
+
+        // this.setState({growthPlan: response.data, loading: false});
+        // this.dealWithPlanData(response.data);
+        console.log('Good fetch');
+      })
+      .catch(error => {
+        console.log(error);
+        // this.setState({growthPlan: {}, loading: false});
       });
   }
 
@@ -349,7 +429,10 @@ class growthPlan extends React.Component {
         key={oneWeek.name}
         style={styles.week}
         title={oneWeek.phaseName}>
-        <List.Accordion style={styles.dayTime} title="Morning">
+        <List.Accordion
+          style={styles.dayTime}
+          title="Morning"
+          key={oneWeek.name + 'Morning'}>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
           <View style={styles.slider}>
             <Text style={{marginTop: 20}}>15</Text>
@@ -422,7 +505,10 @@ class growthPlan extends React.Component {
             <Text style={{marginTop: 20}}>100</Text>
           </View>
         </List.Accordion>
-        <List.Accordion style={styles.dayTime} title="Day">
+        <List.Accordion
+          style={styles.dayTime}
+          title="Day"
+          key={oneWeek.name + 'Day'}>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
           <View style={styles.slider}>
             <Text style={{marginTop: 20}}>15</Text>
@@ -495,7 +581,10 @@ class growthPlan extends React.Component {
             <Text style={{marginTop: 20}}>100</Text>
           </View>
         </List.Accordion>
-        <List.Accordion style={styles.dayTime} title="Evening">
+        <List.Accordion
+          style={styles.dayTime}
+          title="Evening"
+          key={oneWeek.name + 'Evening'}>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
           <View style={styles.slider}>
             <Text style={{marginTop: 20}}>15</Text>
@@ -568,7 +657,10 @@ class growthPlan extends React.Component {
             <Text style={{marginTop: 20}}>100</Text>
           </View>
         </List.Accordion>
-        <List.Accordion style={styles.dayTime} title="Night">
+        <List.Accordion
+          style={styles.dayTime}
+          title="Night"
+          key={oneWeek.name + 'Night'}>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
           <View style={styles.slider}>
             <Text style={{marginTop: 20}}>15</Text>
@@ -672,21 +764,28 @@ class growthPlan extends React.Component {
         <PaperCard style={{marginTop: 2}}>
           <PaperCard.Content>
             <Button
-              style={{backgroundColor: 'lightgray', marginTop: 5}}
+              mode="outlined"
+              style={{marginTop: 5}}
               onPress={() => {
                 this.removeLastWeek();
               }}>
               Remove Last Week
             </Button>
             <Button
-              style={{backgroundColor: 'lightgray', marginTop: 5}}
+              mode="outlined"
+              style={{marginTop: 5}}
               onPress={() => this.addWeek()}>
               Add Week
             </Button>
 
             <Button
-              style={{marginTop: 5}}
-              mode="outlined"
+              style={{
+                marginTop: 5,
+                backgroundColor: plantyColor,
+                // textColor: 'white',
+              }}
+              color={'white'}
+              // mode="outlined"
               loading={this.state.savingPlan}
               onPress={() => {
                 this.saveGrowthPlan()
@@ -732,6 +831,38 @@ class growthPlan extends React.Component {
                   this.state.growthPlan.phases.map(one => this.renderWeeks(one))
                 )}
               </List.Section>
+              <Button
+                mode="outlined"
+                style={{marginTop: 5}}
+                disabled={!this.state.makePublicActive}
+                onPress={this._showDialog}>
+                Make growth plan public
+              </Button>
+              <Portal>
+                <Dialog
+                  visible={this.state.visible}
+                  onDismiss={this._hideDialog}>
+                  <Dialog.Title>Are you sure?</Dialog.Title>
+                  <Dialog.Content>
+                    <Paragraph>
+                      This will publish the plan you created to the public use
+                    </Paragraph>
+                  </Dialog.Content>
+                  <Dialog.Actions style={{alignContent: 'space-between'}}>
+                    <Button onPress={this._hideDialog}>Cancel</Button>
+                    <Button
+                      loading={this.state.okLoading}
+                      style={{width: 100}}
+                      onPress={() => {
+                        this.setState({okLoading: true});
+                        this.publishPlan();
+                      }}>
+                      {' '}
+                      OK{' '}
+                    </Button>
+                  </Dialog.Actions>
+                </Dialog>
+              </Portal>
             </PaperCard.Content>
           </PaperCard>
         </ScrollView>

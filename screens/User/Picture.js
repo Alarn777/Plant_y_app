@@ -111,6 +111,48 @@ class Picture extends React.Component {
     // this.successTesting();
     // return;
 
+    console.log(this.props.navigation.getParam('picture').key);
+
+    //ec2
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/testplantpictureec2AI',
+        {
+          image: this.props.navigation.getParam('picture').key,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        // If request is good...
+        // console.log(response.data);
+        // console.log(response);
+        // let labels_array = response.data.body.CustomLabels;
+        // console.log(labels_array);
+
+        console.log(response.data.body);
+
+        let a = JSON.parse(response.data.body);
+
+        console.log(a['image-status']);
+
+        let sick = 0.0;
+
+        if (a['image-status'] === 'sick') sick = 100;
+        else sick = 0.0;
+        this.setState({healthStatus: 100 - sick});
+
+        this.successTesting();
+      })
+      .catch(error => {
+        this.failureTesting();
+        console.log('error ' + error);
+      });
+
+    return;
+
+    //recognition
     await axios
       .post(
         Consts.apigatewayRoute + '/testPlantPicture',
@@ -209,9 +251,13 @@ class Picture extends React.Component {
     } else
       return (
         <View>
-          <Text style={{color: 'red', margin: 9, height: 20}}>
-            Please tend to your plant!
-          </Text>
+          {this.state.healthStatus === 100 ? (
+            <Text />
+          ) : (
+            <Text style={{color: 'red', margin: 9, height: 20}}>
+              Please tend to your plant!
+            </Text>
+          )}
 
           <ProgressBar
             style={{margin: 9, height: 10}}
