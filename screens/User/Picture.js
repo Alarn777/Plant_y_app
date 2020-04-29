@@ -27,7 +27,7 @@ import {AddAvatarLink} from '../../FriendActions';
 import Amplify, {Storage} from 'aws-amplify';
 import LinearGradient from 'react-native-linear-gradient';
 // import RNAmazonKinesis from 'react-native-amazon-kinesis';
-
+import WS from '../../websocket';
 // import {LivePlayer} from "react-native-live-stream";
 const plantyColor = '#6f9e04';
 
@@ -53,6 +53,28 @@ class Picture extends React.Component {
       width: Dimensions.get('window').width,
       height: Dimensions.get('window').height,
     };
+
+    WS.onMessage(data => {
+      console.log('GOT in Picture screen', data.data);
+
+      let instructions = data.data.split(';');
+      if (instructions.length > 2)
+        switch (instructions[2]) {
+          case 'IMAGE_STATUS':
+            // console.log(instructions[3]);
+            // console.log(instructions[4]);
+            // this.setState({testingPlantText: 'Testing...'});
+            let sick = 0;
+            if (instructions[4] === 'sick') sick = 100;
+            else sick = 0.0;
+            this.setState({healthStatus: 100 - sick});
+            this.successTesting();
+            // this.setState({waterAdded: true, loadingAddingWater: false});
+            break;
+          default:
+            break;
+        }
+    });
 
     this.checkPlantHealth = this.checkPlantHealth.bind(this);
     // this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -98,7 +120,7 @@ class Picture extends React.Component {
   async checkPlantHealth() {
     // console.log(this.props.plantyData);
 
-    console.log(this.props.navigation.getParam('picture').key);
+    // console.log(this.props.navigation.getParam('picture').key);
     // console.log(this.props.plantyData.myCognitoUser.username);
     // console.log(this.props.navigation.getParam('planterName'));
 
@@ -111,8 +133,18 @@ class Picture extends React.Component {
     // this.successTesting();
     // return;
 
-    console.log(this.props.navigation.getParam('picture').key);
+    // console.log(this.props.navigation.getParam('picture').key);
 
+    //socket
+
+    // WS.sendMessage(
+    //   'FROM_CLIENT;' +
+    //     this.state.item.UUID +
+    //     ';CHECK_IMAGE;' +
+    //     this.props.navigation.getParam('picture').key,
+    // );
+
+    return;
     //ec2
     await axios
       .post(
@@ -131,11 +163,11 @@ class Picture extends React.Component {
         // let labels_array = response.data.body.CustomLabels;
         // console.log(labels_array);
 
-        console.log(response.data.body);
+        // console.log(response.data.body);
 
         let a = JSON.parse(response.data.body);
 
-        console.log(a['image-status']);
+        // console.log(a['image-status']);
 
         let sick = 0.0;
 
@@ -313,9 +345,17 @@ class Picture extends React.Component {
               backgroundColor="#6f9e04"
               color="#6f9e04"
               onPress={() => {
-                this.checkPlantHealth()
-                  .then()
-                  .catch();
+                this.setState({testingPlant: true});
+                WS.sendMessage(
+                  'FROM_CLIENT;PHONE' +
+                    ';CHECK_IMAGE;' +
+                    this.props.navigation.getParam('picture').key +
+                    ';;',
+                );
+
+                // this.checkPlantHealth()
+                //   .then()
+                //   .catch();
               }}>
               {this.state.testingPlantText}
             </Button>
@@ -354,7 +394,10 @@ const mapDispatchToProps = dispatch =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(Picture);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Picture);
 
 let styles = StyleSheet.create({
   sickHealthy: {
