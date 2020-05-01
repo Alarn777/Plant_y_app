@@ -18,6 +18,7 @@ import {
   FAB,
   ProgressBar,
 } from 'react-native-paper';
+
 //redusx
 import {connect} from 'react-redux';
 import {HeaderBackButton} from 'react-navigation-stack';
@@ -30,6 +31,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import WS from '../../websocket';
 // import {LivePlayer} from "react-native-live-stream";
 const plantyColor = '#6f9e04';
+const errorColor = '#ee3e34';
 
 class Picture extends React.Component {
   constructor(props) {
@@ -249,9 +251,22 @@ class Picture extends React.Component {
       testingPlantText: 'Success',
       // testingPlantDisabled: true,
     });
-    // setTimeout(this.goBack, 1200);
+    setTimeout(this.changeBack, 5000);
 
     // this.props.navigation.getParam('loadPlanters')();
+  };
+
+  changeBack = () => {
+    this.setState({
+      // testingPlant: false,
+      plant_tested: false,
+      // testingPlanticon: 'check',
+      // testingPlantText: 'Success',
+      testingPlantText: 'Test',
+      testingPlant: false,
+      testingPlanticon: 'clipboard-play-outline',
+      // testingPlantDisabled: true,
+    });
   };
 
   // goBack = () => {
@@ -284,18 +299,48 @@ class Picture extends React.Component {
       return (
         <View>
           {this.state.healthStatus === 100 ? (
-            <Text />
+            <View>
+              <Text
+                style={{
+                  color: plantyColor,
+                  alignSelf: 'center',
+                  margin: 9,
+                  height: 20,
+                }}>
+                Good job, your plant looks healthy!
+              </Text>
+              <Icon
+                style={{width: 40, height: 40, alignSelf: 'center'}}
+                fill={plantyColor}
+                // name="alert-circle-outline"
+                name="checkmark-circle-outline"
+              />
+            </View>
           ) : (
-            <Text style={{color: 'red', margin: 9, height: 20}}>
-              Please tend to your plant!
-            </Text>
+            <View>
+              <Text
+                style={{
+                  alignSelf: 'center',
+                  color: errorColor,
+                  margin: 9,
+                  height: 20,
+                }}>
+                Please tend to your plant!
+              </Text>
+              <Icon
+                style={{width: 40, height: 40, alignSelf: 'center'}}
+                fill={errorColor}
+                name="alert-circle-outline"
+                // name="checkmark-circle-outline"
+              />
+            </View>
           )}
 
-          <ProgressBar
-            style={{margin: 9, height: 10}}
-            progress={this.state.healthStatus * 0.01}
-            color={color}
-          />
+          {/*<ProgressBar*/}
+          {/*  style={{margin: 9, height: 10}}*/}
+          {/*  progress={this.state.healthStatus * 0.01}*/}
+          {/*  color={color}*/}
+          {/*/>*/}
 
           {/*<LinearGradient*/}
           {/*  start={{x: 0.3}}*/}
@@ -319,10 +364,10 @@ class Picture extends React.Component {
           {/*    |*/}
           {/*  </Text>*/}
           {/*</LinearGradient>*/}
-          <View style={styles.sickHealthy}>
-            <Text>Sick</Text>
-            <Text>Healthy</Text>
-          </View>
+          {/*<View style={styles.sickHealthy}>*/}
+          {/*  <Text>Sick</Text>*/}
+          {/*  <Text>Healthy</Text>*/}
+          {/*</View>*/}
         </View>
       );
   };
@@ -333,7 +378,11 @@ class Picture extends React.Component {
         <PaperCard style={{height: this.state.height}}>
           <PaperCard.Content style={{marginTop: 10}}>
             <Image
-              style={{height: '60%', resizeMode: 'contain'}}
+              style={{
+                height: '60%',
+                resizeMode: 'contain',
+                backgroundColor: 'gray',
+              }}
               source={{uri: this.props.navigation.getParam('picture').url}}
             />
             {this.renderTestResults()}

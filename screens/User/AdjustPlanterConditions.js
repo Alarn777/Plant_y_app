@@ -35,6 +35,7 @@ import {
   Headline,
   Caption,
   Chip,
+  BottomNavigation,
 } from 'react-native-paper';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Consts from '../../ENV_VARS';
@@ -1182,7 +1183,7 @@ class AdjustPlanterConditions extends React.Component {
                   //   this._carousel = c;
                   // }}
                   loop={false}
-                  autoplay={true}
+                  autoplay={false}
                   autoplayDelay={0}
                   autoplayInterval={10000}
                   data={this.state.entries}
@@ -1211,102 +1212,6 @@ class AdjustPlanterConditions extends React.Component {
                   inactiveDotOpacity={0.4}
                   inactiveDotScale={0.6}
                 />
-
-                {/*<Paragraph style={{fontWeight: 'bold', fontSize: 15}}>*/}
-                {/*  Temperature over the week*/}
-                {/*</Paragraph>*/}
-                {/*<BarChart*/}
-                {/*  data={data}*/}
-                {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-                {/*  height={220}*/}
-                {/*  // yAxisLabel="$"*/}
-                {/*  yAxisSuffix="C"*/}
-                {/*  fromZero={true}*/}
-                {/*  yAxisInterval={1} // optional, defaults to 1*/}
-                {/*  chartConfig={{*/}
-                {/*    // backgroundColor: plantyColor,*/}
-                {/*    backgroundGradientFrom: plantyColor,*/}
-                {/*    // backgroundGradientTo: '#ffa726',*/}
-                {/*    decimalPlaces: 1, // optional, defaults to 2dp*/}
-                {/*    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,*/}
-                {/*    barPercentage: 0.8,*/}
-                {/*  }}*/}
-                {/*  bezier*/}
-                {/*  style={{*/}
-                {/*    marginVertical: 8,*/}
-                {/*    borderRadius: 10,*/}
-                {/*  }}*/}
-                {/*/>*/}
-                {/*<View style={styles.conditionsText}>*/}
-                {/*  <Text style={styles.actionsText}>Current Temperature:</Text>*/}
-                {/*  <Text style={styles.actionsText}>*/}
-                {/*    {this.state.currTemperature + ' C'}*/}
-                {/*  </Text>*/}
-                {/*</View>*/}
-                {/*<Divider />*/}
-                {/*<Paragraph style={{fontWeight: 'bold', fontSize: 15}}>*/}
-                {/*  Humidity over the week*/}
-                {/*</Paragraph>*/}
-                {/*<BarChart*/}
-                {/*  data={data}*/}
-                {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-                {/*  height={220}*/}
-                {/*  // yAxisLabel="$"*/}
-                {/*  yAxisSuffix="C"*/}
-                {/*  fromZero={true}*/}
-                {/*  yAxisInterval={1} // optional, defaults to 1*/}
-                {/*  chartConfig={{*/}
-                {/*    // backgroundColor: plantyColor,*/}
-                {/*    backgroundGradientFrom: plantyColor,*/}
-                {/*    // backgroundGradientTo: '#ffa726',*/}
-                {/*    decimalPlaces: 1, // optional, defaults to 2dp*/}
-                {/*    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,*/}
-                {/*    barPercentage: 0.8,*/}
-                {/*  }}*/}
-                {/*  bezier*/}
-                {/*  style={{*/}
-                {/*    marginVertical: 8,*/}
-                {/*    borderRadius: 10,*/}
-                {/*  }}*/}
-                {/*/>*/}
-
-                {/*<View style={styles.conditionsText}>*/}
-                {/*  <Text style={styles.actionsText}>Current Humidity:</Text>*/}
-                {/*  <Text style={styles.actionsText}>*/}
-                {/*    {this.state.currHumidity * 100 + ' %'}*/}
-                {/*  </Text>*/}
-                {/*</View>*/}
-                {/*<Divider />*/}
-                {/*<Paragraph style={{fontWeight: 'bold', fontSize: 15}}>*/}
-                {/*  UV over the week*/}
-                {/*</Paragraph>*/}
-                {/*<BarChart*/}
-                {/*  data={data}*/}
-                {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-                {/*  height={220}*/}
-                {/*  // yAxisLabel="$"*/}
-                {/*  yAxisSuffix="C"*/}
-                {/*  fromZero={true}*/}
-                {/*  yAxisInterval={1} // optional, defaults to 1*/}
-                {/*  chartConfig={{*/}
-                {/*    // backgroundColor: plantyColor,*/}
-                {/*    backgroundGradientFrom: plantyColor,*/}
-                {/*    // backgroundGradientTo: '#ffa726',*/}
-                {/*    decimalPlaces: 1, // optional, defaults to 2dp*/}
-                {/*    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,*/}
-                {/*    barPercentage: 0.8,*/}
-                {/*  }}*/}
-                {/*  bezier*/}
-                {/*  style={{*/}
-                {/*    marginVertical: 8,*/}
-                {/*    borderRadius: 10,*/}
-                {/*  }}*/}
-                {/*/>*/}
-                {/*<View style={styles.conditionsText}>*/}
-                {/*  <Text style={styles.actionsText}>Current UV:</Text>*/}
-                {/*  <Text style={styles.actionsText}>{this.state.currUV}</Text>*/}
-                {/*  /!*{//' + mlw/sqcm'}*!/*/}
-                {/*</View>*/}
 
                 <Button
                   icon="delete"
