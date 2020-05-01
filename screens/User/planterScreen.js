@@ -580,7 +580,7 @@ class planterScreen extends React.Component {
             }
           />
           <Image
-            style={{position: 'absolute', bottom: 0, zIndex: -10}}
+            style={{position: 'absolute', bottom: -1, zIndex: -10}}
             source={require('../../assets/grass.png')}
           />
         </View>

@@ -1183,7 +1183,7 @@ class AdjustPlanterConditions extends React.Component {
                   // }}
                   loop={false}
                   autoplay={true}
-                  autoplayDelay={500}
+                  autoplayDelay={0}
                   autoplayInterval={10000}
                   data={this.state.entries}
                   renderItem={this._renderCarouselItem}
