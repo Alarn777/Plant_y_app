@@ -20,16 +20,11 @@ import awsConfig from './aws-exports';
 
 Amplify.configure(awsConfig);
 
-import {
-  withAuthenticator,
-  // Greetings,
-  Loading,
-} from 'aws-amplify-react-native';
+import {withAuthenticator} from 'aws-amplify-react-native';
 
 import {
   SignUp,
   SignIn,
-  Greetings,
   ForgotPassword,
   RequireNewPassword,
   ConfirmSignIn,
@@ -183,8 +178,3 @@ export default withAuthenticator(App, false, [
   <ForgotPassword />,
   <RequireNewPassword />,
 ]);
-
-// elif command=="VIDEO_STREAM_ON": videoStreamOn()
-// elif command=="VIDEO_STREAM_OFF": videoStreamOff()
-// else:
-// print("Unknown Command: {0}".format(command))

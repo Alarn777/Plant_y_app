@@ -1,6 +1,5 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
-
 import {HeaderBackButton} from 'react-navigation-stack';
 import {Image, View, Dimensions} from 'react-native';
 import {Auth} from 'aws-amplify';
@@ -13,18 +12,15 @@ import {
   FAB,
   ActivityIndicator,
 } from 'react-native-paper';
-
 import ImagePicker from 'react-native-image-picker';
-
 import Consts from '../../ENV_VARS';
 import {Storage} from 'aws-amplify';
-
 import Buffer from 'buffer';
 import connect from 'react-redux/lib/connect/connect';
 import {AddAvatarLink, cleanReduxState} from '../../FriendActions';
 import ImageResizer from 'react-native-image-resizer';
-
 import RNFS from 'react-native-fs';
+import WS from '../../websocket';
 
 const plantyColor = '#6f9e04';
 
@@ -80,11 +76,9 @@ class UserPage extends React.Component {
           style={{
             position: 'absolute',
             margin: 16,
-
             backgroundColor: '#6f9e04',
             color: '#6f9e04',
             right: 120,
-
             bottom: -10,
           }}
           large
@@ -277,7 +271,6 @@ class UserPage extends React.Component {
               propsForDots: {
                 r: '6',
                 strokeWidth: '2',
-                // stroke: '#ffa726',
               },
             }}
             bezier
@@ -294,20 +287,17 @@ class UserPage extends React.Component {
             onPress={() => {
               Auth.signOut()
                 .then(() => {
-                  // this.props.onStateChange('signedOut');
                   this.props.navigation.goBack();
                   this.props.navigation.getParam('logOut')();
-                  // onStateChange('signedOut');
+                  WS.sendMessage(
+                    'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_OFF',
+                  );
+                  WS.closeSocket();
                 })
                 .catch(e => console.log(e));
-              // this.props.navigation.getParam('logOut')();
-              // this.props.navigation.goBack();
-            }}
-            // this.props.navigation.getParam('logOut')}>
-          >
+            }}>
             Log Out
           </Button>
-          {/*<Button onPress={this.loadTestImg}>test</Button>*/}
         </Card>
       </View>
     );
@@ -333,5 +323,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(UserPage);
-
-// export default UserPage;

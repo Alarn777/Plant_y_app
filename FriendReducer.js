@@ -157,6 +157,8 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
       };
 
     case 'ADD_SOCKET':
+      // console.log(action.payload);
+
       return {
         streamUrl: streamUrl,
         plantsImages: plantsImages,

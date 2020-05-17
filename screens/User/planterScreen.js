@@ -44,10 +44,7 @@ import connect from 'react-redux/lib/connect/connect';
 import {AddAvatarLink, addStreamUrl, addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import RNFS from 'react-native-fs';
-import Buffer from 'buffer';
 import WS from '../../websocket';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const plantyColor = '#6f9e04';
 
@@ -103,7 +100,6 @@ class planterScreen extends React.Component {
         <HeaderBackButton
           title="My Garden"
           onPress={() => {
-            WS.closeSocket();
             navigation.goBack();
           }}
         />
@@ -129,11 +125,7 @@ class planterScreen extends React.Component {
   }
 
   handleRefresh = () => {
-    console.log('refreshing plants');
     this.setState({refreshingPlants: true});
-    // this.loadPlants()
-    //   .then()
-    //   .catch();
   };
 
   componentDidMount(): void {
@@ -148,10 +140,6 @@ class planterScreen extends React.Component {
     this.loadUrl()
       .then()
       .catch(e => console.log(e));
-    // this.setState({
-    //   streamUrl:
-    //     'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-    // });
 
     this.loadPlants()
       .then()
@@ -169,18 +157,14 @@ class planterScreen extends React.Component {
       })
       .then(response => {
         if (response.data) {
-          // console.log(this.props.plantyData);
           if (
             this.props.plantyData.streamUrl === undefined ||
             this.props.plantyData.streamUrl === null
           ) {
             console.log('SETTING URL');
-            console.log(response.data);
-
             this.addUrl(response.data.HLSStreamingSessionURL);
           } else {
             console.log('NOT SETTING URL');
-            console.log(response.data);
             this.setState({streamUrl: this.props.plantyData.streamUrl});
           }
         } else {
@@ -238,38 +222,6 @@ class planterScreen extends React.Component {
     this.setState({refreshingPlants: false});
     this.setState({loading: false});
   };
-
-  async sendAction(action) {
-    switch (action) {
-      case 'left':
-        break;
-      case 'right':
-        break;
-    }
-
-    this.setState({loadingActions: true});
-    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
-      .idToken.jwtToken;
-    const AuthStr = 'Bearer '.concat(USER_TOKEN);
-    await axios
-      .post(
-        Consts.apigatewayRoute + '/sendMessageToQueue',
-        {
-          username: this.props.authData.username,
-          action: action,
-        },
-        {
-          headers: {Authorization: AuthStr},
-        },
-      )
-      .then(response => {
-        this.setState({loadingActions: false});
-      })
-      .catch(error => {
-        this.setState({loadingActions: false});
-        console.log('error ' + error);
-      });
-  }
 
   async takePicture() {
     this.setState({loadingActions: true});
@@ -423,8 +375,6 @@ class planterScreen extends React.Component {
   };
 
   render() {
-    // console.log(this.props.plantyData.myCognitoUser);
-
     if (this.state.loading) {
       return (
         // <View>
@@ -530,10 +480,6 @@ class planterScreen extends React.Component {
               keyExtractor={this._keyExtractor}
               renderItem={this._renderItem}
               refreshing={this.state.refreshingPlants}
-              // onRefresh={this.setState({refreshingPlants: true})}
-              // this.setState({refreshingPlants: true});
-              // this.handleRefresh();
-              /*}}*/
               onRefresh={this.handleRefresh}
             />
           </ScrollView>
@@ -541,7 +487,6 @@ class planterScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              // backgroundColor: '#6f9e04',
               backgroundColor: 'white',
               color: '#6f9e04',
               right: 0,
@@ -562,7 +507,6 @@ class planterScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              // backgroundColor: '#6f9e04',
               backgroundColor: 'white',
               color: '#6f9e04',
               left: 0,

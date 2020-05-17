@@ -54,6 +54,7 @@ import {
 import {bindActionCreators} from 'redux';
 import WS from '../../websocket';
 import {Storage} from 'aws-amplify';
+import Const from '../../ENV_VARS';
 
 const plantyColor = '#6f9e04';
 
@@ -80,6 +81,7 @@ class MainScreen extends React.Component {
       query: '',
       allPlanters: [],
       preloadImages: true,
+      socket: null,
     };
     this.loadPlanters = this.loadPlanters.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -87,6 +89,8 @@ class MainScreen extends React.Component {
     this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
 
+    // console.log(WS.ws);
+    // if (WS.ws === undefined) WS.init();
     WS.init();
 
     WS.onMessage(data => {
@@ -105,6 +109,35 @@ class MainScreen extends React.Component {
             break;
         }
     });
+
+    //redux approach
+    // this.props.addSocket(new WebSocket(Const.apigatewaySocket));
+
+    // console.log(this.props.plantyData.socket);
+    // if (this.props.plantyData.socket === null)
+    //   this.props.addSocket(new WebSocket(Const.apigatewaySocket));
+    // else {
+    //   this.props.plantyData.socket = null;
+    //   this.props.addSocket(new WebSocket(Const.apigatewaySocket));
+    // }
+
+    // console.log(this.props.plantyData);
+    // this.props.plantyData.socket.addEventListener('message', data => {
+    //   console.log('GOT in main screen', data.data);
+    //   let instructions = data.data.split(';');
+    //   if (instructions.length > 2)
+    //     switch (instructions[2]) {
+    //       case 'UPDATE_STATE':
+    //         this.loadPlanters()
+    //           .then()
+    //           .catch();
+    //         break;
+    //       case 'FAILED':
+    //         alert('Failed to communicate with server');
+    //         this.forceUpdate();
+    //         break;
+    //     }
+    // });
   }
 
   static navigationOptions = ({navigation}) => {
@@ -146,6 +179,31 @@ class MainScreen extends React.Component {
     this.setState({preloadImages: true});
   };
 
+  connectSocket() {
+    if (!this.state.socket)
+      this.state.socket = new WebSocket(Const.apigatewaySocket);
+    // this.props.addSocket(new WebSocket(Const.apigatewaySocket));
+
+    this.state.socket.onopen = console.log('Socket is connected');
+
+    this.state.socket.addEventListener('message', data => {
+      console.log('GOT in main screen', data.data);
+      let instructions = data.data.split(';');
+      if (instructions.length > 2)
+        switch (instructions[2]) {
+          case 'UPDATE_STATE':
+            this.loadPlanters()
+              .then()
+              .catch();
+            break;
+          case 'FAILED':
+            alert('Failed to communicate with server');
+            this.forceUpdate();
+            break;
+        }
+    });
+  }
+
   dealWithData = user => {
     if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
 
@@ -170,7 +228,7 @@ class MainScreen extends React.Component {
   }
 
   async loadPlanters() {
-    console.log('loading plants.');
+    // console.log('loading plants.');
     this.setState({plants: []});
 
     // console.log('called reload plants');
@@ -264,36 +322,7 @@ class MainScreen extends React.Component {
         // this.setState({url: data});
       })
       .catch(error => console.log(error));
-
-    // this.props.fetchAllPosts(user);
-
-    // console.log(this.props.plantyData);
-
     this.preloadImages();
-
-    //socket initiation
-    // const client = new W3CWebSocket(Consts.socket_connection_url);
-    // client.onopen = () => {
-    //   console.log('WebSocket Client Connected');
-    // };
-    // client.onmessage = message => {
-    //   console.log(message);
-    // };
-
-    // let socket = new Sockette(Consts.apigatewaySocket, {
-    //   timeout: 5e3,
-    //   maxAttempts: 3,
-    //   onopen: e => console.log('Connected!', e),
-    //   onmessage: e => this.props.dealWithMessage(e),
-    //   onreconnect: e => console.log('Reconnecting...', e),
-    //   onmaximum: e => console.log('Stop Attempting!', e),
-    //   onclose: e => console.log('Closed!', e),
-    //   onerror: e => console.log('Error:', e),
-    // });
-
-    // this.props.connectWS();
-
-    // this.props.addAction(this.showMessage);
   }
 
   logOut = () => {
@@ -364,48 +393,22 @@ class MainScreen extends React.Component {
   };
 
   render() {
-    // console.log(new Date().getTime());
-    // console.log(this.state.plants);
-    // console.log(this.state.allPlanters);
-
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <StatusBar translucent barStyle="dark-content" />
         <PaperCard>
-          {/*<TouchableOpacity*/}
-          {/*  onPress={() =>*/}
-          {/*    this.props.navigation.navigate('UserPage', {*/}
-          {/*      user: this.state.user,*/}
-          {/*      logOut: this.logOut,*/}
-          {/*    })*/}
-          {/*  }>*/}
           <PaperCard.Title
-            title={'Welcome home,' + this.state.username}
-            // subtitle="Card Subtitle"
+            title={'Welcome,' + this.state.username}
             left={props => (
-              // <Avatar.Icon
-              //   {...props}
-              //   style={{backgroundColor: plantyColor}}
-              //   icon="account"
-              // />
               <Avatar.Image
-                // style={{alignSelf: 'center', backgroundColor: 'lightgray'}}
                 {...props}
-                // size={200}
                 source={{uri: this.props.plantyData.avatarUrl}}
               />
             )}
             right={props => (
-              // <Avatar.Icon
-              //   {...props}
-              //   style={{backgroundColor: plantyColor}}
-              //   icon="account"
-              // />
               <IconButton
-                // style={{alignSelf: 'center', backgroundColor: 'lightgray'}}
                 {...props}
                 style={{backgroundColor: 'white'}}
-                // small
                 icon="settings"
                 color={plantyColor}
                 onPress={() =>
@@ -417,32 +420,29 @@ class MainScreen extends React.Component {
               />
             )}
           />
-          {/*</TouchableOpacity>*/}
+
           <PaperCard.Content />
-          <PaperCard.Cover
-            source={require('../../assets/background_image.jpeg')}
+          {/*<PaperCard.Cover source={require('../../assets/logo_text.png')} />*/}
+          <Image
+            resizeMode={'center'}
+            style={{height: 100, width: this.state.width}}
+            source={require('../../assets/logo_text.png')}
           />
           <PaperCard.Actions />
         </PaperCard>
-        {/*<Searchbar*/}
-        {/*  placeholder="Search..."*/}
-        {/*  onChangeText={query => {*/}
-        {/*    // this.setState({query: query});*/}
-        {/*    this.reloadPlants(query);*/}
-        {/*  }}*/}
-        {/*  value={this.state.query}*/}
-        {/*/>*/}
-        <View style={styles.header}>
-          <Text style={styles.headerText}>My garden</Text>
-        </View>
+        {/*<View style={styles.header}>*/}
+        {/*  <Text style={styles.headerText}>My garden</Text>*/}
+        {/*</View>*/}
+        <Card>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>My garden</Text>
+          </View>
+        </Card>
 
         <ScrollView style={styles.data}>
           <FlatList
-            // vertical={false}
-            // horizontal={true}
             scrollEnabled={false}
             numColumns={3}
-            // style={{height: 400, margin: 5}}
             data={this.state.plants}
             keyExtractor={this._keyExtractor}
             renderItem={this._renderItem}
@@ -452,7 +452,6 @@ class MainScreen extends React.Component {
           style={{
             position: 'absolute',
             margin: 16,
-            // backgroundColor: plantyColor,
             backgroundColor: 'white',
             color: plantyColor,
             right: 0,
@@ -473,20 +472,6 @@ class MainScreen extends React.Component {
           style={{position: 'absolute', bottom: -10, left: -10, zIndex: -10}}
           source={require('../../assets/grass.png')}
         />
-        {/*<Portal>*/}
-        {/*  <Snackbar*/}
-        {/*    style={{position: 'absolute', bottom: 15, borderRadius: 5}}*/}
-        {/*    visible={this.state.lightTurnedOn}*/}
-        {/*    onDismiss={() => this.setState({lightTurnedOn: false})}*/}
-        {/*    action={{*/}
-        {/*      label: 'Undo',*/}
-        {/*      onPress: () => {*/}
-        {/*        // Do something*/}
-        {/*      },*/}
-        {/*    }}>*/}
-        {/*    Hey there! I'm a Snackbar.*/}
-        {/*  </Snackbar>*/}
-        {/*</Portal>*/}
       </View>
     );
   }
@@ -544,6 +529,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 20,
+    fontWeight: 'bold',
   },
   header: {
     justifyContent: 'center',

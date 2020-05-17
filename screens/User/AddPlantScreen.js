@@ -1,14 +1,6 @@
 import React from 'react';
-import {
-  Image,
-  View,
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import Video from 'react-native-video';
-import {Icon, Text, Card} from '@ui-kitten/components';
+import {Image, View, StyleSheet} from 'react-native';
+import {Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 
@@ -53,9 +45,6 @@ class AddPlantScreen extends React.Component {
           username: this.props.plantyData.myCognitoUser.username,
           plantName: this.state.plant.name,
           planterName: this.state.planterName,
-          // plantDescription: this.state.plant.description,
-          // plantGrowthPlanGroup: this.state.plant.growthPlanGroup,
-          // plantSoil: this.state.plant.soil,
         },
 
         {
@@ -63,17 +52,12 @@ class AddPlantScreen extends React.Component {
         },
       )
       .then(response => {
-        // If request is good...
-        // console.log(response.data);
         this.successAdding();
       })
       .catch(error => {
         console.log('error ' + error);
         this.failureAdding();
       });
-
-    // setTimeout(this.successAdding, 1000);
-    // this.props.navigation.goBack();
   }
 
   successAdding = () => {
@@ -84,8 +68,6 @@ class AddPlantScreen extends React.Component {
       addingPlantDisabled: true,
     });
     setTimeout(this.goBack, 1200);
-
-    // this.props.navigation.getParam('loadPlanters')();
   };
 
   goBack = () => {
@@ -107,7 +89,6 @@ class AddPlantScreen extends React.Component {
     const {navigation} = this.props;
     let item = navigation.getParam('item');
     let loading = this.state.addingPlant;
-    console.log(item);
     return (
       <View style={styles.container}>
         <Card
@@ -129,7 +110,6 @@ class AddPlantScreen extends React.Component {
                   this.addPlantToMyGarden()
                     .then()
                     .catch();
-                  // navigation.goBack();
                 }}>
                 {this.state.addingPlantText}
               </Button>
@@ -173,11 +153,13 @@ const mapDispatchToProps = dispatch =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddPlantScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AddPlantScreen);
 
 let styles = StyleSheet.create({
   backgroundVideo: {
-    // position: 'absolute',
     top: 0,
     left: 0,
     bottom: 0,
@@ -196,7 +178,6 @@ let styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    // borderColor:'#6f9e04',
     backgroundColor: '#6f9e04',
     color: '#6f9e04',
   },

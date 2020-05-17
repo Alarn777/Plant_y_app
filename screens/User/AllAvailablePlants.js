@@ -11,14 +11,10 @@ import {
 import {Auth} from 'aws-amplify';
 
 import PropTypes from 'prop-types';
-import {Icon, Text, Card, Button} from '@ui-kitten/components';
-import {ActivityIndicator, FAB} from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
-import {
-  withAuthenticator,
-  //Greetings,
-  Loading,
-} from 'aws-amplify-react-native';
+import {Text, Card} from '@ui-kitten/components';
+import {ActivityIndicator} from 'react-native-paper';
+
+import {withAuthenticator} from 'aws-amplify-react-native';
 import {
   ConfirmSignIn,
   ConfirmSignUp,
@@ -93,18 +89,11 @@ class AllAvailablePlants extends React.Component {
         headers: {Authorization: AuthStr},
       })
       .then(response => {
-        // If request is good...
-        // console.log(response.data);
         this.dealWithPlantsData(response.data);
       })
       .catch(error => {
         console.log('error ' + error);
       });
-
-    // await axios.get('https://i7maox5n5g.execute-api.eu-west-1.amazonaws.com/test').then(res => {
-    //   // this.dealWithUserData(res.data[0])
-    //   console.log(res);
-    // }).catch(error => console.log(error))
   }
 
   componentDidMount(): void {
@@ -162,7 +151,6 @@ class AllAvailablePlants extends React.Component {
 
   _renderItem = ({item}) => {
     let url = '';
-    // console.log(item.name);
 
     for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
       if (
@@ -231,7 +219,6 @@ class AllAvailablePlants extends React.Component {
         <ScrollView style={styles.data}>
           <FlatList
             numColumns={3}
-            // style={{width: this.state.width, margin: 5}}
             data={this.state.plants}
             keyExtractor={this._keyExtractor}
             renderItem={this._renderItem}

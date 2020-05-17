@@ -1,35 +1,17 @@
 import React from 'react';
-import {
-  Image,
-  View,
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-} from 'react-native';
-import Video from 'react-native-video';
+import {Image, View, StyleSheet, ScrollView, Dimensions} from 'react-native';
 import {Icon, Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-import {
-  Button,
-  Card as PaperCard,
-  Divider,
-  FAB,
-  ProgressBar,
-} from 'react-native-paper';
+import {Button, Card as PaperCard} from 'react-native-paper';
 
-//redusx
+//redux
 import {connect} from 'react-redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import {IconButton} from 'react-native-paper';
 import {bindActionCreators} from 'redux';
 import {AddAvatarLink} from '../../FriendActions';
-import Amplify, {Storage} from 'aws-amplify';
-import LinearGradient from 'react-native-linear-gradient';
-// import RNAmazonKinesis from 'react-native-amazon-kinesis';
+import {Storage} from 'aws-amplify';
 import WS from '../../websocket';
-// import {LivePlayer} from "react-native-live-stream";
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
 
@@ -38,8 +20,6 @@ class Picture extends React.Component {
     super(props);
     this.state = {
       plant: this.props.navigation.getParam('picture'),
-      // deletingPlantIcon:'delete',
-      // USER_TOKEN: this.props.navigation.getParam('user_token'),
       URL: '',
       planterName: this.props.navigation.getParam('planterName'),
       loadBuffering: false,
@@ -48,8 +28,6 @@ class Picture extends React.Component {
       testingPlantText: 'Test',
       testingPlant: false,
       testingPlanticon: 'clipboard-play-outline',
-      // deletingPlantText: 'Failed to delete',
-      // deletingPlantDisabled: false,
       healthStatus: 0,
       plant_tested: false,
       width: Dimensions.get('window').width,
@@ -63,15 +41,11 @@ class Picture extends React.Component {
       if (instructions.length > 2)
         switch (instructions[2]) {
           case 'IMAGE_STATUS':
-            // console.log(instructions[3]);
-            // console.log(instructions[4]);
-            // this.setState({testingPlantText: 'Testing...'});
             let sick = 0;
             if (instructions[4] === 'sick') sick = 100;
             else sick = 0.0;
             this.setState({healthStatus: 100 - sick});
             this.successTesting();
-            // this.setState({waterAdded: true, loadingAddingWater: false});
             break;
           default:
             break;
@@ -79,13 +53,11 @@ class Picture extends React.Component {
     });
 
     this.checkPlantHealth = this.checkPlantHealth.bind(this);
-    // this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -110,22 +82,7 @@ class Picture extends React.Component {
     };
   };
 
-  UNSAFE_componentWillMount(): void {
-    // this.loadUrl().then(r => console.log());
-  }
-
-  componentDidMount(): void {
-    // console.log(this.state.plant);
-    // console.log(this.state.USER_TOKEN);
-  }
-
   async checkPlantHealth() {
-    // console.log(this.props.plantyData);
-
-    // console.log(this.props.navigation.getParam('picture').key);
-    // console.log(this.props.plantyData.myCognitoUser.username);
-    // console.log(this.props.navigation.getParam('planterName'));
-
     this.setState({testingPlantText: 'Testing...'});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
@@ -139,12 +96,12 @@ class Picture extends React.Component {
 
     //socket
 
-    // WS.sendMessage(
-    //   'FROM_CLIENT;' +
-    //     this.state.item.UUID +
-    //     ';CHECK_IMAGE;' +
-    //     this.props.navigation.getParam('picture').key,
-    // );
+    WS.sendMessage(
+      'FROM_CLIENT;' +
+        this.state.item.UUID +
+        ';CHECK_IMAGE;' +
+        this.props.navigation.getParam('picture').key,
+    );
 
     return;
     //ec2
@@ -224,7 +181,6 @@ class Picture extends React.Component {
   async deletePicture() {
     this.setState({deletingPic: true});
     let pictureKey = this.props.navigation.getParam('picture').key;
-    // console.log(pictureKey);
 
     Storage.remove(pictureKey, {level: 'public'})
       .then(result => {
@@ -252,43 +208,28 @@ class Picture extends React.Component {
       // testingPlantDisabled: true,
     });
     setTimeout(this.changeBack, 5000);
-
-    // this.props.navigation.getParam('loadPlanters')();
   };
 
   changeBack = () => {
     this.setState({
-      // testingPlant: false,
       plant_tested: false,
-      // testingPlanticon: 'check',
-      // testingPlantText: 'Success',
+
       testingPlantText: 'Test',
       testingPlant: false,
       testingPlanticon: 'clipboard-play-outline',
-      // testingPlantDisabled: true,
     });
   };
-
-  // goBack = () => {
-  //   this.props.navigation.navigate('planterScreen', {
-  //     plantWasRemoved: true,
-  //   });
-  // };
 
   failureTesting = () => {
     this.setState({
       testingPlant: false,
       testingPlanticon: 'alert-circle-outline',
       testingPlantText: 'Failed to test',
-      // deletingPlantDisabled: true,
     });
   };
 
   renderTestResults = () => {
-    // console.log(this.state.healthStatus * 0.01);
-
     let color = plantyColor;
-
     if (this.state.healthStatus < 50) {
       color = 'red';
     }
@@ -312,7 +253,6 @@ class Picture extends React.Component {
               <Icon
                 style={{width: 40, height: 40, alignSelf: 'center'}}
                 fill={plantyColor}
-                // name="alert-circle-outline"
                 name="checkmark-circle-outline"
               />
             </View>
@@ -331,43 +271,9 @@ class Picture extends React.Component {
                 style={{width: 40, height: 40, alignSelf: 'center'}}
                 fill={errorColor}
                 name="alert-circle-outline"
-                // name="checkmark-circle-outline"
               />
             </View>
           )}
-
-          {/*<ProgressBar*/}
-          {/*  style={{margin: 9, height: 10}}*/}
-          {/*  progress={this.state.healthStatus * 0.01}*/}
-          {/*  color={color}*/}
-          {/*/>*/}
-
-          {/*<LinearGradient*/}
-          {/*  start={{x: 0.3}}*/}
-          {/*  end={{x: 0.7}}*/}
-          {/*  colors={['red', 'yellow', plantyColor]}*/}
-          {/*  style={styles.linearGradient}>*/}
-          {/*  <Text*/}
-          {/*    style={{*/}
-          {/*      fontSize: 100,*/}
-          {/*      fontFamily: 'Gill Sans',*/}
-          {/*      textAlign: 'left',*/}
-          {/*      marginTop: 10,*/}
-          {/*      marginBottom: 10,*/}
-          {/*      // margin: 10,*/}
-          {/*      position: 'relative',*/}
-          {/*      left: ((this.state.width - 65) / 100) * this.state.healthStatus,*/}
-          {/*      color: 'black',*/}
-          {/*      // left: 0,*/}
-          {/*      backgroundColor: 'transparent',*/}
-          {/*    }}>*/}
-          {/*    |*/}
-          {/*  </Text>*/}
-          {/*</LinearGradient>*/}
-          {/*<View style={styles.sickHealthy}>*/}
-          {/*  <Text>Sick</Text>*/}
-          {/*  <Text>Healthy</Text>*/}
-          {/*</View>*/}
         </View>
       );
   };
@@ -401,10 +307,6 @@ class Picture extends React.Component {
                     this.props.navigation.getParam('picture').key +
                     ';;',
                 );
-
-                // this.checkPlantHealth()
-                //   .then()
-                //   .catch();
               }}>
               {this.state.testingPlantText}
             </Button>
@@ -456,7 +358,6 @@ let styles = StyleSheet.create({
     padding: 8,
   },
   backgroundVideo: {
-    // position: 'absolute',
     top: 0,
     left: 0,
     bottom: 0,
@@ -466,7 +367,6 @@ let styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // height: 1000,
     margin: '1%',
   },
   mainText: {
@@ -475,7 +375,6 @@ let styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    // borderColor:'#6f9e04',
     backgroundColor: plantyColor,
     color: plantyColor,
     borderColor: plantyColor,
@@ -484,9 +383,7 @@ let styles = StyleSheet.create({
     flex: 1,
     height: 100,
   },
-  linearGradient: {
-    // borderRadius: 5,
-  },
+  linearGradient: {},
   buttonText: {
     fontSize: 100,
     fontFamily: 'Gill Sans',

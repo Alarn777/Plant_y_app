@@ -189,9 +189,12 @@ class AdjustPlanterConditions extends React.Component {
                   },
                 ],
               });
+              let temp = instructions[3].split(':')[1];
+              temp = Math.floor(parseFloat(temp));
+              console.log(temp);
 
               this.setState({
-                currTemperature: instructions[3].split(':')[1],
+                currTemperature: temp,
                 currUV: instructions[4].split(':')[1],
                 currHumidity: instructions[5].split(':')[1],
               });
@@ -203,25 +206,16 @@ class AdjustPlanterConditions extends React.Component {
   }
   componentDidMount(): void {
     console.log('did mount');
-    // console.log(this.scrollViewRef);
-
     this.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
-
-    // this.forceUpdate();
   }
 
   setScrollViewRef = element => {
     this.scrollViewRef = element;
   };
 
-  adjustValueOnPlanter() {
-    //do request to AWS lambda
-  }
-
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -274,21 +268,13 @@ class AdjustPlanterConditions extends React.Component {
         this.failureDeleting();
         console.log('error ' + error);
       });
-
-    // setTimeout(this.successDeleting, 1000);
-    // setTimeout(this.failureAdding, 1000);
   }
 
   successDeleting = () => {
     this.setState({
       deletingPlanter: false,
-      // deletingPlanticon: 'check',
-      // deletingPlantText: 'Deleted',
-      // deletingPlantDisabled: true,
     });
     setTimeout(this.goBack, 1000);
-
-    // this.props.navigation.getParam('loadPlanters')();
   };
 
   goBack = () => {
@@ -309,353 +295,8 @@ class AdjustPlanterConditions extends React.Component {
   failureDeleting = () => {
     this.setState({
       deletingPlanter: false,
-      // deletingPlanticon: 'alert-circle-outline',
-      // deletingPlantText: 'Failed to delete',
-      // deletingPlantDisabled: true,
     });
   };
-
-  renderHumidityInput() {
-    if (this.state.toEdit === 'humidity') {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Min humidity:</Text>
-          <TextInput
-            style={{
-              width: 100,
-              height: 30,
-            }}
-            selectionColor={plantyColor}
-            underlineColor={plantyColor}
-            mode="outlined"
-            label="New"
-            value={this.state.humidity}
-            onChangeText={inputValue => this.setState({humidity: inputValue})}
-          />
-          <IconButton
-            icon="check"
-            color={plantyColor}
-            size={20}
-            onPress={() => {
-              this.adjustValueOnPlanter();
-              this.setState({toEdit: ''});
-            }}
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Min humidity:</Text>
-          <Text style={styles.actionsText}> {this.state.humidity}</Text>
-          <IconButton
-            icon="pencil"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: 'humidity'})}
-          />
-        </View>
-      );
-    }
-  }
-
-  renderMaxHumidityInput() {
-    if (this.state.toEdit === 'humidityMax') {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.humidityMax}>Max humidity:</Text>
-          <TextInput
-            style={{
-              width: 100,
-              height: 30,
-            }}
-            selectionColor={plantyColor}
-            underlineColor={plantyColor}
-            mode="outlined"
-            label="New"
-            value={this.state.humidityMax}
-            onChangeText={inputValue =>
-              this.setState({humidityMax: inputValue})
-            }
-          />
-          <IconButton
-            icon="check"
-            color={plantyColor}
-            size={20}
-            onPress={() => {
-              this.adjustValueOnPlanter();
-              this.setState({toEdit: ''});
-            }}
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Max humidity:</Text>
-          <Text style={styles.actionsText}> {this.state.humidityMax}</Text>
-          <IconButton
-            icon="pencil"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: 'humidityMax'})}
-          />
-        </View>
-      );
-    }
-  }
-
-  renderTemperatureInput() {
-    if (this.state.toEdit === 'temp') {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Min Temperature:</Text>
-          <TextInput
-            style={{
-              width: 100,
-              height: 30,
-            }}
-            selectionColor={plantyColor}
-            underlineColor={plantyColor}
-            mode="outlined"
-            label="New"
-            value={this.state.temperature}
-            onChangeText={inputValue =>
-              this.setState({temperature: inputValue})
-            }
-          />
-          <IconButton
-            icon="check"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: ''})}
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Min Temperature:</Text>
-          <Text style={styles.actionsText}> {this.state.temperature}</Text>
-          <IconButton
-            icon="pencil"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: 'temp'})}
-          />
-        </View>
-      );
-    }
-  }
-
-  renderMaxTemperatureInput() {
-    if (this.state.toEdit === 'tempMax') {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Max Temperature:</Text>
-          <TextInput
-            style={{
-              width: 100,
-              height: 30,
-            }}
-            selectionColor={plantyColor}
-            underlineColor={plantyColor}
-            mode="outlined"
-            label="New"
-            value={this.state.temperatureMax}
-            onChangeText={inputValue =>
-              this.setState({temperatureMax: inputValue})
-            }
-          />
-          <IconButton
-            icon="check"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: ''})}
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Max Temperature:</Text>
-          <Text style={styles.actionsText}> {this.state.temperatureMax}</Text>
-          <IconButton
-            icon="pencil"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: 'tempMax'})}
-          />
-        </View>
-      );
-    }
-  }
-
-  renderUVInput() {
-    if (this.state.toEdit === 'uv') {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Min UV:</Text>
-          <TextInput
-            style={{
-              width: 100,
-              height: 30,
-            }}
-            selectionColor={plantyColor}
-            underlineColor={plantyColor}
-            mode="outlined"
-            label="New"
-            value={this.state.uv}
-            onChangeText={inputValue => this.setState({uv: inputValue})}
-          />
-          <IconButton
-            icon="check"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: ''})}
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Min UV:</Text>
-          <Text style={styles.actionsText}> {this.state.uv}</Text>
-          <IconButton
-            icon="pencil"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: 'uv'})}
-          />
-        </View>
-      );
-    }
-  }
-
-  renderMaxUVInput() {
-    if (this.state.toEdit === 'uvMax') {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Max UV:</Text>
-          <TextInput
-            style={{
-              width: 100,
-              height: 30,
-            }}
-            selectionColor={plantyColor}
-            underlineColor={plantyColor}
-            mode="outlined"
-            label="New"
-            value={this.state.uvMax}
-            onChangeText={inputValue => this.setState({uvMax: inputValue})}
-          />
-          <IconButton
-            icon="check"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: ''})}
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            // flex:
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            padding: 8,
-          }}>
-          <Text style={styles.actionsText}>Max UV:</Text>
-          <Text style={styles.actionsText}> {this.state.uvMax}</Text>
-          <IconButton
-            icon="pencil"
-            color={plantyColor}
-            size={20}
-            onPress={() => this.setState({toEdit: 'uvMax'})}
-          />
-        </View>
-      );
-    }
-  }
 
   renderAutomation = () => {
     return (
@@ -692,15 +333,7 @@ class AdjustPlanterConditions extends React.Component {
         <Chip style={{backgroundColor: 'white'}} icon="water-pump">
           Add water to the planter
         </Chip>
-        {/*<IconButton*/}
-        {/*  icon="camera"*/}
-        {/*  loading={true}*/}
-        {/*  color={plantyColor}*/}
-        {/*  size={20}*/}
-        {/*  onPress={() => console.log('Pressed')}*/}
-        {/*/>*/}
         <Button
-          // mode="outlined"
           icon={'water'}
           color={'#42a5f5'}
           loading={this.state.loadingAddingWater}
@@ -712,34 +345,6 @@ class AdjustPlanterConditions extends React.Component {
           }}>
           Add
         </Button>
-        {/*<Switch*/}
-        {/*  value={this.state.waterTurnedOn}*/}
-        {/*  onValueChange={() => {*/}
-        {/*    let action = !this.state.waterTurnedOn ? 'on' : 'off';*/}
-
-        {/*    // let message = 'job=water=action=' + action;*/}
-        {/*    // console.log(message);*/}
-        {/*    // this.props.sendMessage(message);*/}
-        {/*    // console.log(this.props.plantyData.socket);*/}
-
-        {/*    from_client;*/}
-        {/*    planterUUID;*/}
-        {/*    UV_LAMP_OFF;*/}
-        {/*    WS.sendMessage(*/}
-        {/*      'from_client;' +*/}
-        {/*        this.state.item.name.toLowerCase() +*/}
-        {/*        '=job=water=action=' +*/}
-        {/*        action,*/}
-        {/*    );*/}
-
-        {/*    // this.props.plantyData.socket.json({*/}
-        {/*    //   message: 'job=water=action=' + action,*/}
-        {/*    //   action: 'message',*/}
-        {/*    // });*/}
-
-        {/*    // this.setState({waterTurnedOn: !this.state.waterTurnedOn});*/}
-        {/*  }}*/}
-        {/*/>*/}
       </View>
     );
   };
@@ -748,19 +353,16 @@ class AdjustPlanterConditions extends React.Component {
     return (
       <View
         style={{
-          // flex:
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'space-between',
           marginBottom: 10,
           marginTop: 10,
-          // padding: 8,
         }}>
         <Chip style={{backgroundColor: 'white'}} icon="ceiling-light">
           Toggle light
         </Chip>
         <Button
-          // mode="outlined"
           icon={'lightbulb'}
           color={!this.state.lightTurnedOn ? 'gray' : '#ffea00'}
           loading={this.state.loadingLightTurnedOn}
@@ -776,23 +378,6 @@ class AdjustPlanterConditions extends React.Component {
           }}>
           {this.state.lightTurnedOn ? 'on' : 'off'}
         </Button>
-
-        {/*<Switch*/}
-        {/*  disabled={true}*/}
-        {/*  value={this.state.lightTurnedOn}*/}
-        {/*  onValueChange={() => {*/}
-        {/*    let action = !this.state.lightTurnedOn ? 'on' : 'off';*/}
-
-        {/*    WS.sendMessage(*/}
-        {/*      'FROM_CLIENT;' +*/}
-        {/*        this.state.item.UUID +*/}
-        {/*        ';UV_LAMP_' +*/}
-        {/*        action.toUpperCase(),*/}
-        {/*    );*/}
-
-        {/*    // this.setState({lightTurnedOn: !this.state.lightTurnedOn});*/}
-        {/*  }}*/}
-        {/*/>*/}
       </View>
     );
   };
@@ -855,8 +440,6 @@ class AdjustPlanterConditions extends React.Component {
               );
               let newTemp = parseInt(this.state.currTemperature) + 1;
               this.setState({currTemperature: newTemp.toString()});
-
-              // this.setState({lightTurnedOn: !this.state.lightTurnedOn});
             }}
           />
         </View>
@@ -867,15 +450,19 @@ class AdjustPlanterConditions extends React.Component {
   _renderCarouselItem({item, index}) {
     // console.log(item);
 
+    let temp = item.currTemperature;
+    temp = Math.floor(parseFloat(temp));
+
+    let humid = item.currHumidity;
+    humid = Math.floor(parseFloat(humid * 100));
+
     switch (item.title) {
       case 'temperature':
         return (
           <View>
             <View style={styles.conditionsText}>
               <Text style={styles.actionsText}>Current Temperature:</Text>
-              <Text style={styles.actionsText}>
-                {item.currTemperature + ' C'}
-              </Text>
+              <Text style={styles.actionsText}>{temp + ' C'}</Text>
             </View>
             <Divider />
             <Paragraph
@@ -916,9 +503,7 @@ class AdjustPlanterConditions extends React.Component {
           <View>
             <View style={styles.conditionsText}>
               <Text style={styles.actionsText}>Current Humidity:</Text>
-              <Text style={styles.actionsText}>
-                {item.currHumidity * 100 + ' %'}
-              </Text>
+              <Text style={styles.actionsText}>{humid + ' %'}</Text>
             </View>
             <Divider />
             <Paragraph

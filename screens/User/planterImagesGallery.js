@@ -12,17 +12,9 @@ import {
 import {Storage} from 'aws-amplify';
 import PropTypes from 'prop-types';
 
-import {
-  ActivityIndicator,
-  FAB,
-  Card as PaperCard,
-  IconButton,
-  Title,
-  Paragraph,
-} from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
+import {ActivityIndicator, Card as PaperCard} from 'react-native-paper';
 
-import {withAuthenticator, Loading} from 'aws-amplify-react-native';
+import {withAuthenticator} from 'aws-amplify-react-native';
 import {
   ConfirmSignIn,
   ConfirmSignUp,
@@ -33,8 +25,6 @@ import {
   VerifyContact,
   Greetings,
 } from '../Auth';
-import AmplifyTheme from '../AmplifyTheme';
-import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import {HeaderBackButton} from 'react-navigation-stack';
 import {bindActionCreators} from 'redux';
@@ -68,18 +58,6 @@ class planterImagesGallery extends React.Component {
         .catch();
       this.props.navigation.setParams({picWasRemoved: false});
     }
-  }
-
-  UNSAFE_componentWillMount() {
-    // this.fetchUser()
-    //   .then(() => {
-    //     this.props.navigation.setParams({logOut: this.logOut});
-    //
-    //     this.props.navigation.setParams({
-    //       userLoggedIn: this.state.userLoggedIn,
-    //     });
-    //   })
-    //   .catch(e => console.log(e));
   }
 
   async preloadImages(images_array) {
@@ -184,7 +162,6 @@ class planterImagesGallery extends React.Component {
             planterName: this.state.planter.name,
           })
         }
-        // style={{width: this.state.width / 2, backgroundColor: 'red'}}
         index={item.UUID}
         key={item.UUID}>
         <PaperCard>
@@ -208,10 +185,6 @@ class planterImagesGallery extends React.Component {
         index={item.UUID}
         key={item.UUID}>
         <Image height={100} width={100} source={{uri: item.url}} />
-        {/*<PaperCard style={{width: this.state.width, height: 200}}>*/}
-        {/*<Image height={100} width={100} source={{uri: item.url}} />*/}
-        {/*<PaperCard.Cover style={{padding: 1}} source={{uri: item.url}} />*/}
-        {/*</PaperCard>*/}
       </TouchableOpacity>
     );
   };

@@ -3,7 +3,7 @@ import {Image, View, FlatList, StyleSheet, ScrollView} from 'react-native';
 import {Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-import {Button, Divider, FAB} from 'react-native-paper';
+import {Button, Divider} from 'react-native-paper';
 //redux
 import {connect} from 'react-redux';
 import {HeaderBackButton} from 'react-navigation-stack';
@@ -178,11 +178,8 @@ class PlantScreen extends React.Component {
   }
 }
 
-// export default PlantScreen;
-
 let styles = StyleSheet.create({
   backgroundVideo: {
-    // position: 'absolute',
     top: 0,
     left: 0,
     bottom: 0,
@@ -224,4 +221,7 @@ const mapDispatchToProps = dispatch =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(PlantScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(PlantScreen);

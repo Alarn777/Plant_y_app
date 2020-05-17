@@ -10,19 +10,8 @@ const data = [
   {text: 'Highland'},
 ];
 import {HeaderBackButton} from 'react-navigation-stack';
-import {Image, View, Dimensions} from 'react-native';
-import {
-  Avatar,
-  Card as PaperCard,
-  Card,
-  RadioButton,
-  TextInput,
-  ToggleButton,
-  Button,
-  Portal,
-  Dialog,
-  Paragraph,
-} from 'react-native-paper';
+import {Image, View} from 'react-native';
+import {Card as PaperCard, TextInput, Button} from 'react-native-paper';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import {bindActionCreators} from 'redux';
@@ -52,11 +41,8 @@ class addPlanterScreen extends React.Component {
       growthPlans: [],
       growthPlansOptions: [],
     };
-    // this.dealWithData = this.dealWithData.bind(this);
-    // this.createPlanter = this.createPlanter.bind(this);
   }
   componentDidMount(): void {
-    // console.log(this.state.user);
     this.loadAllGrowthPlans()
       .then()
       .catch();
@@ -75,30 +61,20 @@ class addPlanterScreen extends React.Component {
         },
       )
       .then(response => {
-        // console.log(response.data.Items);
         this.setState({growthPlans: response.data.Items});
-
         let data1 = [];
         for (let i = 0; i < response.data.Items.length; i++) {
           data1.push({text: response.data.Items[i].growthPlanGroup});
         }
-
-        // console.log(data1);
-
         this.setState({growthPlansOptions: data1});
-
-        // console.log('Good fetch');
       })
       .catch(error => {
         console.log(error);
-        // this.setState({growthPlan: {}, loading: false});
       });
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
-    // const params = navigation.state.params || {};
     return {
-      // headerShown: navigation.getParam('userLoggedIn'),
       headerTitle: (
         <Image
           resizeMode="contain"
@@ -127,23 +103,11 @@ class addPlanterScreen extends React.Component {
   };
 
   setSelectedOption = val => {
-    console.log(val);
-    // console.log(val);
     this.setState({selectedOption: val});
   };
   async addPlanterToMyGarden() {
-    // console.log(this.props.navigation.getParam('user').username);
-
     this.setState({addingPlanter: true});
-
-    // console.log(this.props.navigation.getParam('user').username);
-    // console.log(this.state.planterName);
-    // console.log(this.state.planterDescription);
-    // console.log(this.state.selectedOption['text']);
-    // console.log(this.state.USER_TOKEN);
-
     let growthPlan = {};
-
     this.state.growthPlans.map(one => {
       if (one.growthPlanGroup === this.state.selectedGrowthPlanOption.text) {
         growthPlan = one;
@@ -168,22 +132,15 @@ class addPlanterScreen extends React.Component {
         },
       )
       .then(response => {
-        // If request is good...
-        // console.log(response.data);
         this.dealWithUrlData(response.data);
       })
       .catch(error => {
         this.failureAdding();
         console.log('error ' + error);
       });
-
-    // setTimeout(this.successAdding, 1000);
-    // setTimeout(this.failureAdding, 1000);
-    // this.props.navigation.goBack();
   }
 
   dealWithUrlData = url => {
-    // this.setState({URL: url.HLSStreamingSessionURL});
     this.successAdding();
     this.forceUpdate();
     this.props.navigation.getParam('loadPlanters')();
@@ -213,10 +170,6 @@ class addPlanterScreen extends React.Component {
     const expr = /^[a-zA-Z0-9_.-]*$/;
     const expr1 = /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{6,}$/g;
     let name = this.state.planterName;
-
-    // console.log(this.state.planterName);
-
-    // console.log(expr.test(String(this.state.planterName).toLowerCase()));
     if (
       !expr.test(String(this.state.planterName).toLowerCase()) ||
       this.state.planterName.length === 0
@@ -227,10 +180,6 @@ class addPlanterScreen extends React.Component {
       this.setState({nameError: false});
       return false;
     }
-
-    // if (name.length < 4 || expr.ci(expression)) {
-    //   this.setState({nameError: true});
-    // } else this.setState({nameError: false});
   }
 
   renderErrorMsg() {
@@ -347,8 +296,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// export default addPlanterScreen;
-
 const mapStateToProps = state => {
   const {plantyData} = state;
 
@@ -365,4 +312,7 @@ const mapDispatchToProps = dispatch =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(addPlanterScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(addPlanterScreen);

@@ -1,24 +1,11 @@
 import React from 'react';
-import {
-  Image,
-  View,
-  FlatList,
-  ScrollView,
-  Dimensions,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {Image, View, ScrollView, Dimensions, StyleSheet} from 'react-native';
 
-import {Storage} from 'aws-amplify';
 import PropTypes from 'prop-types';
 
 import {
   ActivityIndicator,
-  FAB,
   Card as PaperCard,
-  IconButton,
-  Title,
-  Drawer,
   List,
   Paragraph,
   TextInput,
@@ -27,9 +14,8 @@ import {
   Portal,
   Dialog,
 } from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
 
-import {withAuthenticator, Loading} from 'aws-amplify-react-native';
+import {withAuthenticator} from 'aws-amplify-react-native';
 import {
   ConfirmSignIn,
   ConfirmSignUp,
@@ -40,7 +26,6 @@ import {
   VerifyContact,
   Greetings,
 } from '../Auth';
-import AmplifyTheme from '../AmplifyTheme';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import {HeaderBackButton} from 'react-navigation-stack';
@@ -48,7 +33,6 @@ import {bindActionCreators} from 'redux';
 import {AddAvatarLink, addImage, addUser} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
 import {
-  lightGreen300,
   lightGreen50,
   lightGreen200,
   lightGreen100,
@@ -77,19 +61,6 @@ class growthPlan extends React.Component {
       okLoading: false,
     };
     this.onLayout = this.onLayout.bind(this);
-  }
-
-  componentDidUpdate(
-    prevProps: Readonly<P>,
-    prevState: Readonly<S>,
-    snapshot: SS,
-  ): void {
-    // if (this.props.navigation.getParam('picWasRemoved')) {
-    //   this.listPicturesData()
-    //     .then()
-    //     .catch();
-    //   this.props.navigation.setParams({picWasRemoved: false});
-    // }
   }
 
   componentDidMount(): void {
@@ -139,7 +110,6 @@ class growthPlan extends React.Component {
       .post(
         Consts.apigatewayRoute + '/managegrowthplan',
         {
-          // username: this.props.authData.username,
           planterName: this.state.planter.name,
           username: this.props.plantyData.myCognitoUser.username,
           action: 'updateGrowthPlan',
@@ -150,21 +120,15 @@ class growthPlan extends React.Component {
         },
       )
       .then(response => {
-        // this.setState({growthPlan: response.data, loading: false});
-        // this.dealWithPlanData(response.data);
         this.setState({savingPlan: false});
         this.loadGrowthPlan();
-
-        // console.log('Good fetch');
       })
       .catch(error => {
         this.setState({growthPlan: {}, savingPlan: false});
-        // console.log('error ' + error);
       });
   }
 
   async loadGrowthPlan() {
-    // this.setState({loading: true});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -173,7 +137,6 @@ class growthPlan extends React.Component {
       .post(
         Consts.apigatewayRoute + '/managegrowthplan',
         {
-          // username: this.props.authData.username,
           planterName: this.state.planter.name,
           username: this.props.plantyData.myCognitoUser.username,
           action: 'loadGrowthPlan',
@@ -185,7 +148,6 @@ class growthPlan extends React.Component {
       .then(response => {
         console.log(response.data);
         this.setState({growthPlan: response.data, loading: false});
-        // this.dealWithPlanData(response.data);
       })
       .catch(error => {
         this.setState({growthPlan: {}, loading: false});
@@ -240,8 +202,6 @@ class growthPlan extends React.Component {
         },
       )
       .then(response => {
-        // console.log(response.data.Items);
-        // console.log(this.state.growthPlan);
         this.setState({makePublicActive: true});
         for (let i = 0; i < response.data.Items.length; i++) {
           if (
@@ -251,14 +211,9 @@ class growthPlan extends React.Component {
             this.setState({makePublicActive: false});
           }
         }
-
-        // this.setState({growthPlan: response.data, loading: false});
-        // this.dealWithPlanData(response.data);
-        // console.log('Good fetch');
       })
       .catch(error => {
         console.log(error);
-        // this.setState({growthPlan: {}, loading: false});
       });
   }
 
@@ -307,18 +262,13 @@ class growthPlan extends React.Component {
       currentWeeks = this.state.growthPlan.phases;
     }
 
-    // let currentWeeks;
-    console.log(currentWeeks);
-
     let newWeekNum = currentWeeks.length + 1;
     let fromDay = 0;
 
     if (currentWeeks.length === 0) {
-      // console.log('here');
       newWeekNum = 1;
       fromDay = 1;
     } else {
-      // console.log('wtf');
       fromDay = currentWeeks[currentWeeks.length - 1].toDay;
     }
 
@@ -464,7 +414,6 @@ class growthPlan extends React.Component {
             <Text style={{marginTop: 20}}>0</Text>
             <RangeSlider
               style={{width: '85%', height: 80}}
-              // gravity={'center'}
               min={0}
               max={30}
               step={1}
@@ -741,9 +690,6 @@ class growthPlan extends React.Component {
   }
 
   render() {
-    // console.log('render callaed');
-    // console.log(this.state.growthPlan.phases);
-
     if (this.state.loading) {
       return (
         <ActivityIndicator
@@ -785,7 +731,6 @@ class growthPlan extends React.Component {
               style={{
                 marginTop: 5,
                 backgroundColor: plantyColor,
-                // textColor: 'white',
               }}
               color={'white'}
               // mode="outlined"
@@ -958,9 +903,7 @@ const styles = StyleSheet.create({
     height: 100,
   },
   phase: {
-    // borderColor: plantyColor,
     backgroundColor: lightGreen200,
-    // borderWidth: 1,
     borderRadius: 5,
     padding: -30,
     margin: 1,
