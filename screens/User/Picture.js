@@ -25,7 +25,7 @@ class Picture extends React.Component {
       loadBuffering: false,
       loading: false,
       deletingPic: false,
-      testingPlantText: 'Test',
+      testingPlantText: 'Health Evaluation',
       testingPlant: false,
       testingPlanticon: 'clipboard-play-outline',
       healthStatus: 0,
@@ -41,6 +41,11 @@ class Picture extends React.Component {
       if (instructions.length > 2)
         switch (instructions[2]) {
           case 'IMAGE_STATUS':
+            if (instructions[4] === 'FAILED') {
+              // this.setState({plant_tested: false});
+              break;
+            }
+
             let sick = 0;
             if (instructions[4] === 'sick') sick = 100;
             else sick = 0.0;
@@ -96,12 +101,12 @@ class Picture extends React.Component {
 
     //socket
 
-    WS.sendMessage(
-      'FROM_CLIENT;' +
-        this.state.item.UUID +
-        ';CHECK_IMAGE;' +
-        this.props.navigation.getParam('picture').key,
-    );
+    // WS.sendMessage(
+    //   'FROM_CLIENT;' +
+    //     this.state.item.UUID +
+    //     ';CHECK_IMAGE;' +
+    //     this.props.navigation.getParam('picture').key,
+    // );
 
     return;
     //ec2

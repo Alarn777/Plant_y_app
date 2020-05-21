@@ -153,6 +153,7 @@ class AdjustPlanterConditions extends React.Component {
       ],
       activeSlide: 0,
       setScrollViewRef: null,
+      currentWeek: 0,
     };
 
     WS.onMessage(data => {
@@ -171,8 +172,8 @@ class AdjustPlanterConditions extends React.Component {
             this.setState({lightTurnedOn: false, loadingLightTurnedOn: false});
             break;
           case 'FAILED':
-            alert('Failed to communicate with server');
-            this.forceUpdate();
+            console.log('Failed to communicate with server');
+            // this.forceUpdate();
             break;
           case 'MEASUREMENTS':
             if (this.state.item.UUID === instructions[1]) {
@@ -191,7 +192,6 @@ class AdjustPlanterConditions extends React.Component {
               });
               let temp = instructions[3].split(':')[1];
               temp = Math.floor(parseFloat(temp));
-              console.log(temp);
 
               this.setState({
                 currTemperature: temp,
@@ -205,8 +205,14 @@ class AdjustPlanterConditions extends React.Component {
     });
   }
   componentDidMount(): void {
-    console.log('did mount');
     this.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
+
+    let currentTime = new Date().getTime() / 1000;
+    let activatedTime = this.state.item.TimeActivated;
+    let currentWeek = (currentTime - activatedTime) / 86400;
+    // currentWeek = currentWeek / 24;
+    currentWeek = parseInt(currentWeek / 7);
+    this.setState({currentWeek: currentWeek});
   }
 
   setScrollViewRef = element => {
@@ -614,22 +620,10 @@ class AdjustPlanterConditions extends React.Component {
               <Text style={{marginBottom: 10}}>
                 {'Description: ' + this.state.item.description}
               </Text>
-              {/*<Text>{'Climate: ' + this.state.item.climate}</Text>*/}
-              {/*<Text style={{fontWeight: 'bold'}}>*/}
-              {/*  {this.state.item.climate}*/}
-              {/*</Text>*/}
-              {/*{this.renderAutomation()}*/}
-              {/*<Text*/}
-              {/*  style={{*/}
-              {/*    marginTop: 10,*/}
-              {/*    borderColor: errorColor,*/}
-              {/*    borderWidth: 1,*/}
-              {/*    color: errorColor,*/}
-              {/*    padding: 10,*/}
-              {/*    borderRadius: 3,*/}
-              {/*  }}>*/}
-              {/*  {"Your actions will now influence the planter's condition"}*/}
-              {/*</Text>*/}
+              <Divider />
+              <Text style={{marginBottom: 10, marginTop: 10}}>
+                {'Weeks since active: ' + this.state.currentWeek}
+              </Text>
             </PaperCard.Content>
           </PaperCard>
           <PaperCard style={{marginTop: 5}}>
@@ -649,10 +643,7 @@ class AdjustPlanterConditions extends React.Component {
             </PaperCard.Content>
           </PaperCard>
           <PaperCard style={{marginTop: 5}}>
-            <PaperCard.Title
-              title={'Actions'}
-              // subtitle="Card Subtitle"
-            />
+            <PaperCard.Title title={'Actions'} />
             <PaperCard.Content>
               {this.renderWaterControl()}
               <Divider />
@@ -660,30 +651,13 @@ class AdjustPlanterConditions extends React.Component {
               <Divider />
               {this.renderTemperatureControl()}
               <Divider />
-              {/*{this.renderTemperatureInput()}*/}
-              {/*<Divider />*/}
-              {/*{this.renderMaxTemperatureInput()}*/}
-              {/*<Divider />*/}
-              {/*{this.renderHumidityInput()}*/}
-              {/*<Divider />*/}
-              {/*{this.renderMaxHumidityInput()}*/}
-              {/*<Divider />*/}
-              {/*{this.renderUVInput()}*/}
-              {/*<Divider />*/}
-              {/*{this.renderMaxUVInput()}*/}
-              <Divider />
 
               <Button
-                // icon="chart-bell-curve-cumulative"
                 mode="outlined"
-                // loading={this.state.deletingPlanter}
                 onPress={() => {
                   this.props.navigation.navigate('growthPlan', {
                     planter: this.state.item,
                   });
-                  // this.deletePlanter()
-                  //   .then(r => this.goBack())
-                  //   .catch(error => console.log(error));
                 }}>
                 Edit growth plan
               </Button>
@@ -733,15 +707,7 @@ class AdjustPlanterConditions extends React.Component {
         <View style={{margin: '1%', width: '98%'}}>
           <KeyboardAwareScrollView
             innerRef={this.setScrollViewRef}
-            extraScrollHeight={30}
-            // contentContainerStyle={{
-            //   flex: 1,
-            //   justifyContent: 'center',
-            //   alignItems: 'center',
-            //   height: '100%',
-            //   width: '100%',
-            // }}>
-          >
+            extraScrollHeight={30}>
             <PaperCard>
               <PaperCard.Title
                 title={'Planter: ' + this.state.item.name}
@@ -751,17 +717,17 @@ class AdjustPlanterConditions extends React.Component {
                 <Text style={{marginBottom: 10}}>
                   {'Description: ' + this.state.item.description}
                 </Text>
-                {/*{this.renderAutomation()}*/}
+                <Divider />
+                <Text style={{marginBottom: 10, marginTop: 10}}>
+                  {'Weeks since active: ' + this.state.currentWeek}
+                </Text>
               </PaperCard.Content>
             </PaperCard>
             <PaperCard style={{marginTop: 5}}>
               <PaperCard.Content>{this.renderAutomation()}</PaperCard.Content>
             </PaperCard>
             <PaperCard style={{marginTop: 5}}>
-              <PaperCard.Title
-                title={'Conditions'}
-                // subtitle="Conditions of the planter"
-              />
+              <PaperCard.Title title={'Conditions'} />
               <PaperCard.Content>
                 <Carousel
                   // ref={c => {

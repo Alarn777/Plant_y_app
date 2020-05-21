@@ -85,7 +85,27 @@ class SignIn extends AuthPiece {
           user.signInUserSession.idToken.jwtToken,
         );
 
-        //create planter table for user if not existant yet
+        //create pictures for planter table for user if not exists yet
+        axios
+          .post(
+            Consts.apigatewayRoute + '/createPlanterPictures',
+            {
+              username: user.username,
+            },
+            {
+              headers: {Authorization: AuthStr},
+            },
+          )
+          .then(response => {
+            // If request is good...
+            console.log(response);
+            // this.dealWithUrlData(response.data);
+          })
+          .catch(error => {
+            console.log('error ' + error);
+          });
+
+        //create planter table for user if not exists yet
         axios
           .post(
             Consts.apigatewayRoute + '/createPlanterTable',
@@ -112,6 +132,7 @@ class SignIn extends AuthPiece {
         this.setState({loginigIn: false});
         this.error(err);
       });
+    WS.init();
   }
 
   showComponent(theme) {

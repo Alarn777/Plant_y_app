@@ -38,6 +38,8 @@ import {
   lightGreen100,
 } from 'react-native-paper/src/styles/colors';
 import RangeSlider from 'rn-range-slider';
+import WS from '../../websocket';
+import Slider from '@react-native-community/slider';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -54,11 +56,13 @@ class growthPlan extends React.Component {
       savingPlan: false,
       growthPlan: {},
       growthPlanName: '',
+      growthPlanDescription: '',
       errorInName: false,
       errorText: '',
       visible: false,
       makePublicActive: true,
       okLoading: false,
+      currentWeek: 0,
     };
     this.onLayout = this.onLayout.bind(this);
   }
@@ -71,6 +75,13 @@ class growthPlan extends React.Component {
           .catch(),
       )
       .catch();
+
+    let currentTime = new Date().getTime() / 1000;
+    let activatedTime = this.state.planter.TimeActivated;
+    let currentWeek = (currentTime - activatedTime) / 86400;
+    currentWeek = parseInt(currentWeek / 7);
+
+    this.setState({currentWeek: currentWeek});
   }
 
   _showDialog = () => this.setState({visible: true});
@@ -376,12 +387,29 @@ class growthPlan extends React.Component {
 
     if (oneWeek.phaseName.replace('Week ', '').length > 1) {
     } else icon = 'numeric-' + oneWeek.phaseName.replace('Week ', '');
-
+    console.log(parseInt(oneWeek.phaseName.replace('Week ', '')));
+    let border = null;
+    if (
+      parseInt(oneWeek.phaseName.replace('Week ', '')) ===
+      this.state.currentWeek
+    ) {
+      console.log('got ya');
+    }
     return (
       <List.Accordion
         key={oneWeek.name}
-        style={styles.week}
-        title={oneWeek.phaseName}>
+        style={
+          parseInt(oneWeek.phaseName.replace('Week ', '')) ===
+          this.state.currentWeek
+            ? styles.weekActive
+            : styles.week
+        }
+        title={
+          parseInt(oneWeek.phaseName.replace('Week ', '')) ===
+          this.state.currentWeek
+            ? oneWeek.phaseName + ' - Current'
+            : oneWeek.phaseName
+        }>
         <List.Accordion
           style={styles.dayTime}
           title="Morning"
@@ -415,8 +443,9 @@ class growthPlan extends React.Component {
             <RangeSlider
               style={{width: '85%', height: 80}}
               min={0}
-              max={30}
-              step={1}
+              max={4000}
+              step={100}
+              rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[0].uvIntensity.min}
               initialHighValue={oneWeek.subPhases[0].uvIntensity.max}
               selectionColor={plantyColor}
@@ -425,12 +454,13 @@ class growthPlan extends React.Component {
               labelBackgroundColor={plantyColor}
               labelBorderColor={plantyColor}
               onValueChanged={(low, high, fromUser) => {
+                // console.log(low);
                 oneWeek.subPhases[0].uvIntensity.min = low;
-                oneWeek.subPhases[0].uvIntensity.max = high;
+                // oneWeek.subPhases[0].uvIntensity.max = high;
                 this.forceUpdate();
               }}
             />
-            <Text style={{marginTop: 20}}>30</Text>
+            <Text style={{marginTop: 20}}>4000</Text>
           </View>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Humidity</Text>
           <View style={styles.slider}>
@@ -491,8 +521,9 @@ class growthPlan extends React.Component {
               style={{width: '85%', height: 80}}
               // gravity={'center'}
               min={0}
-              max={30}
-              step={1}
+              max={4000}
+              step={100}
+              rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[1].uvIntensity.min}
               initialHighValue={oneWeek.subPhases[1].uvIntensity.max}
               selectionColor={plantyColor}
@@ -502,11 +533,11 @@ class growthPlan extends React.Component {
               labelBorderColor={plantyColor}
               onValueChanged={(low, high, fromUser) => {
                 oneWeek.subPhases[1].uvIntensity.min = low;
-                oneWeek.subPhases[1].uvIntensity.max = high;
+                // oneWeek.subPhases[1].uvIntensity.max = high;
                 this.forceUpdate();
               }}
             />
-            <Text style={{marginTop: 20}}>30</Text>
+            <Text style={{marginTop: 20}}>4000</Text>
           </View>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Humidity</Text>
           <View style={styles.slider}>
@@ -567,8 +598,9 @@ class growthPlan extends React.Component {
               style={{width: '85%', height: 80}}
               // gravity={'center'}
               min={0}
-              max={30}
-              step={1}
+              max={4000}
+              step={100}
+              rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[2].uvIntensity.min}
               initialHighValue={oneWeek.subPhases[2].uvIntensity.max}
               selectionColor={plantyColor}
@@ -578,7 +610,7 @@ class growthPlan extends React.Component {
               labelBorderColor={plantyColor}
               onValueChanged={(low, high, fromUser) => {
                 oneWeek.subPhases[2].uvIntensity.min = low;
-                oneWeek.subPhases[2].uvIntensity.max = high;
+                // oneWeek.subPhases[2].uvIntensity.max = high;
                 this.forceUpdate();
               }}
             />
@@ -643,8 +675,9 @@ class growthPlan extends React.Component {
               style={{width: '85%', height: 80}}
               // gravity={'center'}
               min={0}
-              max={30}
-              step={1}
+              max={4000}
+              step={100}
+              rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[3].uvIntensity.min}
               initialHighValue={oneWeek.subPhases[3].uvIntensity.max}
               selectionColor={plantyColor}
@@ -654,11 +687,11 @@ class growthPlan extends React.Component {
               labelBorderColor={plantyColor}
               onValueChanged={(low, high, fromUser) => {
                 oneWeek.subPhases[3].uvIntensity.min = low;
-                oneWeek.subPhases[3].uvIntensity.max = high;
+                // oneWeek.subPhases[3].uvIntensity.max = high;
                 this.forceUpdate();
               }}
             />
-            <Text style={{marginTop: 20}}>30</Text>
+            <Text style={{marginTop: 20}}>4000</Text>
           </View>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Humidity</Text>
           <View style={styles.slider}>
@@ -736,6 +769,12 @@ class growthPlan extends React.Component {
               // mode="outlined"
               loading={this.state.savingPlan}
               onPress={() => {
+                WS.sendMessage(
+                  'FROM_CLIENT;' +
+                    this.state.planter.UUID +
+                    ';RELOAD_GROWTH_PLAN',
+                );
+
                 this.saveGrowthPlan()
                   .then(
                     this.loadAllGrowthPlans()
@@ -772,6 +811,26 @@ class growthPlan extends React.Component {
                   this.state.growthPlan.constructor === Object
                     ? this.setState({growthPlanName: text})
                     : (this.state.growthPlan.growthPlanGroup = text);
+                  this.forceUpdate();
+                }}
+              />
+              <TextInput
+                style={{marginTop: 5}}
+                label="Description"
+                mode="outlined"
+                multiline={true}
+                // error={this.state.errorInName}
+                value={
+                  Object.keys(this.state.growthPlan).length === 0 &&
+                  this.state.growthPlan.constructor === Object
+                    ? this.state.growthPlanDescription
+                    : this.state.growthPlan.growthPlanDescription
+                }
+                onChangeText={text => {
+                  Object.keys(this.state.growthPlan).length === 0 &&
+                  this.state.growthPlan.constructor === Object
+                    ? this.setState({growthPlanDescription: text})
+                    : (this.state.growthPlan.growthPlanDescription = text);
                   this.forceUpdate();
                 }}
               />
@@ -914,6 +973,13 @@ const styles = StyleSheet.create({
     padding: -30,
     margin: 1,
   },
+  weekActive: {
+    backgroundColor: lightGreen200,
+    borderRadius: 5,
+    padding: -30,
+    margin: 1,
+  },
+
   dayTime: {
     backgroundColor: lightGreen50,
     borderRadius: 5,

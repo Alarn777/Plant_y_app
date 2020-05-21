@@ -55,6 +55,7 @@ import {bindActionCreators} from 'redux';
 import WS from '../../websocket';
 import {Storage} from 'aws-amplify';
 import Const from '../../ENV_VARS';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const plantyColor = '#6f9e04';
 
@@ -89,10 +90,10 @@ class MainScreen extends React.Component {
     this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
 
-    // console.log(WS.ws);
-    // if (WS.ws === undefined) WS.init();
-    WS.init();
-
+    console.log('Websocket: ', WS.ws);
+    if (WS.ws === undefined) WS.init();
+    // WS.init();
+    //
     WS.onMessage(data => {
       console.log('GOT in main screen', data.data);
       let instructions = data.data.split(';');
@@ -104,7 +105,7 @@ class MainScreen extends React.Component {
               .catch();
             break;
           case 'FAILED':
-            alert('Failed to communicate with server');
+            // alert('Failed to communicate with server');
             this.forceUpdate();
             break;
         }
@@ -197,7 +198,7 @@ class MainScreen extends React.Component {
               .catch();
             break;
           case 'FAILED':
-            alert('Failed to communicate with server');
+            // alert('Failed to communicate with server');
             this.forceUpdate();
             break;
         }
@@ -323,6 +324,10 @@ class MainScreen extends React.Component {
       })
       .catch(error => console.log(error));
     this.preloadImages();
+
+    // WS.sendMessage(
+    //   'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
+    // );
   }
 
   logOut = () => {
@@ -373,12 +378,10 @@ class MainScreen extends React.Component {
             );
           }}
           style={{width: this.state.width / 3 - 5, margin: 1}}
-          // style={{width: '100%'}}
           index={item.UUID}
           key={item.UUID}>
           <TouchableOpacity
             onPress={() => {
-              // WS.init();
               this.props.navigation.navigate('planterScreen', {
                 item: item,
                 user_token: this.state.USER_TOKEN,
@@ -420,9 +423,7 @@ class MainScreen extends React.Component {
               />
             )}
           />
-
           <PaperCard.Content />
-          {/*<PaperCard.Cover source={require('../../assets/logo_text.png')} />*/}
           <Image
             resizeMode={'center'}
             style={{height: 100, width: this.state.width}}
@@ -430,9 +431,6 @@ class MainScreen extends React.Component {
           />
           <PaperCard.Actions />
         </PaperCard>
-        {/*<View style={styles.header}>*/}
-        {/*  <Text style={styles.headerText}>My garden</Text>*/}
-        {/*</View>*/}
         <Card>
           <View style={styles.header}>
             <Text style={styles.headerText}>My garden</Text>

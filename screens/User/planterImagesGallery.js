@@ -65,6 +65,8 @@ class planterImagesGallery extends React.Component {
     console.log(images_array);
 
     await images_array.map(oneImage => {
+      if (oneImage.key.endsWith('/')) return;
+
       Storage.get(oneImage.key, {
         level: 'public',
         type: 'image/jpg',

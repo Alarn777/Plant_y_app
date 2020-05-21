@@ -24,6 +24,9 @@ import {
   Chip,
   Button,
   IconButton,
+  Portal,
+  Snackbar,
+  DefaultTheme,
 } from 'react-native-paper';
 
 import {withAuthenticator} from 'aws-amplify-react-native';
@@ -47,6 +50,7 @@ import {HeaderBackButton} from 'react-navigation-stack';
 import WS from '../../websocket';
 
 const plantyColor = '#6f9e04';
+const errorColor = '#ee3e34';
 
 class planterScreen extends React.Component {
   constructor(props) {
@@ -74,10 +78,52 @@ class planterScreen extends React.Component {
       loadingActions: false,
       loadingPlanters: false,
       refreshingPlants: false,
+      sickPlantDetected: false,
+      currTemperature: '',
+      currUV: '',
+      currHumidity: '',
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
     this.onLayout = this.onLayout.bind(this);
+
+    WS.onMessage(data => {
+      console.log('GOT in planter screen', data.data);
+
+      let instructions = data.data.split(';');
+      if (instructions.length > 2)
+        switch (instructions[2]) {
+          case 'FAILED':
+            // alert('Failed to communicate with server');
+            this.forceUpdate();
+            break;
+          case 'IMAGE_STATUS':
+            let sick = 0;
+            if (instructions[4] === 'sick')
+              this.setState({sickPlantDetected: true});
+            break;
+          case 'STREAM_STARTED':
+            this.loadUrl()
+              .then()
+              .catch(e => console.log(e));
+            break;
+
+          case 'MEASUREMENTS':
+            if (this.state.planter.UUID === instructions[1]) {
+              let temp = instructions[3].split(':')[1];
+              temp = Math.floor(parseFloat(temp));
+              this.setState({
+                currTemperature: temp,
+                currUV: instructions[4].split(':')[1],
+                currHumidity: instructions[5].split(':')[1],
+              });
+            }
+
+            break;
+          default:
+            break;
+        }
+    });
   }
 
   static navigationOptions = ({navigation}) => {
@@ -137,16 +183,28 @@ class planterScreen extends React.Component {
         this.props.navigation.getParam('logOut')();
       });
 
-    this.loadUrl()
-      .then()
-      .catch(e => console.log(e));
+    // console.log(this.props.plantyData.streamUrl);
+
+    // if (
+    //   this.props.plantyData.streamUrl === undefined ||
+    //   this.props.plantyData.streamUrl === null
+    // ) {
+    //   this.loadUrl()
+    //     .then()
+    //     .catch(e => console.log(e));
+    // }
 
     this.loadPlants()
       .then()
       .catch(e => console.log(e));
+
+    WS.sendMessage(
+      'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
+    );
   }
 
   async loadUrl() {
+    console.log('fetching url');
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -162,12 +220,15 @@ class planterScreen extends React.Component {
             this.props.plantyData.streamUrl === null
           ) {
             console.log('SETTING URL');
+            console.log(response.data);
             this.addUrl(response.data.HLSStreamingSessionURL);
           } else {
+            console.log(response.data);
             console.log('NOT SETTING URL');
             this.setState({streamUrl: this.props.plantyData.streamUrl});
           }
         } else {
+          console.log(response.data);
           console.log('No stream data URL');
           console.log(response);
         }
@@ -186,7 +247,7 @@ class planterScreen extends React.Component {
 
   addUrl = url => {
     this.props.addStreamUrl(url);
-    this.setState({streamUrl: this.props.plantyData.streamUrl});
+    // this.setState({streamUrl: this.props.plantyData.streamUrl});
   };
 
   async loadPlants() {
@@ -224,6 +285,10 @@ class planterScreen extends React.Component {
   };
 
   async takePicture() {
+    console.log(this.state.currUV);
+    console.log(this.state.currHumidity);
+    console.log(this.state.currTemperature);
+
     this.setState({loadingActions: true});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
@@ -236,6 +301,9 @@ class planterScreen extends React.Component {
           planter: this.props.navigation.getParam('item').name,
           url: this.props.plantyData.streamUrl,
           configuration: 'normal',
+          humidity: this.state.currHumidity.toString(),
+          temperature: this.state.currTemperature.toString(),
+          UV: this.state.currUV.toString(),
         },
         {
           headers: {Authorization: AuthStr},
@@ -350,16 +418,18 @@ class planterScreen extends React.Component {
   };
 
   renderVideo = () => {
+    // console.log(this.state.streamUrl);
+
     if (
-      this.state.streamUrl === '' ||
-      this.state.streamUrl === undefined ||
-      this.state.streamUrl === null
+      this.props.plantyData.streamUrl === '' ||
+      this.props.plantyData.streamUrl === undefined ||
+      this.props.plantyData.streamUrl === null
     ) {
       return <ActivityIndicator size="large" color={plantyColor} />;
     } else
       return (
         <Video
-          source={{uri: this.state.streamUrl, type: 'm3u8'}} // Can be a URL or a local file.
+          source={{uri: this.props.plantyData.streamUrl, type: 'm3u8'}} // Can be a URL or a local file.
           ref={ref => {
             this.player = ref;
           }} // Store reference
@@ -431,9 +501,41 @@ class planterScreen extends React.Component {
                   padding: 8,
                 }}>
                 <IconButton
-                  icon={this.state.loadingActions ? 'reload' : 'arrow-left'}
+                  // icon={
+                  //
+                  //   this.state.loadingActions ? 'reload' : 'arrowhead-right'
+                  // }
+                  icon={
+                    this.state.loadingActions
+                      ? 'reload'
+                      : require('../../assets/arrowhead-left-outline.png')
+                  }
                   color={plantyColor}
-                  disabled={this.state.loadingActions || !this.state.streamUrl}
+                  disabled={
+                    this.state.loadingActions ||
+                    !this.props.plantyData.streamUrl
+                  }
+                  size={40}
+                  onPress={() => {
+                    WS.sendMessage(
+                      'FROM_CLIENT;' +
+                        this.props.navigation.getParam('item').UUID +
+                        ';MOVE_CAMERA_LEFT_LONG',
+                    );
+                  }}
+                />
+                <IconButton
+                  icon={
+                    this.state.loadingActions
+                      ? 'reload'
+                      : require('../../assets/arrow-ios-back-outline.png')
+                  }
+                  // icon={this.state.loadingActions ? 'reload' : 'chevron-left'}
+                  color={plantyColor}
+                  disabled={
+                    this.state.loadingActions ||
+                    !this.props.plantyData.streamUrl
+                  }
                   size={40}
                   onPress={() => {
                     WS.sendMessage(
@@ -447,7 +549,10 @@ class planterScreen extends React.Component {
                   icon={this.state.loadingActions ? 'reload' : 'camera'}
                   color={plantyColor}
                   size={40}
-                  disabled={this.state.loadingActions || !this.state.streamUrl}
+                  disabled={
+                    this.state.loadingActions ||
+                    !this.props.plantyData.streamUrl
+                  }
                   onPress={() => {
                     this.takePicture()
                       .then(r => console.log())
@@ -455,10 +560,18 @@ class planterScreen extends React.Component {
                   }}
                 />
                 <IconButton
-                  icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
+                  icon={
+                    this.state.loadingActions
+                      ? 'reload'
+                      : require('../../assets/arrow-ios-forward-outline.png')
+                  }
+                  // icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
                   size={40}
-                  disabled={this.state.loadingActions || !this.state.streamUrl}
+                  disabled={
+                    this.state.loadingActions ||
+                    !this.props.plantyData.streamUrl
+                  }
                   onPress={() => {
                     WS.sendMessage(
                       'FROM_CLIENT;' +
@@ -467,10 +580,47 @@ class planterScreen extends React.Component {
                     );
                   }}
                 />
+                <IconButton
+                  icon={
+                    this.state.loadingActions
+                      ? 'reload'
+                      : require('../../assets/arrowhead-right-outline.png')
+                  }
+                  // icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
+                  color={plantyColor}
+                  size={40}
+                  disabled={
+                    this.state.loadingActions ||
+                    !this.props.plantyData.streamUrl
+                  }
+                  onPress={() => {
+                    WS.sendMessage(
+                      'FROM_CLIENT;' +
+                        this.props.navigation.getParam('item').UUID +
+                        ';MOVE_CAMERA_RIGHT_LONG',
+                    );
+                  }}
+                />
               </View>
               <Text style={styles.headerText}>Plants in Planter</Text>
             </PaperCard.Actions>
           </PaperCard>
+          <Portal>
+            <Snackbar
+              theme={{colors: {accent: 'white'}}}
+              style={{backgroundColor: errorColor, top: 15, borderRadius: 5}}
+              visible={this.state.sickPlantDetected}
+              onDismiss={() => this.setState({sickPlantDetected: false})}
+              action={{
+                label: 'OK',
+
+                onPress: () => {
+                  this.setState({sickPlantDetected: false});
+                },
+              }}>
+              We detected a sick plant in your garden,please tend to it!
+            </Snackbar>
+          </Portal>
           <ScrollView style={styles.data}>
             <FlatList
               vertical={true}
