@@ -12,7 +12,7 @@ import PlantScreen from './screens/User/PlantScreen';
 import AllAvailablePlants from './screens/User/AllAvailablePlants';
 import AddPlantScreen from './screens/User/AddPlantScreen';
 import planterScreen from './screens/User/planterScreen';
-
+import History from './screens/User/history';
 import UserPage from './screens/User/UserPage';
 
 import Amplify, {Auth} from 'aws-amplify';
@@ -115,6 +115,13 @@ const AppNavigator = createStackNavigator(
     growthPlan: {
       name: 'GrowthPlan',
       screen: GrowthPlan,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
+    history: {
+      name: 'History',
+      screen: History,
       navigationOptions: {
         gesturesEnabled: false,
       },

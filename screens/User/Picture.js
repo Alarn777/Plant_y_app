@@ -186,11 +186,39 @@ class Picture extends React.Component {
   async deletePicture() {
     this.setState({deletingPic: true});
     let pictureKey = this.props.navigation.getParam('picture').key;
-
+    console.log(
+      this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
+    );
     Storage.remove(pictureKey, {level: 'public'})
       .then(result => {
-        console.log(result);
-        this.setState({deletingPic: true});
+        //dynamoDB
+        let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+          .idToken.jwtToken;
+
+        const AuthStr = 'Bearer '.concat(USER_TOKEN);
+        axios
+          .post(
+            Consts.apigatewayRoute + '/getPlanterPictures',
+            {
+              username: this.props.plantyData.myCognitoUser.username,
+              mode: 'delete',
+              UUID: this.state.plant.UUID,
+            },
+            {
+              headers: {Authorization: AuthStr},
+            },
+          )
+          .then(response => {
+            console.log(response);
+            // this.dealWithPicsData(response.data.Items);
+            this.setState({deletingPic: true});
+            // this.setState({pictures:response.data.Items})
+          })
+          .catch(error => {
+            console.log('error ' + error);
+          });
+
+        // this.setState({deletingPic: true});
       })
       .catch(err => {
         console.log(err);
@@ -296,6 +324,18 @@ class Picture extends React.Component {
               }}
               source={{uri: this.props.navigation.getParam('picture').url}}
             />
+            <View style={styles.metadata}>
+              <Text style={styles.metadataText}>
+                Date and time: {this.state.plant.timestamp}
+              </Text>
+              <Text style={styles.metadataText}>
+                Temperature: {this.state.plant.temperature}
+              </Text>
+              <Text style={styles.metadataText}>UV: {this.state.plant.UV}</Text>
+              <Text style={styles.metadataText}>
+                Humidity: {parseFloat(this.state.plant.humidity * 100)}
+              </Text>
+            </View>
             {this.renderTestResults()}
             <Button
               icon={this.state.testingPlanticon}
@@ -397,5 +437,16 @@ let styles = StyleSheet.create({
     position: 'relative',
     color: 'black',
     backgroundColor: 'transparent',
+  },
+  metadata: {
+    borderColor: plantyColor,
+    borderWidth: 1,
+    marginTop: 5,
+    padding: 5,
+    borderRadius: 3,
+  },
+  metadataText: {
+    fontSize: 16,
+    color: plantyColor,
   },
 });

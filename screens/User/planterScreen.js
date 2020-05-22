@@ -204,6 +204,12 @@ class planterScreen extends React.Component {
   }
 
   async loadUrl() {
+    if (
+      this.props.plantyData.streamUrl === undefined ||
+      this.props.plantyData.streamUrl === null
+    ) {
+    }
+
     console.log('fetching url');
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
@@ -221,6 +227,9 @@ class planterScreen extends React.Component {
           ) {
             console.log('SETTING URL');
             console.log(response.data);
+            if (response.data.errorMessage) {
+              return;
+            }
             this.addUrl(response.data.HLSStreamingSessionURL);
           } else {
             console.log(response.data);
@@ -311,6 +320,7 @@ class planterScreen extends React.Component {
       )
       .then(response => {
         this.setState({loadingActions: false});
+        console.log(response);
       })
       .catch(error => {
         this.setState({loadingActions: false});
@@ -491,6 +501,20 @@ class planterScreen extends React.Component {
                 justifyContent: 'center',
                 padding: 8,
               }}>
+              <IconButton
+                icon={'reload'}
+                color={plantyColor}
+                size={20}
+                style={{position: 'absolute', left: 5, top: 0}}
+                onPress={() => {
+                  console.log('props ', this.props.plantyData.streamUrl);
+                  console.log('state', this.state.streamUrl);
+                  this.props.addStreamUrl(undefined);
+                  this.loadUrl()
+                    .then()
+                    .catch();
+                }}
+              />
               <Text style={styles.mainText}>Camera Controllers</Text>
               <View
                 style={{
@@ -508,7 +532,7 @@ class planterScreen extends React.Component {
                   icon={
                     this.state.loadingActions
                       ? 'reload'
-                      : require('../../assets/arrowhead-left-outline.png')
+                      : require('../../assets/icons/arrowhead-left-outline.png')
                   }
                   color={plantyColor}
                   disabled={
@@ -528,7 +552,7 @@ class planterScreen extends React.Component {
                   icon={
                     this.state.loadingActions
                       ? 'reload'
-                      : require('../../assets/arrow-ios-back-outline.png')
+                      : require('../../assets/icons/arrow-ios-back-outline.png')
                   }
                   // icon={this.state.loadingActions ? 'reload' : 'chevron-left'}
                   color={plantyColor}
@@ -563,7 +587,7 @@ class planterScreen extends React.Component {
                   icon={
                     this.state.loadingActions
                       ? 'reload'
-                      : require('../../assets/arrow-ios-forward-outline.png')
+                      : require('../../assets/icons/arrow-ios-forward-outline.png')
                   }
                   // icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
@@ -584,7 +608,7 @@ class planterScreen extends React.Component {
                   icon={
                     this.state.loadingActions
                       ? 'reload'
-                      : require('../../assets/arrowhead-right-outline.png')
+                      : require('../../assets/icons/arrowhead-right-outline.png')
                   }
                   // icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
@@ -662,7 +686,7 @@ class planterScreen extends React.Component {
               left: 0,
               bottom: 14,
             }}
-            label="Adjust Conditions"
+            label="Manage planter"
             lage
             color={plantyColor}
             icon="pencil"

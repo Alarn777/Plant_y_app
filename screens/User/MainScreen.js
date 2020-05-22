@@ -412,7 +412,7 @@ class MainScreen extends React.Component {
               <IconButton
                 {...props}
                 style={{backgroundColor: 'white'}}
-                icon="settings"
+                icon={require('../../assets/icons/settings-2-outline.png')}
                 color={plantyColor}
                 onPress={() =>
                   this.props.navigation.navigate('UserPage', {

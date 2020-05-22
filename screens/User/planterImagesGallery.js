@@ -30,6 +30,7 @@ import {HeaderBackButton} from 'react-navigation-stack';
 import {bindActionCreators} from 'redux';
 import {AddAvatarLink, addImage, addUser} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
+import axios from 'axios';
 const plantyColor = '#6f9e04';
 
 class planterImagesGallery extends React.Component {
@@ -62,23 +63,34 @@ class planterImagesGallery extends React.Component {
 
   async preloadImages(images_array) {
     console.log('Now loading images');
-    console.log(images_array);
-
+    // console.log(images_array);
     await images_array.map(oneImage => {
-      if (oneImage.key.endsWith('/')) return;
+      // console.log(oneImage);
+      // if (oneImage.image_key.endsWith('/')) return;
 
-      Storage.get(oneImage.key, {
+      Storage.get(oneImage.image_key, {
         level: 'public',
         type: 'image/jpg',
       })
         .then(data => {
+          let date = new Date(oneImage.timestamp * 1e3)
+            .toISOString()
+            .replace(/-/g, '/')
+            .replace(/T/g, ' ')
+            .replace(/Z/g, '')
+            .slice(0, 19);
+
           let obj = {
-            UUID: oneImage.eTag,
+            UUID: oneImage.UUID,
             url: data,
-            lastModified: oneImage.lastModified,
-            size: oneImage.size,
-            key: oneImage.key,
+            timestamp: date,
+            timestamp_seconds: oneImage.timestamp,
+            UV: oneImage.UV,
+            temperature: oneImage.temperature,
+            humidity: oneImage.humidity,
+            key: oneImage.image_key,
           };
+          console.log(obj);
 
           this.setState(prevState => ({
             pictures: [...prevState.pictures, obj],
@@ -86,6 +98,30 @@ class planterImagesGallery extends React.Component {
         })
         .catch(error => console.log(error));
     });
+
+    // await images_array.map(oneImage => {
+    //   if (oneImage.key.endsWith('/')) return;
+    //
+    //   Storage.get(oneImage.key, {
+    //     level: 'public',
+    //     type: 'image/jpg',
+    //   })
+    //     .then(data => {
+    //       let obj = {
+    //         UUID: oneImage.eTag,
+    //         url: data,
+    //         lastModified: oneImage.lastModified,
+    //         size: oneImage.size,
+    //         key: oneImage.key,
+    //       };
+    //       console.log(obj);
+    //
+    //       this.setState(prevState => ({
+    //         pictures: [...prevState.pictures, obj],
+    //       }));
+    //     })
+    //     .catch(error => console.log(error));
+    // });
   }
 
   componentDidMount(): void {
@@ -97,24 +133,62 @@ class planterImagesGallery extends React.Component {
   async listPicturesData() {
     this.setState({pictures: []});
 
-    let bucketUrl =
-      this.props.plantyData.myCognitoUser.username +
-      '/' +
-      this.state.planter.name;
+    // let bucketUrl =
+    //   this.props.plantyData.myCognitoUser.username +
+    //   '/' +
+    //   this.state.planter.name;
+    //
+    // Storage.list(bucketUrl, {level: 'public'})
+    //   .then(result => {
+    //     let res_arr = [];
+    //     result.map(one => {
+    //       if (one.key === bucketUrl + '/') {
+    //       } else res_arr.push(one);
+    //     });
+    //     this.preloadImages(res_arr)
+    //       .then(r => console.log())
+    //       .catch(error => console.log(error));
+    //   })
+    //   .catch(err => console.log(err));
 
-    Storage.list(bucketUrl, {level: 'public'})
-      .then(result => {
-        let res_arr = [];
-        result.map(one => {
-          if (one.key === bucketUrl + '/') {
-          } else res_arr.push(one);
-        });
-        this.preloadImages(res_arr)
-          .then(r => console.log())
-          .catch(error => console.log(error));
+    //dynamoDB
+    let USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
+
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/getPlanterPictures',
+        {
+          username: this.props.authData.username,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        // console.log(response.data.Items);
+        this.dealWithPicsData(response.data.Items);
+        // this.setState({pictures:response.data.Items})
       })
-      .catch(err => console.log(err));
+      .catch(error => {
+        console.log('error ' + error);
+      });
   }
+
+  dealWithPicsData = pic_array => {
+    let sorted_array = [];
+    pic_array.map(one => {
+      console.log(one);
+      let planterName = one.image_key.split('/')[1];
+      if (planterName === this.state.planter.name) {
+        sorted_array.push(one);
+      }
+    });
+
+    this.preloadImages(sorted_array)
+      .then(r => console.log())
+      .catch(error => console.log(error));
+  };
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};

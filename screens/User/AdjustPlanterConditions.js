@@ -92,6 +92,11 @@ const dayData = {
     '',
     '',
     '',
+    '',
+    '',
+    '',
+    '',
+    '',
   ],
   datasets: [
     {
@@ -113,6 +118,10 @@ const dayData = {
         80,
         99,
         43,
+        80,
+        99,
+        43,
+        12,
         80,
         99,
         43,
@@ -733,8 +742,8 @@ class AdjustPlanterConditions extends React.Component {
                   // ref={c => {
                   //   this._carousel = c;
                   // }}
-                  loop={false}
-                  autoplay={false}
+                  loop={true}
+                  autoplay={true}
                   autoplayDelay={0}
                   autoplayInterval={10000}
                   data={this.state.entries}
@@ -763,8 +772,22 @@ class AdjustPlanterConditions extends React.Component {
                   inactiveDotOpacity={0.4}
                   inactiveDotScale={0.6}
                 />
+                <Button
+                  mode="outlined"
+                  onPress={() => {
+                    console.log('history');
+                    // this.props.navigation.navigate('history', {
+                    //   planter: this.state.item,
+                    // });
+                    this.props.navigation.navigate('history', {
+                      planter: this.state.item,
+                    });
+                  }}>
+                  See history
+                </Button>
 
                 <Button
+                  style={{marginTop: 10}}
                   icon="delete"
                   mode="outlined"
                   loading={this.state.deletingPlanter}

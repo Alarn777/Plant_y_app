@@ -30,6 +30,7 @@
     "prop-types": "latest",
     "react": "16.9.0",
     "react-native": "0.61.5",
+    "react-native-calendars": "^1.265.0",
     "react-native-chart-kit": "^5.1.1",
     "react-native-eject": "^0.1.2",
     "react-native-elements": "^1.2.7",
