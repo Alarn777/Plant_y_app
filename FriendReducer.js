@@ -40,6 +40,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     streamUrl,
     socket,
     controls,
+    lightStatus,
     socketActions,
   } = state;
 
@@ -132,12 +133,27 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     //       events.splice(index, 1);
     //     }
     //   }
+    case 'TOGGLE_LIGHT':
+      return {
+        streamUrl: streamUrl,
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
+        socket: socket,
+        myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: action.payload,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
+      };
 
     case 'ACTION':
       //parce action here'
 
-      console.log('in reducer action');
-      console.log(action);
+      // console.log('in reducer action');
+      // console.log(action);
 
       socketActions.map(one => one());
 

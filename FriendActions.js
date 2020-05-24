@@ -23,6 +23,11 @@ export const addStreamUrl = cleaner => ({
   payload: cleaner,
 });
 
+export const toggleLight = lightStatus => ({
+  type: 'TOGGLE_LIGHT',
+  payload: lightStatus,
+});
+
 export const addUser = user => ({
   type: 'ADD_USER',
   payload: user,

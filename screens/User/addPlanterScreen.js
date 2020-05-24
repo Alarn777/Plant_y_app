@@ -114,8 +114,6 @@ class addPlanterScreen extends React.Component {
       }
     });
 
-    console.log(growthPlan);
-
     const AuthStr = 'Bearer '.concat(this.state.USER_TOKEN);
     await axios
       .post(

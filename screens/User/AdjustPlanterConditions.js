@@ -40,7 +40,12 @@ import {
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Consts from '../../ENV_VARS';
 import axios from 'axios';
-import {addAction, AddAvatarLink, sendMessage} from '../../FriendActions';
+import {
+  addAction,
+  AddAvatarLink,
+  sendMessage,
+  toggleLight,
+} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
 import WS from '../../websocket';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
@@ -64,8 +69,8 @@ const chartConfig = {
 };
 
 const dayData = {
-  // labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
   labels: [
+    '0',
     '',
     '',
     '',
@@ -85,48 +90,11 @@ const dayData = {
     '',
     '',
     '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
+    '22',
   ],
   datasets: [
     {
-      //data: [20, 45, 28, 80, 99, 43, 80, 99, 43, 12],
-      data: [
-        20,
-        45,
-        28,
-        80,
-        99,
-        43,
-        80,
-        99,
-        43,
-        12,
-        20,
-        45,
-        28,
-        80,
-        99,
-        43,
-        80,
-        99,
-        43,
-        12,
-        80,
-        99,
-        43,
-        12,
-      ],
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
   ],
 };
@@ -156,9 +124,21 @@ class AdjustPlanterConditions extends React.Component {
       waterAdded: false,
       loadingAddingWater: false,
       entries: [
-        {title: 'temperature', currTemperature: '10'},
-        {title: 'uv', currUV: '2'},
-        {title: 'humidity', currHumidity: '2'},
+        {
+          title: 'temperature',
+          currTemperature: '10',
+          plots: this.props.navigation.getParam('item').plots,
+        },
+        {
+          title: 'uv',
+          currUV: '2',
+          plots: this.props.navigation.getParam('item').plots,
+        },
+        {
+          title: 'humidity',
+          currHumidity: '2',
+          plots: this.props.navigation.getParam('item').plots,
+        },
       ],
       activeSlide: 0,
       setScrollViewRef: null,
@@ -176,8 +156,10 @@ class AdjustPlanterConditions extends React.Component {
             break;
           case 'UV_LAMP_IS_ON':
             this.setState({lightTurnedOn: true, loadingLightTurnedOn: false});
+            this.props.toggleLight(true);
             break;
           case 'UV_LAMP_IS_OFF':
+            this.props.toggleLight(false);
             this.setState({lightTurnedOn: false, loadingLightTurnedOn: false});
             break;
           case 'FAILED':
@@ -191,11 +173,17 @@ class AdjustPlanterConditions extends React.Component {
                   {
                     title: 'temperature',
                     currTemperature: instructions[3].split(':')[1],
+                    plots: this.state.item.plots,
                   },
-                  {title: 'uv', currUV: instructions[4].split(':')[1]},
+                  {
+                    title: 'uv',
+                    currUV: instructions[4].split(':')[1],
+                    plots: this.state.item.plots,
+                  },
                   {
                     title: 'humidity',
                     currHumidity: instructions[5].split(':')[1],
+                    plots: this.state.item.plots,
                   },
                 ],
               });
@@ -379,10 +367,14 @@ class AdjustPlanterConditions extends React.Component {
         </Chip>
         <Button
           icon={'lightbulb'}
-          color={!this.state.lightTurnedOn ? 'gray' : '#ffea00'}
+          color={
+            !this.props.plantyData.controls.lightEnabled ? 'gray' : '#ffea00'
+          }
           loading={this.state.loadingLightTurnedOn}
           onPress={() => {
-            let action = !this.state.lightTurnedOn ? 'on' : 'off';
+            let action = !this.props.plantyData.controls.lightEnabled
+              ? 'on'
+              : 'off';
             this.setState({loadingLightTurnedOn: true});
             WS.sendMessage(
               'FROM_CLIENT;' +
@@ -391,7 +383,7 @@ class AdjustPlanterConditions extends React.Component {
                 action.toUpperCase(),
             );
           }}>
-          {this.state.lightTurnedOn ? 'on' : 'off'}
+          {this.props.plantyData.controls.lightEnabled ? 'on' : 'off'}
         </Button>
       </View>
     );
@@ -401,13 +393,11 @@ class AdjustPlanterConditions extends React.Component {
     return (
       <View
         style={{
-          // flex:
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'space-between',
           marginBottom: 10,
           marginTop: 10,
-          // padding: 8,
         }}>
         <Chip
           style={{paddingTop: 10, paddingBottom: 5, backgroundColor: 'white'}}
@@ -417,7 +407,6 @@ class AdjustPlanterConditions extends React.Component {
 
         <View
           style={{
-            // flex:
             flexDirection: 'row',
             flexWrap: 'wrap',
             justifyContent: 'space-between',
@@ -463,8 +452,6 @@ class AdjustPlanterConditions extends React.Component {
   };
 
   _renderCarouselItem({item, index}) {
-    // console.log(item);
-
     let temp = item.currTemperature;
     temp = Math.floor(parseFloat(temp));
 
@@ -485,11 +472,15 @@ class AdjustPlanterConditions extends React.Component {
               Temperature over this day
             </Paragraph>
             <LineChart
-              data={dayData}
+              formatYLabel={val => {
+                // let val1 = parseFloat(val) * 100;
+                return Math.floor(val).toString() + ' C';
+              }}
+              data={item.plots.daily.ambientTemperatureCelsius}
               width={Dimensions.get('window').width - 40} // from react-native
               height={220}
               fromZero={true}
-              yAxisSuffix="C"
+              // yAxisSuffix="C"
               yAxisInterval={1} // optional, defaults to 1
               chartConfig={chartConfig}
               style={styles.chart}
@@ -500,11 +491,15 @@ class AdjustPlanterConditions extends React.Component {
               Temperature over the week
             </Paragraph>
             <BarChart
-              data={data}
+              formatYLabel={val => {
+                // let val1 = parseFloat(val) * 100;
+                return Math.floor(val).toString() + ' C';
+              }}
+              data={item.plots.weekly.ambientTemperatureCelsius}
               width={Dimensions.get('window').width - 40} // from react-native
               height={220}
               // yAxisLabel="$"
-              yAxisSuffix="C"
+              // yAxisSuffix="C"
               fromZero={true}
               yAxisInterval={1} // optional, defaults to 1
               chartConfig={chartConfig}
@@ -526,14 +521,21 @@ class AdjustPlanterConditions extends React.Component {
               Humidity over this day
             </Paragraph>
             <LineChart
-              data={dayData}
+              // yLabelsOffset={0}
+              data={item.plots.daily.soilHumidity}
               width={Dimensions.get('window').width - 40} // from react-native
               height={220}
               fromZero={true}
-              yAxisSuffix="C"
+              // withVerticalLabels={true}
+              // yAxisSuffix="%"
               yAxisInterval={1} // optional, defaults to 1
               chartConfig={chartConfig}
               style={styles.chart}
+              segments={2}
+              formatYLabel={val => {
+                let val1 = parseFloat(val) * 100;
+                return val1.toString() + '%';
+              }}
             />
             <Divider />
             <Paragraph
@@ -541,16 +543,20 @@ class AdjustPlanterConditions extends React.Component {
               Humidity over the week
             </Paragraph>
             <BarChart
-              data={data}
+              data={item.plots.weekly.soilHumidity}
               width={Dimensions.get('window').width - 40} // from react-native
               height={220}
               // yAxisLabel="$"
-              yAxisSuffix="C"
+              // yAxisSuffix=""
               fromZero={true}
               yAxisInterval={1} // optional, defaults to 1
               chartConfig={chartConfig}
               bezier
               style={styles.chart}
+              formatYLabel={val => {
+                let val1 = parseFloat(val) * 100;
+                return val1.toString() + '%';
+              }}
             />
           </View>
         );
@@ -560,7 +566,6 @@ class AdjustPlanterConditions extends React.Component {
             <View style={styles.conditionsText}>
               <Text style={styles.actionsText}>Current UV:</Text>
               <Text style={styles.actionsText}>{item.currUV}</Text>
-              {/*{//' + mlw/sqcm'}*/}
             </View>
             <Divider />
             <Paragraph
@@ -568,11 +573,15 @@ class AdjustPlanterConditions extends React.Component {
               UV over this day
             </Paragraph>
             <LineChart
-              data={dayData}
+              formatYLabel={val => {
+                // let val1 = parseFloat(val) * 100;
+                return Math.floor(val).toString() + '';
+              }}
+              data={item.plots.daily.uvIntensity}
               width={Dimensions.get('window').width - 40} // from react-native
               height={220}
               fromZero={true}
-              yAxisSuffix="C"
+              yAxisSuffix=""
               yAxisInterval={1} // optional, defaults to 1
               chartConfig={chartConfig}
               style={styles.chart}
@@ -583,11 +592,11 @@ class AdjustPlanterConditions extends React.Component {
               UV over the week
             </Paragraph>
             <BarChart
-              data={data}
+              data={item.plots.weekly.uvIntensity}
               width={Dimensions.get('window').width - 40} // from react-native
               height={220}
               // yAxisLabel="$"
-              yAxisSuffix="C"
+              yAxisSuffix=""
               fromZero={true}
               yAxisInterval={1} // optional, defaults to 1
               chartConfig={chartConfig}
@@ -605,20 +614,6 @@ class AdjustPlanterConditions extends React.Component {
     if (this.state.manualMode) {
       return (
         <KeyboardAwareScrollView style={{margin: '1%', width: '98%'}}>
-          {/*<Portal>*/}
-          {/*  <Snackbar*/}
-          {/*    style={{position: 'absolute', bottom: 15, borderRadius: 5}}*/}
-          {/*    visible={this.state.lightTurnedOn}*/}
-          {/*    onDismiss={() => this.setState({lightTurnedOn: false})}*/}
-          {/*    action={{*/}
-          {/*      label: 'Undo',*/}
-          {/*      onPress: () => {*/}
-          {/*        // Do something*/}
-          {/*      },*/}
-          {/*    }}>*/}
-          {/*    Hey there! I'm a Snackbar.*/}
-          {/*  </Snackbar>*/}
-          {/*</Portal>*/}
           <PaperCard>
             <PaperCard.Title
               title={'Planter: ' + this.state.item.name}
@@ -866,6 +861,7 @@ const mapDispatchToProps = dispatch =>
       AddAvatarLink,
       sendMessage,
       addAction,
+      toggleLight,
     },
     dispatch,
   );

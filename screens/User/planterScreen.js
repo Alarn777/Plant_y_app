@@ -720,7 +720,15 @@ class planterScreen extends React.Component {
               <PaperCard.Content>
                 {this.props.navigation.getParam('item').planterStatus ===
                 'pending' ? (
-                  <Text>We are preparing your planter...</Text>
+                  <View>
+                    <Text style={{alignSelf: 'center'}}>
+                      We are preparing your planter...
+                    </Text>
+                    <Image
+                      style={{alignSelf: 'center', height: 100, width: 90}}
+                      source={require('../../assets/happy_plant.png')}
+                    />
+                  </View>
                 ) : (
                   <Text>Planter is empty now, add some plants</Text>
                 )}

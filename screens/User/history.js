@@ -30,7 +30,7 @@ import {Storage} from 'aws-amplify';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import WS from '../../websocket';
 import {green100, green200} from 'react-native-paper/src/styles/colors';
-import {LineChart} from 'react-native-chart-kit';
+import {BarChart, LineChart} from 'react-native-chart-kit';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -115,7 +115,7 @@ class History extends React.Component {
     this.state = {
       planter: this.props.navigation.getParam('planter'),
       loadBuffering: false,
-      loading: false,
+      loading: true,
       deletingPic: false,
       testingPlantText: 'Health Evaluation',
       testingPlant: false,
@@ -127,7 +127,7 @@ class History extends React.Component {
       today: '2020-01-01',
       selectedDay: '2020-01-01',
       minDay: '',
-      pickDay: false,
+      pickDay: true,
       buttonText: '',
       pictures: [],
       dayPictures: [],
@@ -285,7 +285,7 @@ class History extends React.Component {
           minDate={this.state.minDay}
           maxDate={this.state.today}
           onDayPress={day => {
-            console.log('selected day', day);
+            // console.log('selected day', day);
             this.setState({pickDay: false, loading: false});
             this.getDayFromDB(day);
           }}
@@ -354,7 +354,7 @@ class History extends React.Component {
       <View>
         <TouchableOpacity
           onPress={() => {
-            console.log('open ', item);
+            // console.log('open ', item);
 
             // this.state.modalVisible = true;
             this.setState({currentPicture: item, modalVisible: true});
@@ -409,7 +409,17 @@ class History extends React.Component {
 
   renderDayPictures = () => {
     if (this.state.dayPictures.length === 0) {
-      return <Text>No pictures were taken on this day</Text>;
+      return (
+        <View>
+          <Text style={{alignSelf: 'center'}}>
+            No pictures were taken on this day
+          </Text>
+          <Image
+            style={{alignSelf: 'center', height: 100, width: 90}}
+            source={require('../../assets/sad_plant.png')}
+          />
+        </View>
+      );
     } else
       return (
         // <View style={{flexDirection: 'row'}}>
@@ -441,7 +451,6 @@ class History extends React.Component {
   };
 
   renderDayHistory = day => {
-    // console.log(day);
     if (this.state.loading) {
       return <ActivityIndicator size="large" color={plantyColor} />;
     }
@@ -452,30 +461,49 @@ class History extends React.Component {
           justifyContent: 'center',
           // padding: 8,
         }}>
+        <Divider />
         <Text
           style={{
+            borderColor: plantyColor,
+            borderWidth: 1,
+            borderRadius: 3,
             fontWeight: 'bold',
             fontSize: 19,
             alignSelf: 'center',
             marginBottom: 15,
+            marginTop: 15,
+            padding: 10,
           }}>
-          Showing history for {day.dateString}
+          Showing history for: {day.dateString.replace(/-/g, '/')}
         </Text>
-
-        <Text style={{fontWeight: 'bold', fontSize: 17}}>Temperature</Text>
+        <Divider />
+        <Text style={{fontWeight: 'bold', fontSize: 17, marginTop: 15}}>
+          Temperature
+        </Text>
         <LineChart
+          formatYLabel={val => {
+            // let val1 = parseFloat(val) * 100;
+            return Math.floor(val).toString() + ' C';
+          }}
           data={dayData}
           width={Dimensions.get('window').width - 40} // from react-native
           height={220}
           fromZero={true}
-          yAxisSuffix="C"
+          // yAxisSuffix="C"
           yAxisInterval={1} // optional, defaults to 1
           chartConfig={chartConfig}
           style={styles.chart}
         />
 
-        <Text style={{fontWeight: 'bold', fontSize: 17}}>UV</Text>
+        <Divider />
+        <Text style={{fontWeight: 'bold', fontSize: 17, marginTop: 15}}>
+          UV
+        </Text>
         <LineChart
+          formatYLabel={val => {
+            // let val1 = parseFloat(val) * 100;
+            return Math.floor(val).toString();
+          }}
           data={dayData}
           width={Dimensions.get('window').width - 40} // from react-native
           height={220}
@@ -486,13 +514,20 @@ class History extends React.Component {
           style={styles.chart}
         />
 
-        <Text style={{fontWeight: 'bold', fontSize: 17}}>Humidity</Text>
+        <Divider />
+        <Text style={{fontWeight: 'bold', fontSize: 17, marginTop: 15}}>
+          Humidity
+        </Text>
         <LineChart
+          formatYLabel={val => {
+            // let val1 = parseFloat(val) * 100;
+            return Math.floor(val).toString() + '%';
+          }}
           data={dayData}
           width={Dimensions.get('window').width - 40} // from react-native
           height={220}
           fromZero={true}
-          yAxisSuffix="%"
+          // yAxisSuffix="%"
           yAxisInterval={1} // optional, defaults to 1
           chartConfig={chartConfig}
           style={styles.chart}
@@ -518,7 +553,7 @@ class History extends React.Component {
       <ScrollView style={styles.container}>
         <PaperCard>
           <PaperCard.Title
-            title={'History of ' + this.state.planter.name}
+            title={'History for the planter ' + this.state.planter.name}
             subtitle={'Choose a day to see history'}
           />
           <PaperCard.Content style={{marginTop: 10}}>
