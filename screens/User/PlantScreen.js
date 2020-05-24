@@ -3,7 +3,7 @@ import {Image, View, FlatList, StyleSheet, ScrollView} from 'react-native';
 import {Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-import {Button, Divider} from 'react-native-paper';
+import {Button, Card as PaperCard, Divider} from 'react-native-paper';
 //redux
 import {connect} from 'react-redux';
 import {HeaderBackButton} from 'react-navigation-stack';
@@ -132,47 +132,96 @@ class PlantScreen extends React.Component {
         color = 'orange';
     }
 
+    let LeftContent = props => (
+      <Text
+        style={{
+          margin: 10,
+          color: color,
+          alignSelf: 'center',
+          borderWidth: 1,
+          borderColor: color,
+          padding: 5,
+          borderRadius: 5,
+        }}>
+        {this.props.navigation.getParam('item').plantStatus}
+      </Text>
+    );
+
     return (
       <ScrollView style={styles.container}>
-        <Card
-          header={() => {
-            return <Text style={styles.mainText}>{item.name}</Text>;
-          }}
-          footer={() => {
-            return (
-              <Button
-                icon={this.state.deletingPlanticon}
-                style={{margin: 10}}
-                loading={this.state.deletingPlant}
-                disabled={this.state.addingPlantDisabled}
-                mode="outlined"
-                backgroundColor="#6f9e04"
-                color="#6f9e04"
-                onPress={() => {
-                  this.removePlantFromPlanter()
-                    .then()
-                    .catch();
-                }}>
-                {this.state.deletingPlantText}
-              </Button>
-            );
-          }}>
-          <Image
-            style={{height: 300}}
-            source={{uri: this.props.navigation.getParam('item').pic}}
+        {/*<Card*/}
+        {/*  header={() => {*/}
+        {/*    return <Text style={styles.mainText}>{item.name}</Text>;*/}
+        {/*  }}*/}
+        {/*  footer={() => {*/}
+        {/*    return (*/}
+        {/*      <Button*/}
+        {/*        icon={this.state.deletingPlanticon}*/}
+        {/*        style={{margin: 10}}*/}
+        {/*        loading={this.state.deletingPlant}*/}
+        {/*        disabled={this.state.addingPlantDisabled}*/}
+        {/*        mode="outlined"*/}
+        {/*        backgroundColor="#6f9e04"*/}
+        {/*        color="#6f9e04"*/}
+        {/*        onPress={() => {*/}
+        {/*          this.removePlantFromPlanter()*/}
+        {/*            .then()*/}
+        {/*            .catch();*/}
+        {/*        }}>*/}
+        {/*        {this.state.deletingPlantText}*/}
+        {/*      </Button>*/}
+        {/*    );*/}
+        {/*  }}>*/}
+        {/*  <Image*/}
+        {/*    style={{height: 300}}*/}
+        {/*    source={{uri: this.props.navigation.getParam('item').pic}}*/}
+        {/*  />*/}
+        {/*  <Text style={styles.mainText}>Description</Text>*/}
+        {/*  <Text>{this.props.navigation.getParam('item').description}</Text>*/}
+        {/*  <Divider />*/}
+        {/*  <Text style={{marginTop: 10, fontWeight: 'bold'}}>*/}
+        {/*    Appropriate soils:*/}
+        {/*    {this.props.navigation.getParam('item').soil.type}*/}
+        {/*  </Text>*/}
+        {/*  <Text style={{marginTop: 10, color: color}}>*/}
+        {/*    Plant status:*/}
+        {/*    {this.props.navigation.getParam('item').plantStatus}*/}
+        {/*  </Text>*/}
+        {/*</Card>*/}
+
+        <PaperCard>
+          <PaperCard.Title
+            title={item.name}
+            subtitle={`Appropriate soil: ${item.soil.type}`}
+            right={LeftContent}
           />
-          <Text style={styles.mainText}>Description</Text>
-          <Text>{this.props.navigation.getParam('item').description}</Text>
-          <Divider />
-          <Text style={{marginTop: 10, fontWeight: 'bold'}}>
-            Appropriate soils:
-            {this.props.navigation.getParam('item').soil.type}
+          <PaperCard.Cover style={{height: 300}} source={{uri: item.pic}} />
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 16,
+              margin: 10,
+            }}>
+            {item.description}
           </Text>
-          <Text style={{marginTop: 10, color: color}}>
-            Plant status:
-            {this.props.navigation.getParam('item').plantStatus}
-          </Text>
-        </Card>
+          <PaperCard.Actions>
+            <Button
+              icon={this.state.deletingPlanticon}
+              style={{margin: 10, width: '95%'}}
+              loading={this.state.deletingPlant}
+              disabled={this.state.addingPlantDisabled}
+              mode="outlined"
+              backgroundColor="#6f9e04"
+              color="#6f9e04"
+              onPress={() => {
+                this.removePlantFromPlanter()
+                  .then()
+                  .catch();
+              }}>
+              {this.state.deletingPlantText}
+            </Button>
+          </PaperCard.Actions>
+        </PaperCard>
       </ScrollView>
     );
   }

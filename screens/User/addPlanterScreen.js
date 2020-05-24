@@ -19,6 +19,7 @@ import {addAction, AddAvatarLink, sendMessage} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
 
 const plantyColor = '#6f9e04';
+const errorColor = '#ee3e34';
 
 class addPlanterScreen extends React.Component {
   constructor(props) {
@@ -40,6 +41,12 @@ class addPlanterScreen extends React.Component {
       allActions: false,
       growthPlans: [],
       growthPlansOptions: [],
+      planError: false,
+      currentPlanSelected: {
+        growthPlanGroup: 'No plan selected',
+        phases: [],
+        growthPlanDescription: '',
+      },
     };
   }
   componentDidMount(): void {
@@ -62,6 +69,8 @@ class addPlanterScreen extends React.Component {
       )
       .then(response => {
         this.setState({growthPlans: response.data.Items});
+
+        // console.log(response.data.Items);
         let data1 = [];
         for (let i = 0; i < response.data.Items.length; i++) {
           data1.push({text: response.data.Items[i].growthPlanGroup});
@@ -99,7 +108,15 @@ class addPlanterScreen extends React.Component {
   };
 
   setSelectedGrowthPlanOption = val => {
-    this.setState({selectedGrowthPlanOption: val});
+    // console.log(val);
+
+    this.state.growthPlans.map(one => {
+      if (one.growthPlanGroup === val.text) {
+        this.setState({currentPlanSelected: one});
+      }
+    });
+
+    this.setState({selectedGrowthPlanOption: val, planError: false});
   };
 
   setSelectedOption = val => {
@@ -173,11 +190,17 @@ class addPlanterScreen extends React.Component {
       this.state.planterName.length === 0
     ) {
       this.setState({nameError: true});
-      return true;
+      // return true;
     } else {
       this.setState({nameError: false});
-      return false;
+      // return false;
     }
+
+    if (this.state.selectedGrowthPlanOption.text === '') {
+      this.setState({planError: true});
+      return true;
+    } else this.setState({planError: false});
+    return false;
   }
 
   renderErrorMsg() {
@@ -185,8 +208,20 @@ class addPlanterScreen extends React.Component {
       return <View />;
     } else {
       return (
-        <Text style={{color: 'red', margin: 10}}>
+        <Text style={{color: errorColor, margin: 10}}>
           Name must have only numbers and Letters
+        </Text>
+      );
+    }
+  }
+
+  renderPlanErrorMsg() {
+    if (!this.state.planError) {
+      return <View />;
+    } else {
+      return (
+        <Text style={{color: errorColor, margin: 10}}>
+          You must select a Growth Plan
         </Text>
       );
     }
@@ -209,7 +244,7 @@ class addPlanterScreen extends React.Component {
               value={this.state.planterName}
               error={this.state.nameError}
               onChangeText={text => {
-                this.setState({planterName: text});
+                this.setState({planterName: text, nameError: false});
               }}
             />
             {this.renderErrorMsg()}
@@ -241,17 +276,29 @@ class addPlanterScreen extends React.Component {
             <View style={styles.controlContainer}>
               <Select
                 disabled={allActionsDisabled}
+                error={this.state.planError}
                 style={{
                   borderRadius: 4,
                   borderWidth: 0.5,
                   margin: 10,
-                  borderColor: plantyColor,
+                  borderColor: this.state.planError ? errorColor : plantyColor,
                 }}
                 data={this.state.growthPlansOptions}
                 selectedOption={this.state.selectedGrowthPlanOption}
                 onSelect={this.setSelectedGrowthPlanOption}
               />
+              {this.renderPlanErrorMsg()}
             </View>
+            <Text style={{marginLeft: 10, marginBottom: 10}}>
+              Description:{' '}
+              {this.state.currentPlanSelected.growthPlanDescription}
+            </Text>
+            <Text style={{marginLeft: 10}}>
+              This plan will last for:{' '}
+              {this.state.currentPlanSelected.phases.length}
+              {' weeks'}
+            </Text>
+
             <Button
               icon={this.state.addingPlanterIcon}
               style={{margin: 10}}
@@ -281,6 +328,8 @@ const styles = StyleSheet.create({
   },
   simpleText: {
     margin: 10,
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   select: {
     margin: 10,

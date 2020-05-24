@@ -42,12 +42,15 @@ import {
 } from '../Auth';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-import Video from 'react-native-video';
+// import Video from 'react-native-video';
 import connect from 'react-redux/lib/connect/connect';
 import {AddAvatarLink, addStreamUrl, addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
 import WS from '../../websocket';
+import MediaControls, {PLAYER_STATES} from 'react-native-media-controls';
+import Slider from 'react-native-slider';
+import Player from './VideoPlayer';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -82,6 +85,14 @@ class planterScreen extends React.Component {
       currTemperature: '',
       currUV: '',
       currHumidity: '',
+
+      currentTime: 0,
+      duration: 0,
+      isFullScreen: false,
+      isLoading: true,
+      paused: false,
+      playerState: PLAYER_STATES.PLAYING,
+      screenType: 'content',
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -354,37 +365,46 @@ class planterScreen extends React.Component {
     item.pic = url;
     return (
       <View>
-        <Card
-          header={() => {
-            return (
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('PlantScreen', {
-                    item: item,
-                    user_token: this.state.USER_TOKEN,
-                    planterName: this.props.navigation.getParam('item').name,
-                    planterUUID: this.props.navigation.getParam('item').UUID,
-                  })
-                }>
-                <Image style={styles.headerImage} source={{uri: url}} />
-              </TouchableOpacity>
-            );
-          }}
-          style={{width: this.state.width / 3, padding: 3}}
+        <PaperCard
+          onPress={() =>
+            this.props.navigation.navigate('PlantScreen', {
+              item: item,
+              user_token: this.state.USER_TOKEN,
+              planterName: this.props.navigation.getParam('item').name,
+              planterUUID: this.props.navigation.getParam('item').UUID,
+            })
+          }
+          // header={() => {
+          //   return (
+          //     // <TouchableOpacity
+          //     //   onPress={() =>
+          //     //     this.props.navigation.navigate('PlantScreen', {
+          //     //       item: item,
+          //     //       user_token: this.state.USER_TOKEN,
+          //     //       planterName: this.props.navigation.getParam('item').name,
+          //     //       planterUUID: this.props.navigation.getParam('item').UUID,
+          //     //     })
+          //     //   }>
+          //     <Image style={styles.headerImage} source={{uri: url}} />
+          //     // </TouchableOpacity>
+          //   );
+          // }}
+          style={{width: this.state.width / 3 - 6, margin: 3, borderRadius: 5}}
           index={item.id}
           key={item.id}>
-          <TouchableOpacity
-            onPress={() =>
-              this.props.navigation.navigate('PlantScreen', {
-                item: item,
-                user_token: this.state.USER_TOKEN,
-                planterName: this.props.navigation.getParam('item').name,
-                planterUUID: this.props.navigation.getParam('item').UUID,
-              })
-            }>
-            <Text style={styles.partyText}>{item.name}</Text>
-          </TouchableOpacity>
-        </Card>
+          <Image style={styles.headerImage} source={{uri: url}} />
+          {/*<TouchableOpacity*/}
+          {/*  onPress={() =>*/}
+          {/*    this.props.navigation.navigate('PlantScreen', {*/}
+          {/*      item: item,*/}
+          {/*      user_token: this.state.USER_TOKEN,*/}
+          {/*      planterName: this.props.navigation.getParam('item').name,*/}
+          {/*      planterUUID: this.props.navigation.getParam('item').UUID,*/}
+          {/*    })*/}
+          {/*  }>*/}
+          <Text style={styles.partyText}>{item.name}</Text>
+          {/*</TouchableOpacity>*/}
+        </PaperCard>
       </View>
     );
   };
@@ -438,19 +458,22 @@ class planterScreen extends React.Component {
       return <ActivityIndicator size="large" color={plantyColor} />;
     } else
       return (
-        <Video
-          source={{uri: this.props.plantyData.streamUrl, type: 'm3u8'}} // Can be a URL or a local file.
-          ref={ref => {
-            this.player = ref;
-          }} // Store reference
-          resizeMode="stretch"
-          paused={false}
-          controls={true}
-          onBuffer={this.loadBuffering} // Callback when remote video is buffering
-          onError={this.videoError} // Callback when video cannot be loaded
-          style={styles.backgroundVideo}
-          minLoadRetryCount={10}
-        />
+        // <Video
+        //   source={{uri: this.props.plantyData.streamUrl, type: 'm3u8'}} // Can be a URL or a local file.
+        //   ref={ref => {
+        //     this.player = ref;
+        //   }} // Store reference
+        //   resizeMode="stretch"
+        //   paused={false}
+        //   controls={true}
+        //   onBuffer={this.loadBuffering} // Callback when remote video is buffering
+        //   onError={this.videoError} // Callback when video cannot be loaded
+        //   style={styles.backgroundVideo}
+        //   minLoadRetryCount={10}
+        // />
+        <View style={{height: 200}}>
+          <Player url={this.props.plantyData.streamUrl} />
+        </View>
       );
   };
 
@@ -820,7 +843,8 @@ const styles = StyleSheet.create({
   partyText: {
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 14,
+    padding: 5,
   },
   button: {
     justifyContent: 'center',
@@ -839,6 +863,9 @@ const styles = StyleSheet.create({
   headerImage: {
     flex: 1,
     height: 100,
+    width: '100%',
+    padding: -10,
+    borderRadius: 5,
   },
   backgroundVideo: {
     top: 0,

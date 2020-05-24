@@ -12,7 +12,7 @@ import {Auth} from 'aws-amplify';
 
 import PropTypes from 'prop-types';
 import {Text, Card} from '@ui-kitten/components';
-import {ActivityIndicator} from 'react-native-paper';
+import {ActivityIndicator, Card as PaperCard} from 'react-native-paper';
 
 import {withAuthenticator} from 'aws-amplify-react-native';
 import {
@@ -162,40 +162,24 @@ class AllAvailablePlants extends React.Component {
     }
     item.pic = url;
 
-    console.log(item.pic);
+    // console.log(item);
 
     return (
       <View>
-        <Card
-          header={() => {
-            return (
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('AddPlantScreen', {
-                    item: item,
-                    user_token: this.state.USER_TOKEN,
-                    planterName: this.props.navigation.getParam('planterName'),
-                  })
-                }>
-                <Image style={styles.headerImage} source={{uri: url}} />
-              </TouchableOpacity>
-            );
-          }}
-          style={{width: this.state.width / 3}}
+        <PaperCard
+          onPress={() =>
+            this.props.navigation.navigate('AddPlantScreen', {
+              item: item,
+              user_token: this.state.USER_TOKEN,
+              planterName: this.props.navigation.getParam('planterName'),
+            })
+          }
+          style={{width: this.state.width / 3 - 10, margin: 5, borderRadius: 5}}
           index={item.UUID}
           key={item.UUID}>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.navigation.navigate('AddPlantScreen', {
-                item: item,
-                user_token: this.state.USER_TOKEN,
-                loadPlanters: this.props.navigation.getParam('loadPlanters'),
-                planterName: this.props.navigation.getParam('planterName'),
-              });
-            }}>
-            <Text style={styles.partyText}>{item.name}</Text>
-          </TouchableOpacity>
-        </Card>
+          <Image style={styles.headerImage} source={{uri: url}} />
+          <Text style={styles.partyText}>{item.name}</Text>
+        </PaperCard>
       </View>
     );
   };
@@ -277,7 +261,12 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   headerText: {
+    height: 50,
     fontSize: 20,
+    fontWeight: 'bold',
+    padding: 10,
+    marginBottom: 10,
+    marginTop: 20,
   },
   header: {
     justifyContent: 'center',
@@ -291,6 +280,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,
+    padding: 5,
   },
   button: {
     justifyContent: 'center',
@@ -309,5 +299,6 @@ const styles = StyleSheet.create({
   headerImage: {
     flex: 1,
     height: 100,
+    borderRadius: 5,
   },
 });

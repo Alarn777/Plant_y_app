@@ -62,12 +62,7 @@ class planterImagesGallery extends React.Component {
   }
 
   async preloadImages(images_array) {
-    console.log('Now loading images');
-    // console.log(images_array);
     await images_array.map(oneImage => {
-      // console.log(oneImage);
-      // if (oneImage.image_key.endsWith('/')) return;
-
       Storage.get(oneImage.image_key, {
         level: 'public',
         type: 'image/jpg',
@@ -90,8 +85,6 @@ class planterImagesGallery extends React.Component {
             humidity: oneImage.humidity,
             key: oneImage.image_key,
           };
-          console.log(obj);
-
           this.setState(prevState => ({
             pictures: [...prevState.pictures, obj],
           }));
@@ -178,7 +171,7 @@ class planterImagesGallery extends React.Component {
   dealWithPicsData = pic_array => {
     let sorted_array = [];
     pic_array.map(one => {
-      console.log(one);
+      // console.log(one);
       let planterName = one.image_key.split('/')[1];
       if (planterName === this.state.planter.name) {
         sorted_array.push(one);
@@ -186,7 +179,7 @@ class planterImagesGallery extends React.Component {
     });
 
     this.preloadImages(sorted_array)
-      .then(r => console.log())
+      .then()
       .catch(error => console.log(error));
   };
 

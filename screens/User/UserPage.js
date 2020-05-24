@@ -1,19 +1,19 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import {Image, View, Dimensions} from 'react-native';
+import {Image, View, Dimensions, StyleSheet} from 'react-native';
 import {Auth} from 'aws-amplify';
-import {LineChart} from 'react-native-chart-kit';
+import {BarChart, LineChart} from 'react-native-chart-kit';
 import {
   Avatar,
   Card as PaperCard,
   Card,
   Button,
   FAB,
+  Text,
   ActivityIndicator,
 } from 'react-native-paper';
 import ImagePicker from 'react-native-image-picker';
-import Consts from '../../ENV_VARS';
 import {Storage} from 'aws-amplify';
 import Buffer from 'buffer';
 import connect from 'react-redux/lib/connect/connect';
@@ -24,6 +24,21 @@ import WS from '../../websocket';
 
 const plantyColor = '#6f9e04';
 
+const data = {
+  labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+  datasets: [
+    {
+      data: [20, 45, 28, 80, 99, 43],
+    },
+  ],
+};
+
+const chartConfig = {
+  backgroundGradientFrom: plantyColor,
+  decimalPlaces: 2, // optional, defaults to 2dp
+  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+};
+
 class UserPage extends React.Component {
   constructor(props) {
     super(props);
@@ -32,16 +47,44 @@ class UserPage extends React.Component {
       USER_TOKEN: '',
       url: this.props.plantyData.avatarUrl,
       fileName: '',
-
+      planters: this.props.navigation.getParam('planters'),
       filePath: null,
       fileData: null,
       fileUri: '',
       fileUrl: '',
+      graphData: data,
       buttonMode: 'pick', //pick,upload
     };
   }
 
-  componentDidMount(): void {}
+  componentDidMount(): void {
+    this.loadGraphData();
+  }
+
+  loadGraphData = () => {
+    let newData = {
+      labels: [],
+      datasets: [
+        {
+          data: [],
+        },
+      ],
+    };
+    let currentTime = new Date().getTime() / 1000;
+
+    this.state.planters.map(one => {
+      // console.log(one);
+      // return;
+      let activatedTime = one.TimeActivated;
+      let currentWeek = (currentTime - activatedTime) / 86400;
+      // currentWeek = currentWeek / 24;
+      currentWeek = parseInt(currentWeek / 7);
+      newData.labels.push(one.name);
+      newData.datasets[0].data.push(currentWeek);
+    });
+
+    this.setState({graphData: newData});
+  };
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
@@ -237,49 +280,38 @@ class UserPage extends React.Component {
           {this.renderAvatarButton()}
         </Card>
         <Card>
-          <LineChart
-            data={{
-              labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-              datasets: [
-                {
-                  data: [
-                    Math.random() * 100,
-                    Math.random() * 100,
-                    Math.random() * 100,
-                    Math.random() * 100,
-                    Math.random() * 100,
-                    Math.random() * 100,
-                  ],
-                },
-              ],
-            }}
-            width={Dimensions.get('window').width} // from react-native
-            height={210}
-            yAxisLabel="$"
-            yAxisSuffix="k"
-            yAxisInterval={1} // optional, defaults to 1
-            chartConfig={{
-              backgroundColor: '#e26a00',
-              backgroundGradientFrom: plantyColor,
-              backgroundGradientTo: '#ffa726',
-              decimalPlaces: 2, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: '6',
-                strokeWidth: '2',
-              },
-            }}
-            bezier
+          <Text
             style={{
-              margin: 5,
-              marginVertical: 8,
-              borderRadius: 16,
-            }}
+              marginLeft: 5,
+              fontSize: 20,
+              padding: 5,
+              alignSelf: 'center',
+              // fontWeight: 'bold',
+            }}>
+            Planter Lifetimes
+          </Text>
+          <BarChart
+            data={this.state.graphData}
+            width={Dimensions.get('window').width - 10} // from react-native
+            height={220}
+            // yAxisLabel="Weeks"
+            yAxisSuffix={' W'}
+            // horizontalLabelRotation={45}
+            showValuesOnTopOfBars={true}
+            // showBarTops={true}
+            // formatYLabel={val => {
+
+            //   // console.log(val);
+            //   // let val1 = parseFloat(val) * 100;
+            //   return Math.floor(val).toString() + 'Weekss';
+            // }}
+            fromZero={true}
+            yAxisInterval={1} // optional, defaults to 1
+            chartConfig={chartConfig}
+            bezier
+            style={styles.chart}
           />
+          <Text style={{marginLeft: 7, color: plantyColor}}>*W - Weeks</Text>
           <Button
             style={{margin: 10}}
             icon="logout"
@@ -303,6 +335,32 @@ class UserPage extends React.Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  chart: {
+    margin: 5,
+    marginVertical: 8,
+    borderRadius: 10,
+  },
+  container: {
+    padding: 25,
+  },
+  modalContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 30,
+  },
+  modalText: {},
+  conditionsText: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  actionsText: {
+    marginTop: 7,
+    marginBottom: 7,
+  },
+});
 
 const mapStateToProps = state => {
   const {plantyData} = state;

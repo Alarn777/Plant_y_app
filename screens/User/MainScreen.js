@@ -162,7 +162,14 @@ class MainScreen extends React.Component {
   preloadImages = () => {
     if (!this.state.preloadImages) return;
 
-    let allImages = ['mint', 'potato', 'sunflower', 'tomato', 'cucumber'];
+    let allImages = [
+      'mint',
+      'potato',
+      'sunflower',
+      'tomato',
+      'cucumber',
+      'strawberry',
+    ];
 
     allImages.map(oneImage => {
       Storage.get(oneImage + '_img.jpg', {
@@ -418,6 +425,7 @@ class MainScreen extends React.Component {
                   this.props.navigation.navigate('UserPage', {
                     user: this.state.user,
                     logOut: this.logOut,
+                    planters: this.state.plants,
                   })
                 }
               />

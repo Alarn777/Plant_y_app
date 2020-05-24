@@ -388,12 +388,11 @@ class growthPlan extends React.Component {
     if (oneWeek.phaseName.replace('Week ', '').length > 1) {
     } else icon = 'numeric-' + oneWeek.phaseName.replace('Week ', '');
     console.log(parseInt(oneWeek.phaseName.replace('Week ', '')));
-    let border = null;
     if (
       parseInt(oneWeek.phaseName.replace('Week ', '')) ===
       this.state.currentWeek
     ) {
-      console.log('got ya');
+      // console.log('got ya');
     }
     return (
       <List.Accordion

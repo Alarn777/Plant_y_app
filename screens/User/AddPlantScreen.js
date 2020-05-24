@@ -1,15 +1,22 @@
 import React from 'react';
-import {Image, View, StyleSheet} from 'react-native';
+import {Image, View, StyleSheet, ScrollView} from 'react-native';
 import {Text, Card} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 
-import {Button, Divider} from 'react-native-paper';
+import {
+  Button,
+  Divider,
+  Card as PaperCard,
+  Paragraph,
+  Title,
+} from 'react-native-paper';
 
 //redux
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {addSocket, addUser, loadPlanters} from '../../FriendActions';
+import {HeaderBackButton} from 'react-navigation-stack';
 
 class AddPlantScreen extends React.Component {
   constructor(props) {
@@ -32,6 +39,32 @@ class AddPlantScreen extends React.Component {
   componentDidMount(): void {
     this.setState({plant: this.props.navigation.getParam('item')});
   }
+
+  static navigationOptions = ({navigation, screenProps}) => {
+    const params = navigation.state.params || {};
+    return {
+      headerTitle: (
+        <Image
+          resizeMode="contain"
+          style={{height: 40, width: 40}}
+          source={require('../../assets/logo.png')}
+        />
+      ),
+      headerLeft: (
+        <HeaderBackButton
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+      ),
+
+      headerTitleStyle: {
+        flex: 1,
+        textAlign: 'center',
+        alignSelf: 'center',
+      },
+    };
+  };
 
   async addPlantToMyGarden() {
     this.setState({addingPlant: true});
@@ -88,51 +121,41 @@ class AddPlantScreen extends React.Component {
   render() {
     const {navigation} = this.props;
     let item = navigation.getParam('item');
-    let loading = this.state.addingPlant;
     return (
-      <View style={styles.container}>
-        <Card
-          style={{margin: 5, width: '95%'}}
-          header={() => {
-            return <Text style={styles.mainText}>{item.name}</Text>;
-          }}
-          footer={() => {
-            return (
-              <Button
-                icon={this.state.addingPlanticon}
-                style={{margin: 10}}
-                loading={loading}
-                disabled={this.state.addingPlantDisabled}
-                mode="outlined"
-                backgroundColor="#6f9e04"
-                color="#6f9e04"
-                onPress={() => {
-                  this.addPlantToMyGarden()
-                    .then()
-                    .catch();
-                }}>
-                {this.state.addingPlantText}
-              </Button>
-            );
-          }}>
-          <Image
-            style={{alignSelf: 'center', margin: 5, height: 200, width: 200}}
-            source={{uri: item.pic}}
+      <ScrollView style={styles.container}>
+        <PaperCard>
+          <PaperCard.Title
+            title={item.name}
+            subtitle={`Appropriate soil: ${item.soil.type}`}
           />
-          <Text style={styles.mainText}>About</Text>
+          <PaperCard.Cover style={{height: 300}} source={{uri: item.pic}} />
           <Text
             style={{
               textAlign: 'center',
               fontSize: 16,
+              margin: 10,
             }}>
             {item.description}
           </Text>
-          <Divider />
-          <Text style={{marginTop: 10, fontWeight: 'bold'}}>
-            Appropriate soils: {item.soil.type}
-          </Text>
-        </Card>
-      </View>
+          <PaperCard.Actions>
+            <Button
+              icon={this.state.addingPlanticon}
+              style={{margin: 10, width: '95%'}}
+              loading={this.state.addingPlant}
+              disabled={this.state.addingPlantDisabled}
+              mode="outlined"
+              backgroundColor="#6f9e04"
+              color="#6f9e04"
+              onPress={() => {
+                this.addPlantToMyGarden()
+                  .then()
+                  .catch();
+              }}>
+              {this.state.addingPlantText}
+            </Button>
+          </PaperCard.Actions>
+        </PaperCard>
+      </ScrollView>
     );
   }
 }
@@ -169,13 +192,15 @@ let styles = StyleSheet.create({
   },
   container: {
     // flex:1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   mainText: {
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,
+    // padding: 10,
+    marginTop: 10,
   },
   button: {
     backgroundColor: '#6f9e04',
