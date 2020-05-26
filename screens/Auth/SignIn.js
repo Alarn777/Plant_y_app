@@ -214,6 +214,7 @@ class SignIn extends AuthPiece {
                   backgroundColor="#6f9e04"
                   // backgroundColor={''}
                   color="#6f9e04"
+                  // onPress={() => this.changeState('confirmSignUp', 'LOL')}
                   onPress={this.signIn}>
                   {I18n.get('Sign In').toUpperCase()}
                 </Button>

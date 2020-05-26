@@ -90,12 +90,12 @@ class MainScreen extends React.Component {
     this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
 
-    console.log('Websocket: ', WS.ws);
+    // console.log('Websocket: ', WS.ws);
     if (WS.ws === undefined) WS.init();
     // WS.init();
     //
     WS.onMessage(data => {
-      console.log('GOT in main screen', data.data);
+      // console.log('GOT in main screen', data.data);
       let instructions = data.data.split(';');
       if (instructions.length > 2)
         switch (instructions[2]) {
@@ -110,35 +110,6 @@ class MainScreen extends React.Component {
             break;
         }
     });
-
-    //redux approach
-    // this.props.addSocket(new WebSocket(Const.apigatewaySocket));
-
-    // console.log(this.props.plantyData.socket);
-    // if (this.props.plantyData.socket === null)
-    //   this.props.addSocket(new WebSocket(Const.apigatewaySocket));
-    // else {
-    //   this.props.plantyData.socket = null;
-    //   this.props.addSocket(new WebSocket(Const.apigatewaySocket));
-    // }
-
-    // console.log(this.props.plantyData);
-    // this.props.plantyData.socket.addEventListener('message', data => {
-    //   console.log('GOT in main screen', data.data);
-    //   let instructions = data.data.split(';');
-    //   if (instructions.length > 2)
-    //     switch (instructions[2]) {
-    //       case 'UPDATE_STATE':
-    //         this.loadPlanters()
-    //           .then()
-    //           .catch();
-    //         break;
-    //       case 'FAILED':
-    //         alert('Failed to communicate with server');
-    //         this.forceUpdate();
-    //         break;
-    //     }
-    // });
   }
 
   static navigationOptions = ({navigation}) => {
@@ -177,6 +148,7 @@ class MainScreen extends React.Component {
         type: 'image/jpg',
       })
         .then(data => {
+          console.log({name: oneImage, URL: data});
           this.props.addImage({name: oneImage, URL: data});
         })
         .catch(error => {
@@ -187,31 +159,6 @@ class MainScreen extends React.Component {
     this.setState({preloadImages: true});
   };
 
-  connectSocket() {
-    if (!this.state.socket)
-      this.state.socket = new WebSocket(Const.apigatewaySocket);
-    // this.props.addSocket(new WebSocket(Const.apigatewaySocket));
-
-    this.state.socket.onopen = console.log('Socket is connected');
-
-    this.state.socket.addEventListener('message', data => {
-      console.log('GOT in main screen', data.data);
-      let instructions = data.data.split(';');
-      if (instructions.length > 2)
-        switch (instructions[2]) {
-          case 'UPDATE_STATE':
-            this.loadPlanters()
-              .then()
-              .catch();
-            break;
-          case 'FAILED':
-            // alert('Failed to communicate with server');
-            this.forceUpdate();
-            break;
-        }
-    });
-  }
-
   dealWithData = user => {
     if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
 
@@ -221,7 +168,14 @@ class MainScreen extends React.Component {
 
   dealWithPlantsData = plants => {
     if (plants.Items) {
-      this.setState({plants: plants.Items, allPlanters: plants.Items});
+      let planters = [];
+      plants.Items.map(one => {
+        if (one.planterStatus !== 'inactive') {
+          planters.push(one);
+        }
+      });
+
+      this.setState({plants: planters, allPlanters: planters});
     } else this.setState({plants: []});
   };
 
@@ -365,39 +319,58 @@ class MainScreen extends React.Component {
 
     return (
       <View>
-        <Card
-          header={() => {
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  // WS.init();
-                  this.props.navigation.navigate('planterScreen', {
-                    item: item,
-                    user_token: this.state.USER_TOKEN,
-                    loadPlanters: this.loadPlanters,
-                  });
-                }}>
-                <Image
-                  style={styles.headerImage}
-                  source={require('../../assets/greenhouse.png')}
-                />
-              </TouchableOpacity>
-            );
-          }}
-          style={{width: this.state.width / 3 - 5, margin: 1}}
+        <PaperCard
+          onPress={() =>
+            this.props.navigation.navigate('planterScreen', {
+              item: item,
+              user_token: this.state.USER_TOKEN,
+              loadPlanters: this.loadPlanters,
+            })
+          }
+          style={{width: this.state.width / 3 - 9, margin: 3, borderRadius: 5}}
           index={item.UUID}
           key={item.UUID}>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.navigation.navigate('planterScreen', {
-                item: item,
-                user_token: this.state.USER_TOKEN,
-                loadPlanters: this.loadPlanters,
-              });
-            }}>
-            <Text style={styles.partyText}>{item.name}</Text>
-          </TouchableOpacity>
-        </Card>
+          <Image
+            style={styles.headerImage}
+            source={require('../../assets/greenhouse.png')}
+          />
+          <Text style={styles.partyText}>{item.name}</Text>
+          {/*</TouchableOpacity>*/}
+        </PaperCard>
+
+        {/*<Card*/}
+        {/*  header={() => {*/}
+        {/*    return (*/}
+        {/*      <TouchableOpacity*/}
+        {/*        onPress={() => {*/}
+        {/*          // WS.init();*/}
+        {/*          this.props.navigation.navigate('planterScreen', {*/}
+        {/*            item: item,*/}
+        {/*            user_token: this.state.USER_TOKEN,*/}
+        {/*            loadPlanters: this.loadPlanters,*/}
+        {/*          });*/}
+        {/*        }}>*/}
+        {/*        <Image*/}
+        {/*          style={styles.headerImage}*/}
+        {/*          source={require('../../assets/greenhouse.png')}*/}
+        {/*        />*/}
+        {/*      </TouchableOpacity>*/}
+        {/*    );*/}
+        {/*  }}*/}
+        {/*  style={{width: this.state.width / 3 - 5, margin: 1}}*/}
+        {/*  index={item.UUID}*/}
+        {/*  key={item.UUID}>*/}
+        {/*  <TouchableOpacity*/}
+        {/*    onPress={() => {*/}
+        {/*      this.props.navigation.navigate('planterScreen', {*/}
+        {/*        item: item,*/}
+        {/*        user_token: this.state.USER_TOKEN,*/}
+        {/*        loadPlanters: this.loadPlanters,*/}
+        {/*      });*/}
+        {/*    }}>*/}
+        {/*    <Text style={styles.partyText}>{item.name}</Text>*/}
+        {/*  </TouchableOpacity>*/}
+        {/*</Card>*/}
       </View>
     );
   };
@@ -408,7 +381,11 @@ class MainScreen extends React.Component {
         <StatusBar translucent barStyle="dark-content" />
         <PaperCard>
           <PaperCard.Title
-            title={'Welcome,' + this.state.username}
+            title={
+              this.state.username === 'Test'
+                ? 'Username: Yukio'
+                : 'Username: ' + this.state.username
+            }
             left={props => (
               <Avatar.Image
                 {...props}
@@ -431,19 +408,39 @@ class MainScreen extends React.Component {
               />
             )}
           />
-          <PaperCard.Content />
+        </PaperCard>
+        <PaperCard style={{marginTop: 5, marginBottom: 5}}>
           <Image
             resizeMode={'center'}
-            style={{height: 100, width: this.state.width}}
+            style={{
+              height: 100,
+              width: this.state.width,
+              marginTop: 10,
+              marginBottom: 5,
+            }}
             source={require('../../assets/logo_text.png')}
           />
           <PaperCard.Actions />
         </PaperCard>
-        <Card>
+
+        {/*<Card>*/}
+        <PaperCard style={{marginTop: 0, marginBottom: 5}}>
           <View style={styles.header}>
             <Text style={styles.headerText}>My garden</Text>
           </View>
-        </Card>
+          <IconButton
+            icon={'reload'}
+            color={plantyColor}
+            size={20}
+            style={{position: 'absolute', left: -5, top: -5}}
+            onPress={() => {
+              this.loadPlanters()
+                .then()
+                .catch();
+            }}
+          />
+        </PaperCard>
+        {/*</Card>*/}
 
         <ScrollView style={styles.data}>
           <FlatList
@@ -534,7 +531,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   headerText: {
-    fontSize: 20,
+    // fontSize: 20,
+    marginBottom: 5,
+    height: 30,
     fontWeight: 'bold',
   },
   header: {
@@ -548,6 +547,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,
+    marginBottom: 5,
   },
   button: {
     justifyContent: 'center',

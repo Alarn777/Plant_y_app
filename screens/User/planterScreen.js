@@ -2,31 +2,25 @@ import React from 'react';
 import {
   Image,
   View,
-  // FlatList,
   ScrollView,
   Dimensions,
-  TouchableOpacity,
   ImageBackground,
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import {Auth, Storage} from 'aws-amplify';
+import {Auth} from 'aws-amplify';
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
-import {Icon, Text, Card, Spinner} from '@ui-kitten/components';
+import {Text, Spinner} from '@ui-kitten/components';
 import {
   FAB,
-  Title,
   Card as PaperCard,
-  Paragraph,
-  Avatar,
   ActivityIndicator,
-  Colors,
-  Chip,
   Button,
   IconButton,
   Portal,
   Snackbar,
-  DefaultTheme,
+  Dialog,
+  Paragraph,
 } from 'react-native-paper';
 
 import {withAuthenticator} from 'aws-amplify-react-native';
@@ -42,15 +36,14 @@ import {
 } from '../Auth';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-// import Video from 'react-native-video';
 import connect from 'react-redux/lib/connect/connect';
 import {AddAvatarLink, addStreamUrl, addUser} from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
 import WS from '../../websocket';
-import MediaControls, {PLAYER_STATES} from 'react-native-media-controls';
-import Slider from 'react-native-slider';
+import {PLAYER_STATES} from 'react-native-media-controls';
 import Player from './VideoPlayer';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -81,7 +74,8 @@ class planterScreen extends React.Component {
       loadingActions: false,
       loadingPlanters: false,
       refreshingPlants: false,
-      sickPlantDetected: false,
+      sickPlantDetected: this.props.navigation.getParam('item')
+        .sickPlantDetected,
       currTemperature: '',
       currUV: '',
       currHumidity: '',
@@ -93,25 +87,30 @@ class planterScreen extends React.Component {
       paused: false,
       playerState: PLAYER_STATES.PLAYING,
       screenType: 'content',
+      pictureAlertIsOn: false,
+      pictureAlertText: '',
+      modalVisible: false,
+      deletingPlanter: false,
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
     this.onLayout = this.onLayout.bind(this);
 
     WS.onMessage(data => {
-      console.log('GOT in planter screen', data.data);
+      // console.log('GOT in planter screen', data.data);
 
       let instructions = data.data.split(';');
       if (instructions.length > 2)
         switch (instructions[2]) {
           case 'FAILED':
-            // alert('Failed to communicate with server');
             this.forceUpdate();
             break;
           case 'IMAGE_STATUS':
             let sick = 0;
-            if (instructions[4] === 'sick')
+            if (instructions[4] === 'sick') {
+              this.state.planter.sickPlantDetected = true;
               this.setState({sickPlantDetected: true});
+            }
             break;
           case 'STREAM_STARTED':
             this.loadUrl()
@@ -186,6 +185,7 @@ class planterScreen extends React.Component {
   };
 
   componentDidMount(): void {
+    // console.log(this.state);
     Auth.currentAuthenticatedUser()
       .then()
       .then()
@@ -256,6 +256,9 @@ class planterScreen extends React.Component {
       .catch(error => {
         console.log('error ' + error);
 
+        this.fetchUser()
+          .then()
+          .catch();
         this.setState({
           videoErrorObj: {
             videoErrorFlag: true,
@@ -264,6 +267,22 @@ class planterScreen extends React.Component {
         });
       });
   }
+
+  async fetchUser() {
+    await Auth.currentAuthenticatedUser({
+      bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
+    })
+      .then(user => {
+        this.dealWithUserData(user);
+      })
+      .catch(err => console.log(err));
+  }
+
+  dealWithUserData = user => {
+    this.props.addUser(user);
+    // this.loadPlants();
+    // this.loadUrl();
+  };
 
   addUrl = url => {
     this.props.addStreamUrl(url);
@@ -295,6 +314,77 @@ class planterScreen extends React.Component {
       });
   }
 
+  async deletePlanter() {
+    this.setState({deletingPlanter: true});
+
+    console.log('In deleting Planter');
+    const AuthStr = 'Bearer '.concat(
+      this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
+    );
+
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/changeStatusOfPlanter',
+        {
+          username: this.props.plantyData.myCognitoUser.username,
+          // planterName: this.state.item.name,
+          planterUUID: this.state.planter.UUID,
+          planterStatus: 'inactive',
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        console.log(response);
+        this.successDeleting();
+      })
+      .catch(error => {
+        this.failureDeleting();
+        console.log('error ' + error);
+      });
+  }
+
+  successDeleting = () => {
+    this.setState({
+      deletingPlanter: false,
+    });
+    setTimeout(this.goBack, 1000);
+  };
+  failureDeleting = () => {
+    this.setState({
+      deletingPlanter: false,
+    });
+  };
+
+  async acknoledgeSickPlant() {
+    // this.setState({loading: true, plants: []});
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+      .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    await axios
+      .post(
+        Consts.apigatewayRoute + '/acknoledgeSickPlant',
+        {
+          username: this.props.authData.username,
+          sickPlantDetected: false,
+          UUID: this.props.navigation.getParam('item').UUID,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        // this.dealWithPlantsData(response.data);
+        this.state.planter.sickPlantDetected = false;
+        this.setState({sickPlantDetected: false});
+        this.props.navigation.getParam('loadPlanters')();
+      })
+      .catch(error => {
+        console.log('error ' + error);
+      });
+  }
+
   dealWithPlantsData = plants => {
     if (plants) {
       this.setState({plants: plants});
@@ -305,9 +395,9 @@ class planterScreen extends React.Component {
   };
 
   async takePicture() {
-    console.log(this.state.currUV);
-    console.log(this.state.currHumidity);
-    console.log(this.state.currTemperature);
+    // console.log(this.state.currUV);
+    // console.log(this.state.currHumidity);
+    // console.log(this.state.currTemperature);
 
     this.setState({loadingActions: true});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
@@ -331,11 +421,19 @@ class planterScreen extends React.Component {
       )
       .then(response => {
         this.setState({loadingActions: false});
-        console.log(response);
+        // console.log(response);
+        this.setState({
+          pictureAlertIsOn: true,
+          pictureAlertText: 'Saved picture to your gallery',
+        });
       })
       .catch(error => {
         this.setState({loadingActions: false});
         console.log('error ' + error);
+        this.setState({
+          pictureAlertIsOn: true,
+          pictureAlertText: 'Failed to take picture',
+        });
       });
   }
 
@@ -427,12 +525,10 @@ class planterScreen extends React.Component {
     );
   };
 
-  videoError = () => {
-    return (
-      <View>
-        <Text syle={{color: 'red'}}>Error loading Video</Text>
-      </View>
-    );
+  goBack = () => {
+    this.props.navigation.navigate('HomeScreenUser', {
+      planterWasRemoved: true,
+    });
   };
 
   showVideoError = () => {
@@ -548,10 +644,6 @@ class planterScreen extends React.Component {
                   padding: 8,
                 }}>
                 <IconButton
-                  // icon={
-                  //
-                  //   this.state.loadingActions ? 'reload' : 'arrowhead-right'
-                  // }
                   icon={
                     this.state.loadingActions
                       ? 'reload'
@@ -577,7 +669,6 @@ class planterScreen extends React.Component {
                       ? 'reload'
                       : require('../../assets/icons/arrow-ios-back-outline.png')
                   }
-                  // icon={this.state.loadingActions ? 'reload' : 'chevron-left'}
                   color={plantyColor}
                   disabled={
                     this.state.loadingActions ||
@@ -654,6 +745,7 @@ class planterScreen extends React.Component {
           </PaperCard>
           <Portal>
             <Snackbar
+              duration={99999999}
               theme={{colors: {accent: 'white'}}}
               style={{backgroundColor: errorColor, top: 15, borderRadius: 5}}
               visible={this.state.sickPlantDetected}
@@ -662,12 +754,28 @@ class planterScreen extends React.Component {
                 label: 'OK',
 
                 onPress: () => {
-                  this.setState({sickPlantDetected: false});
+                  this.acknoledgeSickPlant()
+                    .then()
+                    .catch();
                 },
               }}>
               We detected a sick plant in your garden,please tend to it!
             </Snackbar>
           </Portal>
+          <Portal>
+            <Dialog
+              visible={this.state.pictureAlertIsOn}
+              onDismiss={() => this.setState({pictureAlertIsOn: false})}>
+              <Dialog.Title>{this.state.pictureAlertText}</Dialog.Title>
+              <Dialog.Actions>
+                <Button
+                  onPress={() => this.setState({pictureAlertIsOn: false})}>
+                  OK
+                </Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
+
           <ScrollView style={styles.data}>
             <FlatList
               vertical={true}
@@ -755,6 +863,19 @@ class planterScreen extends React.Component {
                 ) : (
                   <Text>Planter is empty now, add some plants</Text>
                 )}
+                <Button
+                  style={{marginTop: 10}}
+                  icon="delete"
+                  mode="outlined"
+                  loading={this.state.deletingPlanter}
+                  onPress={() => {
+                    this.setState({modalVisible: true});
+                    // this.deletePlanter()
+                    //   .then(r => this.goBack())
+                    //   .catch(error => console.log(error));
+                  }}>
+                  Delete planter
+                </Button>
               </PaperCard.Content>
             </PaperCard>
             <FAB
@@ -781,6 +902,34 @@ class planterScreen extends React.Component {
               }
             />
           </ImageBackground>
+          <Portal>
+            <Dialog
+              visible={this.state.modalVisible}
+              onDismiss={() => this.setState({modalVisible: false})}>
+              <Dialog.Title>
+                Delete planter {this.state.planter.name}?
+              </Dialog.Title>
+              <Dialog.Content>
+                <Paragraph>
+                  This will permanently delete this planter from your account
+                </Paragraph>
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button
+                  onPress={() => {
+                    this.setState({modalVisible: false});
+                    this.deletePlanter()
+                      .then(r => this.goBack())
+                      .catch(error => console.log(error));
+                  }}>
+                  Delete
+                </Button>
+                <Button onPress={() => this.setState({modalVisible: false})}>
+                  Cancel
+                </Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
         </View>
       );
     }

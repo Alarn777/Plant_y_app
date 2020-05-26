@@ -233,9 +233,20 @@ class planterImagesGallery extends React.Component {
         }
         index={item.UUID}
         key={item.UUID}>
-        <PaperCard>
+        <PaperCard
+          style={{
+            width: this.state.width / 2 - 5,
+            height: 200,
+            margin: 2,
+            borderRadius: 3,
+          }}>
           <Image
-            style={{width: this.state.width / 2 - 11, height: 200, margin: 5}}
+            style={{
+              width: this.state.width / 2 - 14,
+              height: 190,
+              margin: 5,
+              borderRadius: 3,
+            }}
             source={{uri: item.url}}
           />
         </PaperCard>

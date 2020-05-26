@@ -318,7 +318,7 @@ class Picture extends React.Component {
           <PaperCard.Content style={{marginTop: 10}}>
             <Image
               style={{
-                height: '60%',
+                height: 285,
                 resizeMode: 'contain',
                 backgroundColor: 'gray',
               }}

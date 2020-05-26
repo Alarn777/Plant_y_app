@@ -264,7 +264,11 @@ class UserPage extends React.Component {
       <View>
         <Card>
           <PaperCard.Title
-            title={'Username: ' + this.state.user.username}
+            title={
+              this.state.user.username === 'Test'
+                ? 'Username: Yukio'
+                : 'Username: ' + this.state.user.username
+            }
             subtitle={'Email: ' + this.state.user.attributes.email}
           />
 

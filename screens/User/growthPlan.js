@@ -459,7 +459,7 @@ class growthPlan extends React.Component {
                 this.forceUpdate();
               }}
             />
-            <Text style={{marginTop: 20}}>4000</Text>
+            <Text style={{marginTop: 20}}>400</Text>
           </View>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Humidity</Text>
           <View style={styles.slider}>
@@ -520,7 +520,7 @@ class growthPlan extends React.Component {
               style={{width: '85%', height: 80}}
               // gravity={'center'}
               min={0}
-              max={4000}
+              max={400}
               step={100}
               rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[1].uvIntensity.min}
@@ -536,7 +536,7 @@ class growthPlan extends React.Component {
                 this.forceUpdate();
               }}
             />
-            <Text style={{marginTop: 20}}>4000</Text>
+            <Text style={{marginTop: 20}}>400</Text>
           </View>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Humidity</Text>
           <View style={styles.slider}>
@@ -597,7 +597,7 @@ class growthPlan extends React.Component {
               style={{width: '85%', height: 80}}
               // gravity={'center'}
               min={0}
-              max={4000}
+              max={400}
               step={100}
               rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[2].uvIntensity.min}
@@ -674,7 +674,7 @@ class growthPlan extends React.Component {
               style={{width: '85%', height: 80}}
               // gravity={'center'}
               min={0}
-              max={4000}
+              max={400}
               step={100}
               rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[3].uvIntensity.min}
@@ -690,7 +690,7 @@ class growthPlan extends React.Component {
                 this.forceUpdate();
               }}
             />
-            <Text style={{marginTop: 20}}>4000</Text>
+            <Text style={{marginTop: 20}}>400</Text>
           </View>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Humidity</Text>
           <View style={styles.slider}>

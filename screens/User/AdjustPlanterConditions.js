@@ -162,6 +162,13 @@ class AdjustPlanterConditions extends React.Component {
             this.props.toggleLight(false);
             this.setState({lightTurnedOn: false, loadingLightTurnedOn: false});
             break;
+
+          case 'LAMP_IS_OFF':
+            this.setState({lightTurnedOn: false});
+            break;
+          case 'LAMP_IS_ON':
+            this.setState({lightTurnedOn: true});
+            break;
           case 'FAILED':
             console.log('Failed to communicate with server');
             // this.forceUpdate();
@@ -315,6 +322,9 @@ class AdjustPlanterConditions extends React.Component {
         <Switch
           value={this.state.manualMode}
           onValueChange={() => {
+            WS.sendMessage(
+              'FROM_CLIENT;' + this.state.item.UUID + ';UV_LAMP_STATUS',
+            );
             this.setState({manualMode: !this.state.manualMode});
           }}
         />

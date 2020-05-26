@@ -73,52 +73,44 @@ export default class ConfirmSignUp extends AuthPiece {
 
   showComponent(theme) {
     return (
-      <KeyboardAwareScrollView
-        extraScrollHeight={30}
-        contentContainerStyle={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          width: '100%',
-        }}>
-        {/*<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>*/}
-
-        <ImageBackground
-          source={require('../../assets/iphone11Wallpaper.jpg')}
-          style={{width: '100%', height: '100%'}}>
-          <View style={theme.section}>
-            <Header theme={theme}>
-              {I18n.get(
-                '             Thank you for the registration                ',
-              )}
-            </Header>
-            <View style={theme.sectionBody}>
-              <Text>
-                Please confirm your email address by proceeding to the link you
-                will get in your inbox
-              </Text>
-              <View style={theme.sectionFooter}>
-                <LinkCell
-                  theme={theme}
-                  onPress={() => this.changeState('signIn')}>
-                  {I18n.get('Back to Sign In')}
-                </LinkCell>
-              </View>
+      <ImageBackground
+        source={require('../../assets/7dEVFqb.jpg')}
+        style={{width: '100%', height: '100%'}}>
+        <View style={theme.section}>
+          <Header theme={theme}>
+            {I18n.get(
+              '             Thank you for the registration                ',
+            )}
+          </Header>
+          <View style={{width: '100%'}}>
+            <Text>
+              Please confirm your email address by proceeding to the link you
+              will get in your inbox
+            </Text>
+            <View style={theme.sectionFooter}>
+              <LinkCell
+                style={{color: '#6f9e04', alignContent: 'center'}}
+                onPress={() => this.changeState('signIn')}>
+                {I18n.get('Back to Sign In')}
+              </LinkCell>
             </View>
-            <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
-            <Image
-              // resizeMode="contain"
-              resizeMode="stretch"
-              style={{flex: 1, height: 20, width: 400, marginBottom: 0}}
-              source={require('../../assets/logo.png')}
-            />
           </View>
-          {/*</TouchableWithoutFeedback>*/}
-        </ImageBackground>
-      </KeyboardAwareScrollView>
-
-      // </KeyboardAwareScrollView>
+          <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
+          {/*<Image*/}
+          {/*  // resizeMode="contain"*/}
+          {/*  resizeMode="stretch"*/}
+          {/*  style={{*/}
+          {/*    backgroundColor: 'white',*/}
+          {/*    borderRadius: 5,*/}
+          {/*    alignSelf: 'center',*/}
+          {/*    height: 250,*/}
+          {/*    width: 200,*/}
+          {/*    marginBottom: 0,*/}
+          {/*  }}*/}
+          {/*  source={require('../../assets/logo.png')}*/}
+          {/*/>*/}
+        </View>
+      </ImageBackground>
     );
   }
 }

@@ -8,7 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {Auth} from 'aws-amplify';
+import {Auth, Storage} from 'aws-amplify';
 
 import PropTypes from 'prop-types';
 import {Text, Card} from '@ui-kitten/components';
@@ -50,6 +50,7 @@ class AllAvailablePlants extends React.Component {
       user: null,
       USER_TOKEN: this.props.navigation.getParam('user_token'),
       planterToAddTo: this.props.navigation.getParam('planterName'),
+      picArray: [],
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -112,6 +113,8 @@ class AllAvailablePlants extends React.Component {
     this.loadPlants()
       .then()
       .catch(e => console.log(e));
+
+    this.preloadImages();
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -140,6 +143,34 @@ class AllAvailablePlants extends React.Component {
     };
   };
 
+  preloadImages = () => {
+    // if (!this.state.preloadImages) return;
+
+    let allImages = [
+      'mint',
+      'potato',
+      'sunflower',
+      'tomato',
+      'cucumber',
+      'strawberry',
+    ];
+
+    allImages.map(oneImage => {
+      Storage.get(oneImage + '_img.jpg', {
+        level: 'public',
+        type: 'image/jpg',
+      })
+        .then(data => {
+          this.state.picArray.push({name: oneImage, URL: data});
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    });
+
+    // this.setState({preloadImages: true});
+  };
+
   onLayout(e) {
     this.setState({
       width: Dimensions.get('window').width,
@@ -152,14 +183,23 @@ class AllAvailablePlants extends React.Component {
   _renderItem = ({item}) => {
     let url = '';
 
-    for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
+    // for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
+    //   if (
+    //     this.props.plantyData.plantsImages[i].name.toLowerCase() ===
+    //     item.name.toLowerCase()
+    //   ) {
+    //     url = this.props.plantyData.plantsImages[i].URL;
+    //   }
+    // }
+
+    for (let i = 0; i < this.state.picArray.length; i++) {
       if (
-        this.props.plantyData.plantsImages[i].name.toLowerCase() ===
-        item.name.toLowerCase()
+        this.state.picArray[i].name.toLowerCase() === item.name.toLowerCase()
       ) {
-        url = this.props.plantyData.plantsImages[i].URL;
+        url = this.state.picArray[i].URL;
       }
     }
+
     item.pic = url;
 
     // console.log(item);
