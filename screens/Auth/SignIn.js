@@ -19,6 +19,7 @@ import {
   ImageBackground,
   StatusBar,
   Image,
+  Dimensions,
 } from 'react-native';
 StatusBar.setBarStyle('light-content', true);
 import {Auth, I18n, Logger, JS} from 'aws-amplify';
@@ -41,6 +42,7 @@ import {bindActionCreators} from 'redux';
 import {addSocket, addUser, loadPlanters} from '../../FriendActions';
 import {connect} from 'react-redux';
 import WS from '../../websocket';
+import {isIphone7, isIphoneX} from '../../whatDevice';
 
 const logger = new Logger('SignIn');
 
@@ -135,19 +137,52 @@ class SignIn extends AuthPiece {
     WS.init();
   }
 
+  renderSwitch() {
+    if (isIphone7())
+      return (
+        <Image
+          resizeMode="contain"
+          style={{
+            alignSelf: 'center',
+            height: 200,
+            width: 320,
+            marginBottom: '21%',
+          }}
+          source={require('../../assets/logo.png')}
+        />
+      );
+    else if (isIphoneX())
+      return (
+        <Image
+          resizeMode="contain"
+          style={{
+            alignSelf: 'center',
+            height: 200,
+            width: 300,
+            marginBottom: '21%',
+          }}
+          source={require('../../assets/logo.png')}
+        />
+      );
+    else
+      return (
+        <Image
+          resizeMode="contain"
+          style={{
+            alignSelf: 'center',
+            height: 250,
+            width: 390,
+            marginBottom: '21%',
+          }}
+          source={require('../../assets/logo.png')}
+        />
+      );
+  }
+
   showComponent(theme) {
     return (
       <View>
-        <StatusBar
-          // backgroundColor={'red'}
-          translucent
-          barStyle="dark-content"
-        />
-        {/*<View style={{height: 45, backgroundColor: 'white'}} >*/}
-        {/*</View>*/}
-        {/*<TextInput />*/}
-        {/*<Button> asdasd</Button>*/}
-        {/*<SafeAreaView style={{flex: 0, color: 'gray', backgroundColor: 'red'}}>*/}
+        <StatusBar translucent barStyle="dark-content" />
         <KeyboardAwareScrollView
           extraScrollHeight={30}
           contentContainerStyle={{
@@ -157,25 +192,11 @@ class SignIn extends AuthPiece {
             height: '100%',
             width: '100%',
           }}>
-          {/*<SafeAreaView style={{flex: 1}}>*/}
           <ImageBackground
             source={require('../../assets/7dEVFqb.jpg')}
             style={{width: '100%', height: '100%'}}>
             <View style={theme.section}>
-              <Image
-                // resizeMode="contain"
-                resizeMode="contain"
-                style={{
-                  alignSelf: 'center',
-                  // flex: 1,
-                  height: 250,
-                  width: 390,
-                  marginBottom: '21%',
-                }}
-                source={require('../../assets/logo.png')}
-              />
-              {/*<Header theme={theme}>{I18n.get("Welcome to Plant'y")}</Header>*/}
-
+              {this.renderSwitch()}
               <View>
                 {/*{this.renderUsernameField(theme)}*/}
                 <FormField
@@ -194,15 +215,7 @@ class SignIn extends AuthPiece {
                   secureTextEntry={true}
                   required={true}
                 />
-                {/*<AmplifyButton*/}
-                {/*  text={I18n.get('Sign In').toUpperCase()}*/}
-                {/*  // theme={theme}*/}
-                {/*  onPress={this.signIn}*/}
-                {/*  disabled={!this.getUsernameFromInput() && this.state.password}*/}
-                {/*/>*/}
                 <Button
-                  // icon={this.state.addingPlanticon}
-                  // style={{margin: 10}}
                   loading={this.state.loginigIn}
                   disabled={
                     !this.getUsernameFromInput() ||

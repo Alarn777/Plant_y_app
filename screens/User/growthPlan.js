@@ -157,7 +157,7 @@ class growthPlan extends React.Component {
         },
       )
       .then(response => {
-        console.log(response.data);
+        // console.log(response.data);
         this.setState({growthPlan: response.data, loading: false});
       })
       .catch(error => {
@@ -387,7 +387,7 @@ class growthPlan extends React.Component {
 
     if (oneWeek.phaseName.replace('Week ', '').length > 1) {
     } else icon = 'numeric-' + oneWeek.phaseName.replace('Week ', '');
-    console.log(parseInt(oneWeek.phaseName.replace('Week ', '')));
+    // console.log(parseInt(oneWeek.phaseName.replace('Week ', '')));
     if (
       parseInt(oneWeek.phaseName.replace('Week ', '')) ===
       this.state.currentWeek

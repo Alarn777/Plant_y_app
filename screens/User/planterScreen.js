@@ -44,6 +44,7 @@ import WS from '../../websocket';
 import {PLAYER_STATES} from 'react-native-media-controls';
 import Player from './VideoPlayer';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {isIphoneX} from '../../whatDevice';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -654,7 +655,7 @@ class planterScreen extends React.Component {
                     this.state.loadingActions ||
                     !this.props.plantyData.streamUrl
                   }
-                  size={40}
+                  size={isIphoneX() ? 30 : 40}
                   onPress={() => {
                     WS.sendMessage(
                       'FROM_CLIENT;' +
@@ -674,7 +675,7 @@ class planterScreen extends React.Component {
                     this.state.loadingActions ||
                     !this.props.plantyData.streamUrl
                   }
-                  size={40}
+                  size={isIphoneX() ? 30 : 40}
                   onPress={() => {
                     WS.sendMessage(
                       'FROM_CLIENT;' +
@@ -686,7 +687,7 @@ class planterScreen extends React.Component {
                 <IconButton
                   icon={this.state.loadingActions ? 'reload' : 'camera'}
                   color={plantyColor}
-                  size={40}
+                  size={isIphoneX() ? 30 : 40}
                   disabled={
                     this.state.loadingActions ||
                     !this.props.plantyData.streamUrl
@@ -705,7 +706,7 @@ class planterScreen extends React.Component {
                   }
                   // icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
-                  size={40}
+                  size={isIphoneX() ? 30 : 40}
                   disabled={
                     this.state.loadingActions ||
                     !this.props.plantyData.streamUrl
@@ -726,7 +727,7 @@ class planterScreen extends React.Component {
                   }
                   // icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
-                  size={40}
+                  size={isIphoneX() ? 30 : 40}
                   disabled={
                     this.state.loadingActions ||
                     !this.props.plantyData.streamUrl

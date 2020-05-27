@@ -136,6 +136,7 @@ class MainScreen extends React.Component {
     let allImages = [
       'mint',
       'potato',
+      'soy',
       'sunflower',
       'tomato',
       'cucumber',
