@@ -21,6 +21,7 @@ import {AddAvatarLink, cleanReduxState} from '../../FriendActions';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import WS from '../../websocket';
+import BarGraph from '../../BarGraph';
 
 const plantyColor = '#6f9e04';
 
@@ -294,27 +295,30 @@ class UserPage extends React.Component {
             }}>
             Planter Lifetimes
           </Text>
-          <BarChart
-            data={this.state.graphData}
-            width={Dimensions.get('window').width - 10} // from react-native
-            height={220}
-            // yAxisLabel="Weeks"
-            yAxisSuffix={' W'}
-            // horizontalLabelRotation={45}
-            showValuesOnTopOfBars={true}
-            // showBarTops={true}
-            // formatYLabel={val => {
+            <BarGraph data={this.state.graphData} formatter={"W"} />
 
-            //   // console.log(val);
-            //   // let val1 = parseFloat(val) * 100;
-            //   return Math.floor(val).toString() + 'Weekss';
-            // }}
-            fromZero={true}
-            yAxisInterval={1} // optional, defaults to 1
-            chartConfig={chartConfig}
-            bezier
-            style={styles.chart}
-          />
+
+          {/*<BarChart*/}
+          {/*  data={this.state.graphData}*/}
+          {/*  width={Dimensions.get('window').width - 10} // from react-native*/}
+          {/*  height={220}*/}
+          {/*  // yAxisLabel="Weeks"*/}
+          {/*  yAxisSuffix={' W'}*/}
+          {/*  // horizontalLabelRotation={45}*/}
+          {/*  showValuesOnTopOfBars={true}*/}
+          {/*  // showBarTops={true}*/}
+          {/*  // formatYLabel={val => {*/}
+
+          {/*  //   // console.log(val);*/}
+          {/*  //   // let val1 = parseFloat(val) * 100;*/}
+          {/*  //   return Math.floor(val).toString() + 'Weekss';*/}
+          {/*  // }}*/}
+          {/*  fromZero={true}*/}
+          {/*  yAxisInterval={1} // optional, defaults to 1*/}
+          {/*  chartConfig={chartConfig}*/}
+          {/*  bezier*/}
+          {/*  style={styles.chart}*/}
+          {/*/>*/}
           <Text style={{marginLeft: 7, color: plantyColor}}>*W - Weeks</Text>
           <Button
             style={{margin: 10}}

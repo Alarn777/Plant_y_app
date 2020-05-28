@@ -56,6 +56,7 @@ import WS from '../../websocket';
 import {Storage} from 'aws-amplify';
 import Const from '../../ENV_VARS';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import StackedAreaGraph from '../../StackedAreaGraph';
 
 const plantyColor = '#6f9e04';
 
@@ -149,7 +150,7 @@ class MainScreen extends React.Component {
         type: 'image/jpg',
       })
         .then(data => {
-          console.log({name: oneImage, URL: data});
+          // console.log({name: oneImage, URL: data});
           this.props.addImage({name: oneImage, URL: data});
         })
         .catch(error => {
@@ -217,6 +218,7 @@ class MainScreen extends React.Component {
       })
       .catch(error => {
         console.log('error ' + error);
+        this.fetchUser()
       });
   }
 

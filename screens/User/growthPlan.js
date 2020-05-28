@@ -132,6 +132,11 @@ class growthPlan extends React.Component {
       )
       .then(response => {
         this.setState({savingPlan: false});
+        WS.sendMessage(
+            'FROM_CLIENT;' +
+            this.state.planter.UUID +
+            ';RELOAD_GROWTH_PLAN',
+        );
         this.loadGrowthPlan();
       })
       .catch(error => {
@@ -768,11 +773,6 @@ class growthPlan extends React.Component {
               // mode="outlined"
               loading={this.state.savingPlan}
               onPress={() => {
-                WS.sendMessage(
-                  'FROM_CLIENT;' +
-                    this.state.planter.UUID +
-                    ';RELOAD_GROWTH_PLAN',
-                );
 
                 this.saveGrowthPlan()
                   .then(

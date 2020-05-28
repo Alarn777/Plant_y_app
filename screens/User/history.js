@@ -32,6 +32,7 @@ import WS from '../../websocket';
 import {green100, green200} from 'react-native-paper/src/styles/colors';
 import {BarChart, LineChart} from 'react-native-chart-kit';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import AreaGraph from '../../AreaGraph';
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
 
@@ -44,6 +45,7 @@ const chartConfig = {
 const dayData = {
   // labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
   labels: [
+    '0',
     '',
     '',
     '',
@@ -73,37 +75,35 @@ const dayData = {
     '',
     '',
     '',
-    '',
-    '',
+    '24',
   ],
   datasets: [
     {
-      //data: [20, 45, 28, 80, 99, 43, 80, 99, 43, 12],
       data: [
-        20,
-        45,
-        28,
-        80,
-        99,
-        43,
-        80,
-        99,
-        43,
-        12,
-        20,
-        45,
-        28,
-        80,
-        99,
-        43,
-        80,
-        99,
-        43,
-        12,
-        80,
-        99,
-        43,
-        12,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
       ],
     },
   ],
@@ -133,6 +133,11 @@ class History extends React.Component {
       dayPictures: [],
       modalVisible: false,
       currentPicture: {UUID: '0', url: ''},
+      // plots:dayData,
+      plots:{ambientTemperatureCelsius:{},uvIntensity:{},soilHumidity:{}},
+      loadingGraphs:false,
+      errorText:'',
+      error:false
     };
   }
 
@@ -205,7 +210,6 @@ class History extends React.Component {
         },
       )
       .then(response => {
-        // console.log(response);
         this.dealWithPicsData(response.data.Items);
       })
       .catch(error => {
@@ -258,6 +262,7 @@ class History extends React.Component {
   //   });
   // };
   getDayFromDB = day => {
+    this.setState({loadingGraphs:true})
     this.setState({selectedDay: day});
     let sorted_array = [];
     this.state.pictures.map(one => {
@@ -275,7 +280,133 @@ class History extends React.Component {
     this.preloadImages(sorted_array)
       .then(r => console.log())
       .catch(error => console.log(error));
+
+    this.loadHistory(day).then(r => console.log())
+        .catch(error => console.log(error));
+
+
   };
+
+  async loadHistory(date) {
+    let Data = {
+      // labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+      labels: [
+        '0',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '24',
+      ],
+      datasets: [
+        {
+          data: [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+          ],
+        },
+      ],
+    };
+    //dynamoDB
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+        .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    await axios
+        .post(
+            Consts.apigatewayRoute + '/getDayHistory',
+            {
+              // username: this.props.plantyData.myCognitoUser.username,
+              day:date.day.toString(),
+              year:date.year.toString(),
+              month:date.month.toString(),
+              UUID:''
+            },
+            {
+              headers: {Authorization: AuthStr},
+            },
+        )
+        .then(response => {
+          // console.log(response);
+          // this.dealWitHistoryData(response.data);
+
+          if(response.data.errorMessage){
+            console.log('error')
+
+            this.state.plots.soilHumidity = Data
+            this.state.plots.uvIntensity = Data
+            this.state.plots.ambientTemperatureCelsius = Data
+
+            this.state.errorText = "No data for selected date"
+            this.state.error = true
+
+            this.setState({loadingGraphs:false})
+          }
+          else
+          {
+            console.log('not error')
+            this.state.error = false
+            this.setState({plots:response.data})
+            this.setState({loadingGraphs:false})
+          }
+
+
+        })
+        .catch(error => {
+          this.state.error = true
+          this.state.errorText = "Issue with getting data"
+          this.state.plots.soilHumidity = Data
+          this.state.plots.uvIntensity = Data
+          this.state.plots.ambientTemperatureCelsius = Data
+
+          this.setState({loadingGraphs:false})
+          console.log('error ' + error);
+        });
+  }
+
+  dealWitHistoryData = (data) => {
+    console.log(data)
+  }
+
 
   renderCalendar = () => {
     if (this.state.pickDay) {
@@ -422,22 +553,6 @@ class History extends React.Component {
       );
     } else
       return (
-        // <View style={{flexDirection: 'row'}}>
-        //   {this.state.dayPictures.map(one => {
-        //     console.log(one);
-        //     return (
-        //       <Image
-        //         key={one.UUID}
-        //         source={{uri: one.url}}
-        //         style={{
-        //           height: this.state.width / 3 - 30,
-        //           width: this.state.width / 3 - 30,
-        //           margin: 5,
-        //         }}
-        //       />
-        //     );
-        //   })}
-        // </View>
 
         <View>
           <FlatList
@@ -480,58 +595,62 @@ class History extends React.Component {
         <Text style={{fontWeight: 'bold', fontSize: 17, marginTop: 15}}>
           Temperature
         </Text>
-        <LineChart
-          formatYLabel={val => {
-            // let val1 = parseFloat(val) * 100;
-            return Math.floor(val).toString() + ' C';
-          }}
-          data={dayData}
-          width={Dimensions.get('window').width - 40} // from react-native
-          height={220}
-          fromZero={true}
-          // yAxisSuffix="C"
-          yAxisInterval={1} // optional, defaults to 1
-          chartConfig={chartConfig}
-          style={styles.chart}
-        />
+          <AreaGraph formatter={''} data={this.state.plots.ambientTemperatureCelsius} y={[-10,60]}/>
+        {/*<LineChart*/}
+        {/*  formatYLabel={val => {*/}
+        {/*    // let val1 = parseFloat(val) * 100;*/}
+        {/*    return Math.floor(val).toString() + ' C';*/}
+        {/*  }}*/}
+        {/*  data={dayData}*/}
+        {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+        {/*  height={220}*/}
+        {/*  fromZero={true}*/}
+        {/*  // yAxisSuffix="C"*/}
+        {/*  yAxisInterval={1} // optional, defaults to 1*/}
+        {/*  chartConfig={chartConfig}*/}
+        {/*  style={styles.chart}*/}
+        {/*/>*/}
 
         <Divider />
         <Text style={{fontWeight: 'bold', fontSize: 17, marginTop: 15}}>
           UV
         </Text>
-        <LineChart
-          formatYLabel={val => {
-            // let val1 = parseFloat(val) * 100;
-            return Math.floor(val).toString();
-          }}
-          data={dayData}
-          width={Dimensions.get('window').width - 40} // from react-native
-          height={220}
-          fromZero={true}
-          yAxisSuffix=""
-          yAxisInterval={1} // optional, defaults to 1
-          chartConfig={chartConfig}
-          style={styles.chart}
-        />
+
+          <AreaGraph formatter={''} data={this.state.plots.uvIntensity} y={[0,1000]}/>
+        {/*<LineChart*/}
+        {/*  formatYLabel={val => {*/}
+        {/*    // let val1 = parseFloat(val) * 100;*/}
+        {/*    return Math.floor(val).toString();*/}
+        {/*  }}*/}
+        {/*  data={dayData}*/}
+        {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+        {/*  height={220}*/}
+        {/*  fromZero={true}*/}
+        {/*  yAxisSuffix=""*/}
+        {/*  yAxisInterval={1} // optional, defaults to 1*/}
+        {/*  chartConfig={chartConfig}*/}
+        {/*  style={styles.chart}*/}
+        {/*/>*/}
 
         <Divider />
         <Text style={{fontWeight: 'bold', fontSize: 17, marginTop: 15}}>
           Humidity
         </Text>
-        <LineChart
-          formatYLabel={val => {
-            // let val1 = parseFloat(val) * 100;
-            return Math.floor(val).toString() + '%';
-          }}
-          data={dayData}
-          width={Dimensions.get('window').width - 40} // from react-native
-          height={220}
-          fromZero={true}
-          // yAxisSuffix="%"
-          yAxisInterval={1} // optional, defaults to 1
-          chartConfig={chartConfig}
-          style={styles.chart}
-        />
+          <AreaGraph formatter={''} data={this.state.plots.soilHumidity} y={[0,1]}/>
+        {/*<LineChart*/}
+        {/*  formatYLabel={val => {*/}
+        {/*    // let val1 = parseFloat(val) * 100;*/}
+        {/*    return Math.floor(val).toString() + '%';*/}
+        {/*  }}*/}
+        {/*  data={dayData}*/}
+        {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+        {/*  height={220}*/}
+        {/*  fromZero={true}*/}
+        {/*  // yAxisSuffix="%"*/}
+        {/*  yAxisInterval={1} // optional, defaults to 1*/}
+        {/*  chartConfig={chartConfig}*/}
+        {/*  style={styles.chart}*/}
+        {/*/>*/}
         <Divider />
         <Text
           style={{
@@ -548,7 +667,26 @@ class History extends React.Component {
     );
   };
 
+
+  renderError = () =>{
+    if(this.state.error){
+      return <Text style={{alignSelf:'center',margin:10,color:errorColor,fontSize:20}}>{this.state.errorText}</Text>
+    }
+    else
+      return <View/>
+  }
+
   render() {
+    if (this.state.loadingGraphs) {
+      return <View style={{flex:1}}>
+        <PaperCard  style={{height:this.state.height}}>
+        <Image style={{height:300,width:300,alignSelf:'center'}} source={require('../../assets/plant.gif')}/>
+      <Text style={{fontSize:20,alignSelf:'center',margin:10,color:plantyColor}}>Loading...</Text>
+        </PaperCard>
+      </View>
+    }
+
+
     return (
       <ScrollView style={styles.container}>
         <PaperCard>
@@ -558,6 +696,7 @@ class History extends React.Component {
           />
           <PaperCard.Content style={{marginTop: 10}}>
             {this.renderCalendar()}
+            {this.renderError()}
             {this.renderDayHistory(this.state.selectedDay)}
             {this.showPicture()}
           </PaperCard.Content>
@@ -565,6 +704,8 @@ class History extends React.Component {
       </ScrollView>
     );
   }
+
+
 }
 
 const mapStateToProps = state => {

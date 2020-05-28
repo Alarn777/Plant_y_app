@@ -49,6 +49,8 @@ import {
 import connect from 'react-redux/lib/connect/connect';
 import WS from '../../websocket';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import StackedAreaGraph from '../../StackedAreaGraph';
+import AreaGraph from '../../AreaGraph';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -146,7 +148,7 @@ class AdjustPlanterConditions extends React.Component {
     };
 
     WS.onMessage(data => {
-      console.log('GOT in adjust screen', data.data);
+      // console.log('GOT in adjust screen', data.data);
 
       let instructions = data.data.split(';');
       if (instructions.length > 2)
@@ -209,6 +211,8 @@ class AdjustPlanterConditions extends React.Component {
     });
   }
   componentDidMount(): void {
+      console.log(this.state.item.plots)
+
     this.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
 
     let currentTime = new Date().getTime() / 1000;
@@ -271,7 +275,7 @@ class AdjustPlanterConditions extends React.Component {
         },
       )
       .then(response => {
-        console.log(response);
+        // console.log(response);
         this.successDeleting();
       })
       .catch(error => {
@@ -481,41 +485,43 @@ class AdjustPlanterConditions extends React.Component {
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               Temperature over this day
             </Paragraph>
-            <LineChart
-              formatYLabel={val => {
-                // let val1 = parseFloat(val) * 100;
-                return Math.floor(val).toString() + ' C';
-              }}
-              data={item.plots.daily.ambientTemperatureCelsius}
-              width={Dimensions.get('window').width - 40} // from react-native
-              height={220}
-              fromZero={true}
-              // yAxisSuffix="C"
-              yAxisInterval={1} // optional, defaults to 1
-              chartConfig={chartConfig}
-              style={styles.chart}
-            />
+                  <AreaGraph formatter={'C'} data={item.plots.daily.ambientTemperatureCelsius}   y={[-10,60]}/>
+            {/*<LineChart*/}
+            {/*  formatYLabel={val => {*/}
+            {/*    // let val1 = parseFloat(val) * 100;*/}
+            {/*    return Math.floor(val).toString() + ' C';*/}
+            {/*  }}*/}
+            {/*  data={item.plots.daily.ambientTemperatureCelsius}*/}
+            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+            {/*  height={220}*/}
+            {/*  fromZero={true}*/}
+            {/*  // yAxisSuffix="C"*/}
+            {/*  yAxisInterval={1} // optional, defaults to 1*/}
+            {/*  chartConfig={chartConfig}*/}
+            {/*  style={styles.chart}*/}
+            {/*/>*/}
             <Divider />
             <Paragraph
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               Temperature over the week
             </Paragraph>
-            <BarChart
-              formatYLabel={val => {
-                // let val1 = parseFloat(val) * 100;
-                return Math.floor(val).toString() + ' C';
-              }}
-              data={item.plots.weekly.ambientTemperatureCelsius}
-              width={Dimensions.get('window').width - 40} // from react-native
-              height={220}
-              // yAxisLabel="$"
-              // yAxisSuffix="C"
-              fromZero={true}
-              yAxisInterval={1} // optional, defaults to 1
-              chartConfig={chartConfig}
-              bezier
-              style={styles.chart}
-            />
+            {/*<BarChart*/}
+            {/*  formatYLabel={val => {*/}
+            {/*    // let val1 = parseFloat(val) * 100;*/}
+            {/*    return Math.floor(val).toString() + ' C';*/}
+            {/*  }}*/}
+            {/*  data={item.plots.weekly.ambientTemperatureCelsius}*/}
+            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+            {/*  height={220}*/}
+            {/*  // yAxisLabel="$"*/}
+            {/*  // yAxisSuffix="C"*/}
+            {/*  fromZero={true}*/}
+            {/*  yAxisInterval={1} // optional, defaults to 1*/}
+            {/*  chartConfig={chartConfig}*/}
+            {/*  bezier*/}
+            {/*  style={styles.chart}*/}
+            {/*/>*/}
+              <StackedAreaGraph data={item.plots.weekly} formatter={'C'} mode={'temp'}/>
           </View>
         );
       case 'humidity':
@@ -530,44 +536,46 @@ class AdjustPlanterConditions extends React.Component {
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               Humidity over this day
             </Paragraph>
-            <LineChart
-              // yLabelsOffset={0}
-              data={item.plots.daily.soilHumidity}
-              width={Dimensions.get('window').width - 40} // from react-native
-              height={220}
-              fromZero={true}
-              // withVerticalLabels={true}
-              // yAxisSuffix="%"
-              yAxisInterval={1} // optional, defaults to 1
-              chartConfig={chartConfig}
-              style={styles.chart}
-              segments={2}
-              formatYLabel={val => {
-                let val1 = parseFloat(val) * 100;
-                return val1.toString() + '%';
-              }}
-            />
+              <AreaGraph formatter={'%'} data={item.plots.daily.soilHumidity} y={[0,1]}/>
+            {/*<LineChart*/}
+            {/*  // yLabelsOffset={0}*/}
+            {/*  data={item.plots.daily.soilHumidity}*/}
+            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+            {/*  height={220}*/}
+            {/*  fromZero={true}*/}
+            {/*  // withVerticalLabels={true}*/}
+            {/*  // yAxisSuffix="%"*/}
+            {/*  yAxisInterval={1} // optional, defaults to 1*/}
+            {/*  chartConfig={chartConfig}*/}
+            {/*  style={styles.chart}*/}
+            {/*  segments={2}*/}
+            {/*  formatYLabel={val => {*/}
+            {/*    let val1 = parseFloat(val) * 100;*/}
+            {/*    return val1.toString() + '%';*/}
+            {/*  }}*/}
+            {/*/>*/}
             <Divider />
             <Paragraph
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               Humidity over the week
             </Paragraph>
-            <BarChart
-              data={item.plots.weekly.soilHumidity}
-              width={Dimensions.get('window').width - 40} // from react-native
-              height={220}
-              // yAxisLabel="$"
-              // yAxisSuffix=""
-              fromZero={true}
-              yAxisInterval={1} // optional, defaults to 1
-              chartConfig={chartConfig}
-              bezier
-              style={styles.chart}
-              formatYLabel={val => {
-                let val1 = parseFloat(val) * 100;
-                return val1.toString() + '%';
-              }}
-            />
+            {/*<BarChart*/}
+            {/*  data={item.plots.weekly.soilHumidity}*/}
+            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+            {/*  height={220}*/}
+            {/*  // yAxisLabel="$"*/}
+            {/*  // yAxisSuffix=""*/}
+            {/*  fromZero={true}*/}
+            {/*  yAxisInterval={1} // optional, defaults to 1*/}
+            {/*  chartConfig={chartConfig}*/}
+            {/*  bezier*/}
+            {/*  style={styles.chart}*/}
+            {/*  formatYLabel={val => {*/}
+            {/*    let val1 = parseFloat(val) * 100;*/}
+            {/*    return val1.toString() + '%';*/}
+            {/*  }}*/}
+            {/*/>*/}
+              <StackedAreaGraph data={item.plots.weekly} formatter={''} mode={'humid'}/>
           </View>
         );
       case 'uv':
@@ -582,37 +590,39 @@ class AdjustPlanterConditions extends React.Component {
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               UV over this day
             </Paragraph>
-            <LineChart
-              formatYLabel={val => {
-                // let val1 = parseFloat(val) * 100;
-                return Math.floor(val).toString() + '';
-              }}
-              data={item.plots.daily.uvIntensity}
-              width={Dimensions.get('window').width - 40} // from react-native
-              height={220}
-              fromZero={true}
-              yAxisSuffix=""
-              yAxisInterval={1} // optional, defaults to 1
-              chartConfig={chartConfig}
-              style={styles.chart}
-            />
+              <AreaGraph formatter={''} data={item.plots.daily.uvIntensity} y={[0,1000]}/>
+            {/*<LineChart*/}
+            {/*  formatYLabel={val => {*/}
+            {/*    // let val1 = parseFloat(val) * 100;*/}
+            {/*    return Math.floor(val).toString() + '';*/}
+            {/*  }}*/}
+            {/*  data={item.plots.daily.uvIntensity}*/}
+            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+            {/*  height={220}*/}
+            {/*  fromZero={true}*/}
+            {/*  yAxisSuffix=""*/}
+            {/*  yAxisInterval={1} // optional, defaults to 1*/}
+            {/*  chartConfig={chartConfig}*/}
+            {/*  style={styles.chart}*/}
+            {/*/>*/}
             <Divider />
             <Paragraph
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               UV over the week
             </Paragraph>
-            <BarChart
-              data={item.plots.weekly.uvIntensity}
-              width={Dimensions.get('window').width - 40} // from react-native
-              height={220}
-              // yAxisLabel="$"
-              yAxisSuffix=""
-              fromZero={true}
-              yAxisInterval={1} // optional, defaults to 1
-              chartConfig={chartConfig}
-              bezier
-              style={styles.chart}
-            />
+            {/*<BarChart*/}
+            {/*  data={item.plots.weekly.uvIntensity}*/}
+            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
+            {/*  height={220}*/}
+            {/*  // yAxisLabel="$"*/}
+            {/*  yAxisSuffix=""*/}
+            {/*  fromZero={true}*/}
+            {/*  yAxisInterval={1} // optional, defaults to 1*/}
+            {/*  chartConfig={chartConfig}*/}
+            {/*  bezier*/}
+            {/*  style={styles.chart}*/}
+            {/*/>*/}
+              <StackedAreaGraph data={item.plots.weekly} formatter={''} mode={'uv'} />
           </View>
         );
     }
