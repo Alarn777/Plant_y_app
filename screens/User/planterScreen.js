@@ -206,6 +206,9 @@ class planterScreen extends React.Component {
     //     .catch(e => console.log(e));
     // }
 
+    this.loadPlanter().then()
+        .catch(e => console.log(e));
+
     this.loadPlants()
       .then()
       .catch(e => console.log(e));
@@ -214,6 +217,38 @@ class planterScreen extends React.Component {
       'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
     );
   }
+
+  async loadPlanter() {
+    // console.log('loading plants.');
+
+    // console.log('called reload plants');
+
+    let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
+        .idToken.jwtToken;
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+
+    await axios
+        .post(
+            Consts.apigatewayRoute + '/getPlanter',
+            {
+              username: this.props.authData.username,
+              UUID:this.state.planter.UUID
+            },
+            {
+              headers: {Authorization: AuthStr},
+            },
+        )
+        .then(response => {
+          // console.log('planter ' , response.data);
+          // this.dealWithPlantsData(response.data);
+
+          this.setState({sickPlantDetected:response.data.sickPlantDetected,planter:response.data});
+        })
+        .catch(error => {
+          this.fetchUser()
+        });
+  }
+
 
   async loadUrl() {
     if (
