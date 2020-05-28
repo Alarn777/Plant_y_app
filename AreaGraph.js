@@ -92,7 +92,7 @@ class AreaGraph extends React.PureComponent {
                 <Gradient/>
             </AreaChart>
             <YAxis
-                style={ { position: 'absolute', top: 0, bottom: 15 }}
+                style={ { position: 'absolute', top: 10, bottom: 15 }}
                 data={this.props.y}
                 svg={ {
                     fontSize: 8,
