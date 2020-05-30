@@ -92,6 +92,7 @@ class planterScreen extends React.Component {
       pictureAlertText: '',
       modalVisible: false,
       deletingPlanter: false,
+      streamTurnedOn:false
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
@@ -114,9 +115,32 @@ class planterScreen extends React.Component {
             }
             break;
           case 'STREAM_STARTED':
-            this.loadUrl()
-              .then()
-              .catch(e => console.log(e));
+            setTimeout( () => {
+              this.setTimePassed();
+            },1000);
+            // this.loadUrl()
+            //   .then()
+            //   .catch(e => console.log(e));
+            break;
+          case "STREAM_ON":
+            this.setState({
+              streamTurnedOn: true
+            });
+            setTimeout( () => {
+              this.setTimePassed();
+            },1000);
+            // this.loadUrl()
+            //     .then()
+            //     .catch(e => console.log(e));
+            break;
+          case "STREAM_OFF":
+            this.setState({
+              streamTurnedOn: false
+            });
+            WS.sendMessage(
+                'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
+            );
+
             break;
 
           case 'MEASUREMENTS':
@@ -135,6 +159,12 @@ class planterScreen extends React.Component {
             break;
         }
     });
+  }
+
+  setTimePassed = () => {
+    this.loadUrl()
+        .then()
+        .catch(e => console.log(e));
   }
 
   static navigationOptions = ({navigation}) => {
@@ -213,10 +243,18 @@ class planterScreen extends React.Component {
       .then()
       .catch(e => console.log(e));
 
-    WS.sendMessage(
-      'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
-    );
+    this.checkStream()
+    // WS.sendMessage(
+    //   'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
+    // );
   }
+
+  checkStream = () => {
+    if (WS.ws)
+      WS.sendMessage(
+          "FROM_CLIENT;" + this.state.planter.UUID + ";VIDEO_STREAM_STATUS"
+      );
+  };
 
   async loadPlanter() {
     // console.log('loading plants.');
@@ -423,7 +461,14 @@ class planterScreen extends React.Component {
 
   dealWithPlantsData = plants => {
     if (plants) {
-      this.setState({plants: plants});
+      plants.map(one => {
+        if (one.plantStatus === 'inactive') {
+        }
+        else
+          this.state.plants.push(one)
+      })
+      this.forceUpdate()
+
     } else this.setState({plants: []});
 
     this.setState({refreshingPlants: false});
@@ -486,6 +531,8 @@ class planterScreen extends React.Component {
     if (item.plantStatus === 'inactive') {
       return;
     }
+
+
 
     let url = '';
     for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {

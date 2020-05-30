@@ -35,7 +35,7 @@ class Picture extends React.Component {
     };
 
     WS.onMessage(data => {
-      console.log('GOT in Picture screen', data.data);
+      // console.log('GOT in Picture screen', data.data);
 
       let instructions = data.data.split(';');
       if (instructions.length > 2)

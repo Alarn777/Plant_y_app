@@ -100,7 +100,7 @@ class SignIn extends AuthPiece {
           )
           .then(response => {
             // If request is good...
-            console.log(response);
+            console.log(response.data);
             // this.dealWithUrlData(response.data);
           })
           .catch(error => {
@@ -120,7 +120,7 @@ class SignIn extends AuthPiece {
           )
           .then(response => {
             // If request is good...
-            console.log(response);
+            console.log(response.data);
             // this.dealWithUrlData(response.data);
           })
           .catch(error => {

@@ -189,8 +189,8 @@ class StackedAreaGraph extends React.Component {
                     index = this.WeekdayToInt(Object.keys(this.props.data)[i]);
 
 
-                    console.log(i)
-                    console.log(this.props.data[Object.keys(this.props.data)[i]].uvIntensity)
+                    // console.log(i)
+                    // console.log(this.props.data[Object.keys(this.props.data)[i]].uvIntensity)
 
                     // console.log(this.props.data[Object.keys(this.props.data)[i]])
                     this.state.data[index] = {
