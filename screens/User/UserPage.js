@@ -1,17 +1,18 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import {Image, View, Dimensions, StyleSheet} from 'react-native';
+import {Image, View, Dimensions, StyleSheet, ScrollView} from 'react-native';
 import {Auth} from 'aws-amplify';
 import {BarChart, LineChart} from 'react-native-chart-kit';
+import * as Keychain from 'react-native-keychain';
 import {
-  Avatar,
-  Card as PaperCard,
-  Card,
-  Button,
-  FAB,
-  Text,
-  ActivityIndicator,
+    Avatar,
+    Card as PaperCard,
+    Card,
+    Button,
+    FAB,
+    Text,
+    ActivityIndicator, Switch, Portal, Dialog, Paragraph, TextInput,
 } from 'react-native-paper';
 import ImagePicker from 'react-native-image-picker';
 import {Storage} from 'aws-amplify';
@@ -22,6 +23,7 @@ import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import WS from '../../websocket';
 import BarGraph from '../../BarGraph';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const plantyColor = '#6f9e04';
 
@@ -54,12 +56,36 @@ class UserPage extends React.Component {
       fileUri: '',
       fileUrl: '',
       graphData: data,
-      buttonMode: 'pick', //pick,upload
+      buttonMode: 'pick', //pick,upload,
+        FaceIDIsOn:false,
+        username:'',
+        password:'',
+        modalVisible:false,
+        loadingActivation:false
     };
   }
 
   componentDidMount(): void {
     this.loadGraphData();
+    this.checkIfIdActivated().then().catch()
+  }
+
+
+  async checkIfIdActivated() {
+      try {
+          //retrieve the credentials from keychain if saved.
+          let credentials = await Keychain.getGenericPassword()
+          if (credentials) {
+              this.setState({FaceIDIsOn:true})
+          }
+            else
+                this.setState({FaceIDIsOn:false})
+      }
+      catch(err) {
+          this.setState({FaceIDIsOn:false})
+          // if(err.message !== 'No keychain entry found') //No password exists in the key chain...
+          // else //some other error occurred.
+      }
   }
 
   loadGraphData = () => {
@@ -86,6 +112,13 @@ class UserPage extends React.Component {
 
     this.setState({graphData: newData});
   };
+
+  removeFaceIDdetails = () =>{
+    Keychain.resetGenericPassword().then(r => {
+        console.log(r)
+        this.setState({FaceIDIsOn:false,modalVisible:false})
+    }).catch(e => console.log(e))
+}
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
@@ -260,9 +293,47 @@ class UserPage extends React.Component {
       .catch(error => console.log(error));
   };
 
+
+
+
+    addToKeyChain = () => {
+        this.setState({loadingActivation:true})
+        const {
+            username,               // Get the credentials entered by the user
+            password,               // (We're assuming you are using controlled form inputs here)
+        } = this.state;
+
+
+        if(username === '' || password === ''){
+            this.setState({error:true,loadingActivation:false})
+            return
+        }
+        else
+            this.setState({error:false})
+
+        Auth.signIn(username, password)
+            .then(user => {
+                Keychain.setGenericPassword(username, password).then(val => {
+                    console.log(val)
+                    this.setState({modalVisible:false,loadingActivation:false})
+                    this.checkIfIdActivated().then().catch()
+                    this.setState({})
+                }).catch(e => {
+                    console.log(e)
+                    this.setState({})
+                    this.setState({error:true,loadingActivation:false,modalVisible:false})});
+            })
+            .catch(e => {
+                console.log(e)
+                this.setState({error:true,loadingActivation:false,modalVisible:false})
+            })
+    };
+
   render() {
+      // console.log(this.state.user.username)
+      // console.log(this.props.navigation.getParam('user').username)
     return (
-      <View>
+      <ScrollView>
         <Card>
           <PaperCard.Title
             title={
@@ -320,6 +391,73 @@ class UserPage extends React.Component {
           {/*  style={styles.chart}*/}
           {/*/>*/}
           <Text style={{marginLeft: 7, color: plantyColor}}>*W - Weeks</Text>
+            <View
+                style={{
+                    // flex:
+                    margin:10,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between',
+                    // padding: 8,
+                }}>
+                <Text style={styles.actionsText}>Enable FaceID / Touch ID</Text>
+                <Switch
+                    value={this.state.FaceIDIsOn}
+                    onValueChange={() => {
+                        this.setState({modalVisible:true})
+                        // this.setState({FaceIDIsOn: !this.state.FaceIDIsOn});
+                    }}
+                />
+            </View>
+            <Portal>
+                {this.state.FaceIDIsOn?  <Dialog
+                    visible={this.state.modalVisible}
+                    onDismiss={() => this.setState({modalVisible: false})}>
+
+                    <Dialog.Title>
+                        This will disable faceId option for you
+                    </Dialog.Title>
+                    <Dialog.Content>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={() => {this.removeFaceIDdetails()}}>OK</Button>
+                        <Button onPress={() => this.setState({modalVisible: false})}>
+                            Cancel
+                        </Button>
+                    </Dialog.Actions>
+                </Dialog> :     <Dialog
+                    visible={this.state.modalVisible}
+                    onDismiss={() => this.setState({modalVisible: false})}>
+
+                    <Dialog.Title>
+                        Please enter your credentials:
+                    </Dialog.Title>
+                    <Dialog.Content>
+                        <TextInput
+                            style={{margin:10}}
+                            error={this.state.error}
+                            label='Usename'
+                            value={this.state.username}
+                            onChangeText={username => this.setState({ username })}
+                        />
+                        <TextInput
+                            error={this.state.error}
+                            style={{margin:10}}
+                            label='Password'
+                            secureTextEntry={true}
+                            value={this.state.password}
+                            onChangeText={password => this.setState({ password })}
+                        />
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button loading={this.state.loadingActivation} onPress={() => {this.addToKeyChain()}}>Activate</Button>
+                        <Button onPress={() => this.setState({modalVisible: false,FaceIDIsOn:false,password:''})}>
+                            Cancel
+                        </Button>
+                    </Dialog.Actions>
+                </Dialog>}
+
+            </Portal>
           <Button
             style={{margin: 10}}
             icon="logout"
@@ -339,7 +477,7 @@ class UserPage extends React.Component {
             Log Out
           </Button>
         </Card>
-      </View>
+      </ScrollView>
     );
   }
 }
