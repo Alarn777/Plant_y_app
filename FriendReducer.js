@@ -119,7 +119,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
       };
 
     case 'NEW_MESSAGE':
-      console.log(action.message);
+      // console.log(action.message);
 
       // console.log('sending a message', action.payload);
       // socket.send(JSON.stringify({action: 'message', message: action.payload}));
@@ -280,7 +280,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
       };
 
     case 'ADD_USER':
-      console.log(state);
+      // console.log(state);
       return {
         streamUrl: streamUrl,
         plantsImages: plantsImages,
@@ -313,7 +313,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
       };
 
     case 'FETCH_POST':
-      console.log(action.payload);
+      // console.log(action.payload);
       return {
         streamUrl: streamUrl,
         socket: socket,
@@ -322,7 +322,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
       };
 
     case 'LOAD_PLANTERS':
-      console.log('LOLOAD_PLANTERS');
+      // console.log('LOLOAD_PLANTERS');
       return state;
 
     case 'ADD_ACTION':

@@ -447,8 +447,8 @@ class growthPlan extends React.Component {
             <RangeSlider
               style={{width: '85%', height: 80}}
               min={0}
-              max={4000}
-              step={100}
+              max={400}
+              step={10}
               rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[0].uvIntensity.min}
               initialHighValue={oneWeek.subPhases[0].uvIntensity.max}
@@ -526,7 +526,7 @@ class growthPlan extends React.Component {
               // gravity={'center'}
               min={0}
               max={400}
-              step={100}
+              step={10}
               rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[1].uvIntensity.min}
               initialHighValue={oneWeek.subPhases[1].uvIntensity.max}
@@ -603,7 +603,7 @@ class growthPlan extends React.Component {
               // gravity={'center'}
               min={0}
               max={400}
-              step={100}
+              step={10}
               rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[2].uvIntensity.min}
               initialHighValue={oneWeek.subPhases[2].uvIntensity.max}
@@ -680,7 +680,7 @@ class growthPlan extends React.Component {
               // gravity={'center'}
               min={0}
               max={400}
-              step={100}
+              step={10}
               rangeEnabled={false}
               initialLowValue={oneWeek.subPhases[3].uvIntensity.min}
               initialHighValue={oneWeek.subPhases[3].uvIntensity.max}

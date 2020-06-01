@@ -72,9 +72,9 @@ export const connectWS = data => {
 };
 
 export const sendMessage = message => {
-  console.log(message);
+  // console.log(message);
 
-  console.log(this);
+  // console.log(this);
 
   return {
     type: 'NEW_MESSAGE',
@@ -83,9 +83,9 @@ export const sendMessage = message => {
 };
 
 export const onMessage = event => {
-  console.log(event);
+  // console.log(event);
 
-  console.log(this);
+  // console.log(this);
 
   return dispatch => {
     // you may want to use an action creator function

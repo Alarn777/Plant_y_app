@@ -155,7 +155,7 @@ class History extends React.Component {
   }
 
   async preloadImages(images_array) {
-    console.log('Now loading images');
+    // console.log('Now loading images');
     this.setState({dayPictures: []});
     // console.log(images_array);
     await images_array.map(oneImage => {

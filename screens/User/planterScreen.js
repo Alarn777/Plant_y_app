@@ -830,7 +830,7 @@ class planterScreen extends React.Component {
             <Snackbar
               duration={99999999}
               theme={{colors: {accent: 'white'}}}
-              style={{backgroundColor: errorColor, top: 15, borderRadius: 5}}
+              style={{backgroundColor: errorColor, top: 0, borderRadius: 5}}
               visible={this.state.sickPlantDetected}
               onDismiss={() => this.setState({sickPlantDetected: false})}
               action={{

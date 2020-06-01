@@ -113,11 +113,11 @@ class SignIn extends AuthPiece {
           .then(biometryType => {
               // Success code
               if (biometryType === 'FaceID') {
-                  console.log('FaceID is supported.');
+                  // console.log('FaceID is supported.');
                   this.setState({idIsSupported:true,idIcon:'face'})
 
               } else if (biometryType === 'TouchID'){
-                  console.log('TouchID is supported.');
+                  // console.log('TouchID is supported.');
                   this.setState({idIsSupported:true,idIcon:'fingerprint'})
               } else if (biometryType === true) {
                   // Touch ID is supported on Android
@@ -135,7 +135,7 @@ class SignIn extends AuthPiece {
         Keychain.getGenericPassword()   // Retrieve the credentials from the keychain
             .then(credentials => {
                 const { username, password } = credentials;
-                console.log(username,password)
+                // console.log(username,password)
                 // Prompt the user to authenticate with Touch ID.
                 // You can display the username in the prompt
                 TouchID.authenticate(`to login with username "${username}"`)
@@ -199,7 +199,7 @@ class SignIn extends AuthPiece {
           )
           .then(response => {
             // If request is good...
-            console.log(response.data);
+            // console.log(response.data);
             // this.dealWithUrlData(response.data);
           })
           .catch(error => {
@@ -219,7 +219,7 @@ class SignIn extends AuthPiece {
           )
           .then(response => {
             // If request is good...
-            console.log(response.data);
+            // console.log(response.data);
             // this.dealWithUrlData(response.data);
           })
           .catch(error => {
@@ -245,7 +245,7 @@ class SignIn extends AuthPiece {
             alignSelf: 'center',
             height: 200,
             width: 320,
-            marginBottom: '21%',
+            marginBottom: '18%',
           }}
           source={require('../../assets/logo.png')}
         />

@@ -211,7 +211,7 @@ class AdjustPlanterConditions extends React.Component {
     });
   }
   componentDidMount(): void {
-      console.log(this.state.item.plots)
+      // console.log(this.state.item.plots)
 
     this.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
 
@@ -256,7 +256,7 @@ class AdjustPlanterConditions extends React.Component {
   async deletePlanter() {
     this.setState({deletingPlanter: true});
 
-    console.log('In deleting Planter');
+    // console.log('In deleting Planter');
     const AuthStr = 'Bearer '.concat(
       this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
     );
@@ -790,7 +790,7 @@ class AdjustPlanterConditions extends React.Component {
                 <Button
                   mode="outlined"
                   onPress={() => {
-                    console.log('history');
+                    // console.log('history');
                     // this.props.navigation.navigate('history', {
                     //   planter: this.state.item,
                     // });

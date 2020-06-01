@@ -172,7 +172,7 @@ class Picture extends React.Component {
             sick = parseFloat(one.Confidence);
           }
         });
-        console.log(100 - sick);
+        // console.log(100 - sick);
         this.setState({healthStatus: 100 - sick});
 
         this.successTesting();
@@ -186,9 +186,9 @@ class Picture extends React.Component {
   async deletePicture() {
     this.setState({deletingPic: true});
     let pictureKey = this.props.navigation.getParam('picture').key;
-    console.log(
-      this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
-    );
+    // console.log(
+    //   this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
+    // );
     Storage.remove(pictureKey, {level: 'public'})
       .then(result => {
         //dynamoDB
@@ -209,7 +209,7 @@ class Picture extends React.Component {
             },
           )
           .then(response => {
-            console.log(response);
+            // console.log(response);
             // this.dealWithPicsData(response.data.Items);
             this.setState({deletingPic: true});
             // this.setState({pictures:response.data.Items})
@@ -222,7 +222,7 @@ class Picture extends React.Component {
       })
       .catch(err => {
         console.log(err);
-        this.setState({deletingPic: true});
+        this.setState({deletingPic: false});
       });
   }
 
@@ -237,7 +237,7 @@ class Picture extends React.Component {
       testingPlant: false,
       plant_tested: true,
       testingPlanticon: 'check',
-      testingPlantText: 'Success',
+      testingPlantText: 'Test Successful',
       // testingPlantDisabled: true,
     });
     setTimeout(this.changeBack, 5000);

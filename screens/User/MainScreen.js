@@ -6,7 +6,7 @@ import {
   ScrollView,
   Dimensions,
   TouchableOpacity,
-  StatusBar,
+  StatusBar, Platform,
 } from 'react-native';
 import {Auth} from 'aws-amplify';
 
@@ -57,6 +57,8 @@ import {Storage} from 'aws-amplify';
 import Const from '../../ENV_VARS';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import StackedAreaGraph from '../../StackedAreaGraph';
+import {greaterThan} from 'react-native-reanimated';
+import {isIphone7} from '../../whatDevice';
 
 const plantyColor = '#6f9e04';
 
@@ -70,7 +72,7 @@ class MainScreen extends React.Component {
       username: '',
       width: 0,
       height: 0,
-      plants: [],
+      planters: [],
       parties: [],
       places: null,
       change: false,
@@ -86,7 +88,7 @@ class MainScreen extends React.Component {
       socket: null,
     };
     this.loadPlanters = this.loadPlanters.bind(this);
-    this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
+    this.dealWithPlantersData = this.dealWithPlantersData.bind(this);
     this.dealWithData = this.dealWithData.bind(this);
     this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
@@ -168,17 +170,20 @@ class MainScreen extends React.Component {
     if (this.state.user) this.setState({userLoggedIn: true});
   };
 
-  dealWithPlantsData = plants => {
-    if (plants.Items) {
-      let planters = [];
-      plants.Items.map(one => {
+  dealWithPlantersData = planters => {
+    if (planters.Items) {
+      let filteredPlanters = [];
+
+
+
+      planters.Items.map(one => {
         if (one.planterStatus !== 'inactive') {
-          planters.push(one);
+          filteredPlanters.push(one);
         }
       });
 
-      this.setState({plants: planters, allPlanters: planters});
-    } else this.setState({plants: []});
+      this.setState({planters: filteredPlanters, allPlanters: filteredPlanters});
+    } else this.setState({planters: []});
   };
 
   async fetchUser() {
@@ -192,10 +197,7 @@ class MainScreen extends React.Component {
   }
 
   async loadPlanters() {
-    // console.log('loading plants.');
-    this.setState({plants: []});
-
-    // console.log('called reload plants');
+    this.setState({planters: []});
     let USER_TOKEN = '';
 
     USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
@@ -213,8 +215,7 @@ class MainScreen extends React.Component {
         },
       )
       .then(response => {
-        // console.log(response.data);
-        this.dealWithPlantsData(response.data);
+        this.dealWithPlantersData(response.data);
       })
       .catch(error => {
         console.log('error ' + error);
@@ -240,6 +241,8 @@ class MainScreen extends React.Component {
   }
 
   componentDidMount(): void {
+    this.onLayout()
+
     this.fetchUser()
       .then(() => {
         this.props.navigation.setParams({logOut: this.logOut});
@@ -282,7 +285,6 @@ class MainScreen extends React.Component {
       // region: 'eu',
     })
       .then(data => {
-        // console.log(data);
         this.props.AddAvatarLink(data);
         // this.setState({url: data});
       })
@@ -378,7 +380,12 @@ class MainScreen extends React.Component {
     );
   };
 
+
   render() {
+    let logo_width = this.state.width
+    // logo_width = 414
+    if(isIphone7())
+        logo_width = 414
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <StatusBar translucent barStyle="dark-content" />
@@ -405,7 +412,7 @@ class MainScreen extends React.Component {
                   this.props.navigation.navigate('UserPage', {
                     user: this.state.user,
                     logOut: this.logOut,
-                    planters: this.state.plants,
+                    planters: this.state.planters,
                   })
                 }
               />
@@ -414,11 +421,12 @@ class MainScreen extends React.Component {
         </PaperCard>
         <PaperCard style={{marginTop: 5, marginBottom: 5}}>
           <Image
-            resizeMode={'center'}
+              resizeMode="contain"
             style={{
               height: 100,
-              width: this.state.width,
+              width: logo_width,
               marginTop: 10,
+              alignSelf: 'center',
               marginBottom: 5,
             }}
             source={require('../../assets/logo_text.png')}
@@ -449,7 +457,7 @@ class MainScreen extends React.Component {
           <FlatList
             scrollEnabled={false}
             numColumns={3}
-            data={this.state.plants}
+            data={this.state.planters}
             keyExtractor={this._keyExtractor}
             renderItem={this._renderItem}
           />
