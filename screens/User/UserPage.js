@@ -366,7 +366,7 @@ class UserPage extends React.Component {
             }}>
             Planter Lifetimes
           </Text>
-            <BarGraph data={this.state.graphData} formatter={"W"} />
+            <BarGraph data={this.state.graphData} max={Math.max(... this.state.graphData.datasets[0].data)} formatter={"W"} />
 
 
           {/*<BarChart*/}

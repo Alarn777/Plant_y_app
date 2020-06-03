@@ -128,17 +128,17 @@ class AdjustPlanterConditions extends React.Component {
       entries: [
         {
           title: 'temperature',
-          currTemperature: '10',
+          currTemperature: '0',
           plots: this.props.navigation.getParam('item').plots,
         },
         {
           title: 'uv',
-          currUV: '2',
+          currUV: '0',
           plots: this.props.navigation.getParam('item').plots,
         },
         {
           title: 'humidity',
-          currHumidity: '2',
+          currHumidity: '0',
           plots: this.props.navigation.getParam('item').plots,
         },
       ],
