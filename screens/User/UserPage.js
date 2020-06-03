@@ -28,10 +28,10 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 const plantyColor = '#6f9e04';
 
 const data = {
-  labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+  labels: ['Test', 'Test', 'Test'],
   datasets: [
     {
-      data: [20, 45, 28, 80, 99, 43],
+      data: [3, 5, 3],
     },
   ],
 };
@@ -107,7 +107,7 @@ class UserPage extends React.Component {
       // currentWeek = currentWeek / 24;
       currentWeek = parseInt(currentWeek / 7);
       newData.labels.push(one.name);
-      newData.datasets[0].data.push(currentWeek);
+      newData.datasets[0].data.push(currentWeek + 1);
     });
 
     this.setState({graphData: newData});

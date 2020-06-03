@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, BarChart, XAxis, YAxis} from 'react-native-svg-charts';
+import {Grid, BarChart, XAxis, YAxis, AreaChart} from 'react-native-svg-charts';
 import { Circle, Path } from 'react-native-svg'
 import {green100, green200, green300} from 'react-native-paper/src/styles/colors';
 import {Dimensions, View} from 'react-native';
@@ -74,7 +74,11 @@ class BarGraph extends React.PureComponent {
             keys: ['min', 'avg', 'max'],
             yAxisData: [],
             colors: [plantyColor, green300, green100],
-            range:[]
+            range:[],
+            xAsixData:{
+                data:[0,20],
+                max:20
+            }
         };
         // console.log(data.datasets[0].data)
 
@@ -96,6 +100,9 @@ class BarGraph extends React.PureComponent {
     componentDidMount(): void {
 
 
+        let max =  Math.max(...this.props.data.datasets[0].data)
+        this.state.xAsixData.data[1] = max +1
+        this.state.xAsixData.max = max +1
 
 
         // this.setState({data})
@@ -116,13 +123,15 @@ class BarGraph extends React.PureComponent {
                         gridMin={0}
                         // svg={{ fill: 'url(#gradient)' }}
                         svg={{fill:plantyColor}}
+                        yMin={0}
+                        yMax={this.state.xAsixData.max}
                     >
                     <Grid/>
                     <Gradient/>
                     </BarChart>
                 <YAxis
-                    style={ { position: 'absolute', top: 0, bottom: 15,left:10 }}
-                    data={this.state.data}
+                    style={ { position: 'absolute', top: 10, bottom: 20,left:10 }}
+                    data={this.state.xAsixData.data}
                     svg={ {
                         fontSize: 8,
                         fill: 'white',

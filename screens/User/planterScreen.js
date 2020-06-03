@@ -313,16 +313,20 @@ class planterScreen extends React.Component {
             console.log('SETTING URL');
             console.log(response.data);
             if (response.data.errorMessage) {
+              this.setState({errorText:response.data.errorMessage})
               return;
             }
+            this.setState({errorText:''})
             this.addUrl(response.data.HLSStreamingSessionURL);
           } else {
             console.log(response.data);
             console.log('NOT SETTING URL');
+            this.setState({errorText:''})
             this.setState({streamUrl: this.props.plantyData.streamUrl});
           }
         } else {
           console.log(response.data);
+          this.setState({errorText:'Reload the app'})
           console.log('No stream data URL');
           console.log(response);
         }
@@ -656,6 +660,14 @@ class planterScreen extends React.Component {
       );
   };
 
+  renderStreamError = () => {
+    if(this.state.errorText === '') {
+      return <View/>;
+    }
+    else return  <Text style={{color:errorColor,marginTop:20}}>{this.state.errorText}</Text>
+
+  }
+
   render() {
     if (this.state.loading) {
       return (
@@ -709,14 +721,15 @@ class planterScreen extends React.Component {
                 size={20}
                 style={{position: 'absolute', left: 5, top: 0}}
                 onPress={() => {
-                  console.log('props ', this.props.plantyData.streamUrl);
-                  console.log('state', this.state.streamUrl);
+                  // console.log('props ', this.props.plantyData.streamUrl);
+                  // console.log('state', this.state.streamUrl);
                   this.props.addStreamUrl(undefined);
                   this.loadUrl()
                     .then()
                     .catch();
                 }}
               />
+              {this.renderStreamError()}
               <Text style={styles.mainText}>Camera Controllers</Text>
               <View
                 style={{

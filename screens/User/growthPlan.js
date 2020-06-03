@@ -81,7 +81,7 @@ class growthPlan extends React.Component {
     let currentWeek = (currentTime - activatedTime) / 86400;
     currentWeek = parseInt(currentWeek / 7);
 
-    this.setState({currentWeek: currentWeek});
+    this.setState({currentWeek: currentWeek + 1});
   }
 
   _showDialog = () => this.setState({visible: true});
@@ -285,7 +285,7 @@ class growthPlan extends React.Component {
       newWeekNum = 1;
       fromDay = 1;
     } else {
-      fromDay = currentWeeks[currentWeeks.length - 1].toDay;
+      fromDay = currentWeeks[currentWeeks.length - 1].toDay + 1;
     }
 
     let newWeek = {
