@@ -411,6 +411,8 @@ class History extends React.Component {
   renderCalendar = () => {
     if (this.state.pickDay) {
       return (
+          <View>
+        <Text style={{alignSelf: 'center',margin:10,fontSize:20}}>Please select a date:</Text>
         <Calendar
           current={this.state.today}
           minDate={this.state.minDay}
@@ -460,6 +462,7 @@ class History extends React.Component {
             textDayHeaderFontSize: 15,
           }}
         />
+          </View>
       );
     } else
       return (
@@ -486,10 +489,15 @@ class History extends React.Component {
         <TouchableOpacity
           onPress={() => {
             // console.log('open ', item);
+            this.props.navigation.navigate('Picture', {
+              picture: item,
+              planterName: this.state.planter.name,
+            })
+
 
             // this.state.modalVisible = true;
-            this.setState({currentPicture: item, modalVisible: true});
-            this.forceUpdate();
+            // this.setState({currentPicture: item, modalVisible: true});
+            // this.forceUpdate();
             // console.log(this.state);
             // this.showPicture(item);
           }}>
@@ -567,6 +575,7 @@ class History extends React.Component {
 
   renderDayHistory = day => {
     if (this.state.loading) {
+      return <View/>;
       return <ActivityIndicator size="large" color={plantyColor} />;
     }
     return (

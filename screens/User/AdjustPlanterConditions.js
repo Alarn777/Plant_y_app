@@ -646,7 +646,7 @@ class AdjustPlanterConditions extends React.Component {
               </Text>
               <Divider />
               <Text style={{marginBottom: 10, marginTop: 10}}>
-                {'Weeks since active: ' + this.state.currentWeek}
+                {'Weeks since active: ' + parseInt(this.state.currentWeek + 1)}
               </Text>
             </PaperCard.Content>
           </PaperCard>
@@ -743,7 +743,7 @@ class AdjustPlanterConditions extends React.Component {
                 </Text>
                 <Divider />
                 <Text style={{marginBottom: 10, marginTop: 10}}>
-                  {'Weeks since active: ' + this.state.currentWeek}
+                  {'Weeks since active: ' + parseInt(this.state.currentWeek + 1)}
                 </Text>
               </PaperCard.Content>
             </PaperCard>

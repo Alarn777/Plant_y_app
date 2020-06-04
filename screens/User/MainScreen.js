@@ -144,6 +144,10 @@ class MainScreen extends React.Component {
       'tomato',
       'cucumber',
       'strawberry',
+      'basil',
+      'pepper',
+      'oregano',
+      'melissa'
     ];
 
     allImages.map(oneImage => {
@@ -393,8 +397,8 @@ class MainScreen extends React.Component {
           <PaperCard.Title
             title={
               this.state.username === 'Test'
-                ? 'Username: Yukio'
-                : 'Username: ' + this.state.username
+                ? 'Hello: Yukio'
+                : 'Hello: ' + this.state.username
             }
             left={props => (
               <Avatar.Image

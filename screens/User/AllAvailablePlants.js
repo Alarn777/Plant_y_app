@@ -154,6 +154,10 @@ class AllAvailablePlants extends React.Component {
       'tomato',
       'cucumber',
       'strawberry',
+        'basil',
+        'pepper',
+        'oregano',
+        'melissa'
     ];
 
     allImages.map(oneImage => {
