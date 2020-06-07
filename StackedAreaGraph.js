@@ -24,35 +24,27 @@ class StackedAreaGraph extends React.Component {
             formatter:'',
             data: [
                 {
-                    // month: new Date(2020, 0, 1),
                     min: 11,
                     avg: 28,
                     max: 33,
-                    // dates: 400,
                     label:'Mon'
                 },
                 {
-                    // month: new Date(2020, 1, 1),
                     min: 10,
                     avg: 24,
                     max: 31,
-                    // dates: 400,
                     label:'Tue'
                 },
                 {
-                    // month: new Date(2020, 2, 1),
                     min: 12,
                     avg: 22,
                     max: 38,
-                    // dates: 400,
                     label:'Wed'
                 },
                 {
-                    // month: new Date(2020, 3, 1),
                     min: 16,
                     avg: 24,
                     max: 35,
-                    // dates: 400,
                     label:'Thu'
                 },
             ],
@@ -93,52 +85,28 @@ class StackedAreaGraph extends React.Component {
         if (weekday === "Sat")
             return 5
         if (weekday === "Sun")
-            return 7
+            return 6
 
 }
     componentDidMount(): void {
-
-        // console.log(Object.keys(this.props.data).length)
-
-        // console.log(Object.keys(this.props.data))
-
-        let value = 'UV'
-
-        // console.log('props',this.props.data)
-
+        let index = 0
         switch (this.props.mode) {
+
+
             case 'uv':
                 this.state.data = []
                 this.state.label_data = []
-
-                // let arr = Array(Object.keys(this.props.data).length)
-                // console.log(arr.length)
-
-                // for(let i = 0;i < Object.keys(this.props.data).length;i++){
-                //     let index = this.WeekdayToInt(Object.keys(this.props.data)[i]);
-                //     arr[index] = this.props.data[Object.keys(this.props.data)[i]]
-                // }
-
-                // console.log('arr',arr)
-                let index = 0
                 this.state.data = Array(Object.keys(this.props.data).length)
                 this.state.label_data = Array(Object.keys(this.props.data).length)
 
                 for(let i = 0;i < Object.keys(this.props.data).length;i++){
 
 
-
                     index = this.WeekdayToInt(Object.keys(this.props.data)[i]);
-
-
-
-                    // console.log(this.props.data[Object.keys(this.props.data)[i]])
                     this.state.data[index] = {
-                        // month: new Date(2020, 0, 1),
                         min: this.props.data[Object.keys(this.props.data)[i]].uvIntensity.min,
                         avg: this.props.data[Object.keys(this.props.data)[i]].uvIntensity.avg,
                         max: this.props.data[Object.keys(this.props.data)[i]].uvIntensity.max,
-                        // dates: 400,
                         label:Object.keys(this.props.data)[i]
                     }
                     this.state.label_data[index] = Object.keys(this.props.data)[i]
@@ -150,31 +118,14 @@ class StackedAreaGraph extends React.Component {
             case 'temp':
                 this.state.data = []
                 this.state.label_data = []
-                // for(let i = 0;i < Object.keys(this.props.data).length;i++){
-                //     this.state.data.push(
-                //         {
-                //             // month: new Date(2020, 0, 1),
-                //             min: this.props.data[Object.keys(this.props.data)[i]].ambientTemperatureCelsius.min,
-                //             avg: this.props.data[Object.keys(this.props.data)[i]].ambientTemperatureCelsius.avg,
-                //             max: this.props.data[Object.keys(this.props.data)[i]].ambientTemperatureCelsius.max,
-                //             // dates: 400,
-                //             label:Object.keys(this.props.data)[i]
-                //         },
-                //     )
-                //     this.state.label_data.push(Object.keys(this.props.data)[i])
-                // }
                 for(let i = 0;i < Object.keys(this.props.data).length;i++) {
 
                     index = this.WeekdayToInt(Object.keys(this.props.data)[i]);
 
-
-                    // console.log(this.props.data[Object.keys(this.props.data)[i]])
                     this.state.data[index] = {
-                        // month: new Date(2020, 0, 1),
                         min: this.props.data[Object.keys(this.props.data)[i]].ambientTemperatureCelsius.min,
                         avg: this.props.data[Object.keys(this.props.data)[i]].ambientTemperatureCelsius.avg,
                         max: this.props.data[Object.keys(this.props.data)[i]].ambientTemperatureCelsius.max,
-                        // dates: 400,
                         label: Object.keys(this.props.data)[i]
                     }
                     this.state.label_data[index] = Object.keys(this.props.data)[i]
@@ -183,39 +134,17 @@ class StackedAreaGraph extends React.Component {
             case 'humid':
                 this.state.data = []
                 this.state.label_data = []
-
                 for(let i = 0;i < Object.keys(this.props.data).length;i++) {
 
                     index = this.WeekdayToInt(Object.keys(this.props.data)[i]);
 
-
-                    // console.log(i)
-                    // console.log(this.props.data[Object.keys(this.props.data)[i]].uvIntensity)
-
-                    // console.log(this.props.data[Object.keys(this.props.data)[i]])
                     this.state.data[index] = {
-                        // month: new Date(2020, 0, 1),
                         min: this.props.data[Object.keys(this.props.data)[i]].soilHumidity.min,
                         avg: this.props.data[Object.keys(this.props.data)[i]].soilHumidity.avg,
                         max: this.props.data[Object.keys(this.props.data)[i]].soilHumidity.max,
-                        // dates: 400,
                         label: Object.keys(this.props.data)[i]
                     }
                     this.state.label_data[index] = Object.keys(this.props.data)[i]
-
-                    // for(let i = 0;i < Object.keys(this.props.data).length;i++){
-                    //     this.state.data.push(
-                    //         {
-                    //             // month: new Date(2020, 0, 1),
-                    //             min: this.props.data[Object.keys(this.props.data)[i]].soilHumidity.min,
-                    //             avg: this.props.data[Object.keys(this.props.data)[i]].soilHumidity.avg,
-                    //             max: this.props.data[Object.keys(this.props.data)[i]].soilHumidity.max,
-                    //             // dates: 400,
-                    //             label:Object.keys(this.props.data)[i]
-                    //         },
-                    //     )
-                    //     this.state.label_data.push(Object.keys(this.props.data)[i])
-                    // }
                 }
 
                 break;
