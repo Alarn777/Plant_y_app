@@ -14,6 +14,7 @@ import AddPlantScreen from './screens/User/AddPlantScreen';
 import planterScreen from './screens/User/planterScreen';
 import History from './screens/User/history';
 import UserPage from './screens/User/UserPage';
+import AITesting from './screens/User/AITesting';
 
 import Amplify, {Auth} from 'aws-amplify';
 import awsConfig from './aws-exports';
@@ -122,6 +123,13 @@ const AppNavigator = createStackNavigator(
     history: {
       name: 'History',
       screen: History,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
+    AITesting: {
+      name: 'AITesting',
+      screen: AITesting,
       navigationOptions: {
         gesturesEnabled: false,
       },

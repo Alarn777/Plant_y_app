@@ -367,29 +367,6 @@ class UserPage extends React.Component {
             Planter Lifetimes
           </Text>
             <BarGraph data={this.state.graphData} max={Math.max(... this.state.graphData.datasets[0].data)} formatter={"W"} />
-
-
-          {/*<BarChart*/}
-          {/*  data={this.state.graphData}*/}
-          {/*  width={Dimensions.get('window').width - 10} // from react-native*/}
-          {/*  height={220}*/}
-          {/*  // yAxisLabel="Weeks"*/}
-          {/*  yAxisSuffix={' W'}*/}
-          {/*  // horizontalLabelRotation={45}*/}
-          {/*  showValuesOnTopOfBars={true}*/}
-          {/*  // showBarTops={true}*/}
-          {/*  // formatYLabel={val => {*/}
-
-          {/*  //   // console.log(val);*/}
-          {/*  //   // let val1 = parseFloat(val) * 100;*/}
-          {/*  //   return Math.floor(val).toString() + 'Weekss';*/}
-          {/*  // }}*/}
-          {/*  fromZero={true}*/}
-          {/*  yAxisInterval={1} // optional, defaults to 1*/}
-          {/*  chartConfig={chartConfig}*/}
-          {/*  bezier*/}
-          {/*  style={styles.chart}*/}
-          {/*/>*/}
           <Text style={{marginLeft: 7, color: plantyColor}}>*W - Weeks</Text>
             <View
                 style={{

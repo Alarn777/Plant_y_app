@@ -12,7 +12,11 @@ import {
 import {Storage} from 'aws-amplify';
 import PropTypes from 'prop-types';
 
-import {ActivityIndicator, Card as PaperCard} from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Card as PaperCard,
+  IconButton,
+} from 'react-native-paper';
 
 import {withAuthenticator} from 'aws-amplify-react-native';
 import {
@@ -31,6 +35,7 @@ import {bindActionCreators} from 'redux';
 import {AddAvatarLink, addImage, addUser} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
 import axios from 'axios';
+import {yellow200, yellow500} from 'react-native-paper/src/styles/colors';
 const plantyColor = '#6f9e04';
 
 class planterImagesGallery extends React.Component {
@@ -289,6 +294,19 @@ class planterImagesGallery extends React.Component {
               subtitle={
                 'Planter:' + this.props.navigation.getParam('planter').name
               }
+              right={props => (
+                <IconButton
+                  // icon="camera"
+                  icon={require('../../assets/icons/camera-outline.png')}
+                  color={plantyColor}
+                  size={40}
+                  onPress={() =>
+                    this.props.navigation.navigate('AITesting', {
+                      planter: this.state.planter,
+                    })
+                  }
+                />
+              )}
             />
           </View>
         </PaperCard>

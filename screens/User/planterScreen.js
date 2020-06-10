@@ -92,14 +92,14 @@ class planterScreen extends React.Component {
       pictureAlertText: '',
       modalVisible: false,
       deletingPlanter: false,
-      streamTurnedOn:false
+      streamTurnedOn: false,
     };
     this.loadPlants = this.loadPlants.bind(this);
     this.dealWithPlantsData = this.dealWithPlantsData.bind(this);
     this.onLayout = this.onLayout.bind(this);
 
     WS.onMessage(data => {
-      // console.log('GOT in planter screen', data.data);
+      console.log('GOT in planter screen', data.data);
 
       let instructions = data.data.split(';');
       if (instructions.length > 2)
@@ -115,30 +115,30 @@ class planterScreen extends React.Component {
             }
             break;
           case 'STREAM_STARTED':
-            setTimeout( () => {
+            setTimeout(() => {
               this.setTimePassed();
-            },1000);
+            }, 1000);
             // this.loadUrl()
             //   .then()
             //   .catch(e => console.log(e));
             break;
-          case "STREAM_ON":
+          case 'STREAM_ON':
             this.setState({
-              streamTurnedOn: true
+              streamTurnedOn: true,
             });
-            setTimeout( () => {
+            setTimeout(() => {
               this.setTimePassed();
-            },1000);
+            }, 1000);
             // this.loadUrl()
             //     .then()
             //     .catch(e => console.log(e));
             break;
-          case "STREAM_OFF":
+          case 'STREAM_OFF':
             this.setState({
-              streamTurnedOn: false
+              streamTurnedOn: false,
             });
             WS.sendMessage(
-                'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
+              'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
             );
 
             break;
@@ -163,9 +163,9 @@ class planterScreen extends React.Component {
 
   setTimePassed = () => {
     this.loadUrl()
-        .then()
-        .catch(e => console.log(e));
-  }
+      .then()
+      .catch(e => console.log(e));
+  };
 
   static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
@@ -236,14 +236,15 @@ class planterScreen extends React.Component {
     //     .catch(e => console.log(e));
     // }
 
-    this.loadPlanter().then()
-        .catch(e => console.log(e));
+    this.loadPlanter()
+      .then()
+      .catch(e => console.log(e));
 
     this.loadPlants()
       .then()
       .catch(e => console.log(e));
 
-    this.checkStream()
+    this.checkStream();
     // WS.sendMessage(
     //   'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
     // );
@@ -252,7 +253,7 @@ class planterScreen extends React.Component {
   checkStream = () => {
     if (WS.ws)
       WS.sendMessage(
-          "FROM_CLIENT;" + this.state.planter.UUID + ";VIDEO_STREAM_STATUS"
+        'FROM_CLIENT;' + this.state.planter.UUID + ';VIDEO_STREAM_STATUS',
       );
   };
 
@@ -262,31 +263,33 @@ class planterScreen extends React.Component {
     // console.log('called reload plants');
 
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
-        .idToken.jwtToken;
+      .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
 
     await axios
-        .post(
-            Consts.apigatewayRoute + '/getPlanter',
-            {
-              username: this.props.authData.username,
-              UUID:this.state.planter.UUID
-            },
-            {
-              headers: {Authorization: AuthStr},
-            },
-        )
-        .then(response => {
-          // console.log('planter ' , response.data);
-          // this.dealWithPlantsData(response.data);
+      .post(
+        Consts.apigatewayRoute + '/getPlanter',
+        {
+          username: this.props.authData.username,
+          UUID: this.state.planter.UUID,
+        },
+        {
+          headers: {Authorization: AuthStr},
+        },
+      )
+      .then(response => {
+        // console.log('planter ' , response.data);
+        // this.dealWithPlantsData(response.data);
 
-          this.setState({sickPlantDetected:response.data.sickPlantDetected,planter:response.data});
-        })
-        .catch(error => {
-          this.fetchUser()
+        this.setState({
+          sickPlantDetected: response.data.sickPlantDetected,
+          planter: response.data,
         });
+      })
+      .catch(error => {
+        this.fetchUser();
+      });
   }
-
 
   async loadUrl() {
     if (
@@ -313,20 +316,20 @@ class planterScreen extends React.Component {
             console.log('SETTING URL');
             console.log(response.data);
             if (response.data.errorMessage) {
-              this.setState({errorText:response.data.errorMessage})
+              this.setState({errorText: response.data.errorMessage});
               return;
             }
-            this.setState({errorText:''})
+            this.setState({errorText: ''});
             this.addUrl(response.data.HLSStreamingSessionURL);
           } else {
             console.log(response.data);
             console.log('NOT SETTING URL');
-            this.setState({errorText:''})
+            this.setState({errorText: ''});
             this.setState({streamUrl: this.props.plantyData.streamUrl});
           }
         } else {
           console.log(response.data);
-          this.setState({errorText:'Reload the app'})
+          this.setState({errorText: 'Reload the app'});
           console.log('No stream data URL');
           console.log(response);
         }
@@ -467,12 +470,9 @@ class planterScreen extends React.Component {
     if (plants) {
       plants.map(one => {
         if (one.plantStatus === 'inactive') {
-        }
-        else
-          this.state.plants.push(one)
-      })
-      this.forceUpdate()
-
+        } else this.state.plants.push(one);
+      });
+      this.forceUpdate();
     } else this.setState({plants: []});
 
     this.setState({refreshingPlants: false});
@@ -535,8 +535,6 @@ class planterScreen extends React.Component {
     if (item.plantStatus === 'inactive') {
       return;
     }
-
-
 
     let url = '';
     for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
@@ -661,12 +659,15 @@ class planterScreen extends React.Component {
   };
 
   renderStreamError = () => {
-    if(this.state.errorText === '') {
-      return <View/>;
-    }
-    else return  <Text style={{color:errorColor,marginTop:20}}>{this.state.errorText}</Text>
-
-  }
+    if (this.state.errorText === '') {
+      return <View />;
+    } else
+      return (
+        <Text style={{color: errorColor, marginTop: 20}}>
+          {this.state.errorText}
+        </Text>
+      );
+  };
 
   render() {
     if (this.state.loading) {
