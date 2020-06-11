@@ -17,6 +17,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {addSocket, addUser, loadPlanters} from '../../FriendActions';
 import {HeaderBackButton} from 'react-navigation-stack';
+import {Logger} from '../../Logger';
 
 class AddPlantScreen extends React.Component {
   constructor(props) {
@@ -87,9 +88,14 @@ class AddPlantScreen extends React.Component {
       .then(response => {
         this.successAdding();
       })
-      .catch(error => {
-        console.log('error ' + error);
+      .catch(e => {
         this.failureAdding();
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'addPlantsToPlanter',
+        );
+        console.log(e);
       });
   }
 

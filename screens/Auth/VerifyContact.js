@@ -78,7 +78,14 @@ export default class VerifyContact extends AuthPiece {
         logger.debug(data);
         that.setState({verifyAttr: attr});
       })
-      .catch(err => this.error(err));
+      .catch(err => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          err.toString(),
+          'verifyUser',
+        );
+        this.error(err);
+      });
   }
 
   submit() {

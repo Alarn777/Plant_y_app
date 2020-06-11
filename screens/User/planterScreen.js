@@ -43,8 +43,8 @@ import {HeaderBackButton} from 'react-navigation-stack';
 import WS from '../../websocket';
 import {PLAYER_STATES} from 'react-native-media-controls';
 import Player from './VideoPlayer';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {isIphoneX} from '../../whatDevice';
+import {Logger} from '../../Logger';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -80,7 +80,6 @@ class planterScreen extends React.Component {
       currTemperature: '',
       currUV: '',
       currHumidity: '',
-
       currentTime: 0,
       duration: 0,
       isFullScreen: false,
@@ -99,7 +98,7 @@ class planterScreen extends React.Component {
     this.onLayout = this.onLayout.bind(this);
 
     WS.onMessage(data => {
-      console.log('GOT in planter screen', data.data);
+      // console.log('GOT in planter screen', data.data);
 
       let instructions = data.data.split(';');
       if (instructions.length > 2)
@@ -118,9 +117,6 @@ class planterScreen extends React.Component {
             setTimeout(() => {
               this.setTimePassed();
             }, 1000);
-            // this.loadUrl()
-            //   .then()
-            //   .catch(e => console.log(e));
             break;
           case 'STREAM_ON':
             this.setState({
@@ -129,9 +125,6 @@ class planterScreen extends React.Component {
             setTimeout(() => {
               this.setTimePassed();
             }, 1000);
-            // this.loadUrl()
-            //     .then()
-            //     .catch(e => console.log(e));
             break;
           case 'STREAM_OFF':
             this.setState({
@@ -298,7 +291,7 @@ class planterScreen extends React.Component {
     ) {
     }
 
-    console.log('fetching url');
+    // console.log('fetching url');
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -313,8 +306,8 @@ class planterScreen extends React.Component {
             this.props.plantyData.streamUrl === undefined ||
             this.props.plantyData.streamUrl === null
           ) {
-            console.log('SETTING URL');
-            console.log(response.data);
+            // console.log('SETTING URL');
+            // console.log(response.data);
             if (response.data.errorMessage) {
               this.setState({errorText: response.data.errorMessage});
               return;
@@ -322,13 +315,13 @@ class planterScreen extends React.Component {
             this.setState({errorText: ''});
             this.addUrl(response.data.HLSStreamingSessionURL);
           } else {
-            console.log(response.data);
-            console.log('NOT SETTING URL');
+            // console.log(response.data);
+            // console.log('NOT SETTING URL');
             this.setState({errorText: ''});
             this.setState({streamUrl: this.props.plantyData.streamUrl});
           }
         } else {
-          console.log(response.data);
+          // console.log(response.data);
           this.setState({errorText: 'Reload the app'});
           console.log('No stream data URL');
           console.log(response);
@@ -336,6 +329,12 @@ class planterScreen extends React.Component {
       })
       .catch(error => {
         console.log('error ' + error);
+
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          error.toString(),
+          'loadUrl',
+        );
 
         this.fetchUser()
           .then()
@@ -356,18 +355,22 @@ class planterScreen extends React.Component {
       .then(user => {
         this.dealWithUserData(user);
       })
-      .catch(err => console.log(err));
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'fetchUser - planterScreen',
+        );
+        console.log(e);
+      });
   }
 
   dealWithUserData = user => {
     this.props.addUser(user);
-    // this.loadPlants();
-    // this.loadUrl();
   };
 
   addUrl = url => {
     this.props.addStreamUrl(url);
-    // this.setState({streamUrl: this.props.plantyData.streamUrl});
   };
 
   async loadPlants() {
@@ -390,15 +393,18 @@ class planterScreen extends React.Component {
       .then(response => {
         this.dealWithPlantsData(response.data);
       })
-      .catch(error => {
-        console.log('error ' + error);
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'loadPlants',
+        );
+        console.log(e);
       });
   }
 
   async deletePlanter() {
     this.setState({deletingPlanter: true});
-
-    console.log('In deleting Planter');
     const AuthStr = 'Bearer '.concat(
       this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
     );
@@ -408,7 +414,6 @@ class planterScreen extends React.Component {
         Consts.apigatewayRoute + '/changeStatusOfPlanter',
         {
           username: this.props.plantyData.myCognitoUser.username,
-          // planterName: this.state.item.name,
           planterUUID: this.state.planter.UUID,
           planterStatus: 'inactive',
         },
@@ -423,6 +428,11 @@ class planterScreen extends React.Component {
       .catch(error => {
         this.failureDeleting();
         console.log('error ' + error);
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          error.toString(),
+          'deletePlanter',
+        );
       });
   }
 
@@ -439,7 +449,6 @@ class planterScreen extends React.Component {
   };
 
   async acknoledgeSickPlant() {
-    // this.setState({loading: true, plants: []});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -456,13 +465,17 @@ class planterScreen extends React.Component {
         },
       )
       .then(response => {
-        // this.dealWithPlantsData(response.data);
         this.state.planter.sickPlantDetected = false;
         this.setState({sickPlantDetected: false});
         this.props.navigation.getParam('loadPlanters')();
       })
-      .catch(error => {
-        console.log('error ' + error);
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'acknoledgeSickPlant',
+        );
+        console.log(e);
       });
   }
 
@@ -480,10 +493,6 @@ class planterScreen extends React.Component {
   };
 
   async takePicture() {
-    // console.log(this.state.currUV);
-    // console.log(this.state.currHumidity);
-    // console.log(this.state.currTemperature);
-
     this.setState({loadingActions: true});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
@@ -506,13 +515,18 @@ class planterScreen extends React.Component {
       )
       .then(response => {
         this.setState({loadingActions: false});
-        // console.log(response);
         this.setState({
           pictureAlertIsOn: true,
           pictureAlertText: 'Saved picture to your gallery',
         });
       })
       .catch(error => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          error.toString(),
+          'takePicture',
+        );
+
         this.setState({loadingActions: false});
         console.log('error ' + error);
         this.setState({
@@ -557,43 +571,17 @@ class planterScreen extends React.Component {
               planterUUID: this.props.navigation.getParam('item').UUID,
             })
           }
-          // header={() => {
-          //   return (
-          //     // <TouchableOpacity
-          //     //   onPress={() =>
-          //     //     this.props.navigation.navigate('PlantScreen', {
-          //     //       item: item,
-          //     //       user_token: this.state.USER_TOKEN,
-          //     //       planterName: this.props.navigation.getParam('item').name,
-          //     //       planterUUID: this.props.navigation.getParam('item').UUID,
-          //     //     })
-          //     //   }>
-          //     <Image style={styles.headerImage} source={{uri: url}} />
-          //     // </TouchableOpacity>
-          //   );
-          // }}
           style={{width: this.state.width / 3 - 6, margin: 3, borderRadius: 5}}
           index={item.id}
           key={item.id}>
           <Image style={styles.headerImage} source={{uri: url}} />
-          {/*<TouchableOpacity*/}
-          {/*  onPress={() =>*/}
-          {/*    this.props.navigation.navigate('PlantScreen', {*/}
-          {/*      item: item,*/}
-          {/*      user_token: this.state.USER_TOKEN,*/}
-          {/*      planterName: this.props.navigation.getParam('item').name,*/}
-          {/*      planterUUID: this.props.navigation.getParam('item').UUID,*/}
-          {/*    })*/}
-          {/*  }>*/}
           <Text style={styles.partyText}>{item.name}</Text>
-          {/*</TouchableOpacity>*/}
         </PaperCard>
       </View>
     );
   };
 
   loadBuffering = () => {
-    console.log('loadBuffering');
     return (
       <View
         style={{
@@ -620,7 +608,7 @@ class planterScreen extends React.Component {
     if (this.state.videoErrorObj.videoErrorFlag)
       return (
         <View>
-          <Text syle={{color: 'red'}}>
+          <Text syle={{color: errorColor}}>
             {this.state.videoErrorObj.videoErrorMessage}
           </Text>
         </View>
@@ -629,8 +617,6 @@ class planterScreen extends React.Component {
   };
 
   renderVideo = () => {
-    // console.log(this.state.streamUrl);
-
     if (
       this.props.plantyData.streamUrl === '' ||
       this.props.plantyData.streamUrl === undefined ||
@@ -639,19 +625,6 @@ class planterScreen extends React.Component {
       return <ActivityIndicator size="large" color={plantyColor} />;
     } else
       return (
-        // <Video
-        //   source={{uri: this.props.plantyData.streamUrl, type: 'm3u8'}} // Can be a URL or a local file.
-        //   ref={ref => {
-        //     this.player = ref;
-        //   }} // Store reference
-        //   resizeMode="stretch"
-        //   paused={false}
-        //   controls={true}
-        //   onBuffer={this.loadBuffering} // Callback when remote video is buffering
-        //   onError={this.videoError} // Callback when video cannot be loaded
-        //   style={styles.backgroundVideo}
-        //   minLoadRetryCount={10}
-        // />
         <View style={{height: 200}}>
           <Player url={this.props.plantyData.streamUrl} />
         </View>
@@ -672,9 +645,7 @@ class planterScreen extends React.Component {
   render() {
     if (this.state.loading) {
       return (
-        // <View>
         <ActivityIndicator
-          // style={{flex: 1}}
           size="large"
           color={plantyColor}
           style={{top: this.state.height / 2 - 50}}
@@ -722,8 +693,6 @@ class planterScreen extends React.Component {
                 size={20}
                 style={{position: 'absolute', left: 5, top: 0}}
                 onPress={() => {
-                  // console.log('props ', this.props.plantyData.streamUrl);
-                  // console.log('state', this.state.streamUrl);
                   this.props.addStreamUrl(undefined);
                   this.loadUrl()
                     .then()
@@ -967,9 +936,6 @@ class planterScreen extends React.Component {
                   loading={this.state.deletingPlanter}
                   onPress={() => {
                     this.setState({modalVisible: true});
-                    // this.deletePlanter()
-                    //   .then(r => this.goBack())
-                    //   .catch(error => console.log(error));
                   }}>
                   Delete planter
                 </Button>

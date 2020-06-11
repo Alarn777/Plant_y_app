@@ -5,28 +5,13 @@ import {
   FlatList,
   ScrollView,
   Dimensions,
-  TouchableOpacity,
-  StatusBar, Platform,
+  StatusBar,
 } from 'react-native';
 import {Auth} from 'aws-amplify';
-
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
-import {Icon, Text, Card} from '@ui-kitten/components';
-import {
-  FAB,
-  Title,
-  Button,
-  Card as PaperCard,
-  Paragraph,
-  Avatar,
-  ActivityIndicator,
-  Colors,
-  Chip,
-  Searchbar,
-  IconButton,
-} from 'react-native-paper';
-
+import {Text} from '@ui-kitten/components';
+import {FAB, Card as PaperCard, Avatar, IconButton} from 'react-native-paper';
 import {withAuthenticator} from 'aws-amplify-react-native';
 import {
   ConfirmSignIn,
@@ -54,11 +39,8 @@ import {
 import {bindActionCreators} from 'redux';
 import WS from '../../websocket';
 import {Storage} from 'aws-amplify';
-import Const from '../../ENV_VARS';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import StackedAreaGraph from '../../StackedAreaGraph';
-import {greaterThan} from 'react-native-reanimated';
 import {isIphone7} from '../../whatDevice';
+import {Logger} from '../../Logger';
 
 const plantyColor = '#6f9e04';
 
@@ -147,7 +129,7 @@ class MainScreen extends React.Component {
       'basil',
       'pepper',
       'oregano',
-      'melissa'
+      'melissa',
     ];
 
     allImages.map(oneImage => {
@@ -178,15 +160,16 @@ class MainScreen extends React.Component {
     if (planters.Items) {
       let filteredPlanters = [];
 
-
-
       planters.Items.map(one => {
         if (one.planterStatus !== 'inactive') {
           filteredPlanters.push(one);
         }
       });
 
-      this.setState({planters: filteredPlanters, allPlanters: filteredPlanters});
+      this.setState({
+        planters: filteredPlanters,
+        allPlanters: filteredPlanters,
+      });
     } else this.setState({planters: []});
   };
 
@@ -221,9 +204,13 @@ class MainScreen extends React.Component {
       .then(response => {
         this.dealWithPlantersData(response.data);
       })
-      .catch(error => {
-        console.log('error ' + error);
-        this.fetchUser()
+      .catch(err => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          err.toString(),
+          'loadPlanters',
+        );
+        this.fetchUser();
       });
   }
 
@@ -245,8 +232,7 @@ class MainScreen extends React.Component {
   }
 
   componentDidMount(): void {
-    this.onLayout()
-
+    this.onLayout();
     this.fetchUser()
       .then(() => {
         this.props.navigation.setParams({logOut: this.logOut});
@@ -257,7 +243,14 @@ class MainScreen extends React.Component {
 
         //open socket
       })
-      .catch(e => console.log(e));
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'fetchUser - mainScreen',
+        );
+        console.log(e);
+      });
 
     const {authState, authData} = this.props;
     const user = authData;
@@ -274,7 +267,14 @@ class MainScreen extends React.Component {
     } else this.setState({username: 'Guest'});
     this.loadPlanters()
       .then()
-      .catch(e => console.log(e));
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'loadPlanters',
+        );
+        console.log(e);
+      });
 
     // if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
 
@@ -292,12 +292,15 @@ class MainScreen extends React.Component {
         this.props.AddAvatarLink(data);
         // this.setState({url: data});
       })
-      .catch(error => console.log(error));
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'getUserAvatar',
+        );
+        console.log(e);
+      });
     this.preloadImages();
-
-    // WS.sendMessage(
-    //   'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
-    // );
   }
 
   logOut = () => {
@@ -305,11 +308,16 @@ class MainScreen extends React.Component {
       .then(() => {
         this.props.cleanReduxState();
         this.props.onStateChange('signedOut');
-        // this.props.cleanReduxState();
         this.props.navigation.goBack();
-        // onStateChange('signedOut');
       })
-      .catch(e => console.log(e));
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'logOut',
+        );
+        console.log(e);
+      });
   };
 
   onLayout(e) {
@@ -344,52 +352,14 @@ class MainScreen extends React.Component {
             source={require('../../assets/greenhouse.png')}
           />
           <Text style={styles.partyText}>{item.name}</Text>
-          {/*</TouchableOpacity>*/}
         </PaperCard>
-
-        {/*<Card*/}
-        {/*  header={() => {*/}
-        {/*    return (*/}
-        {/*      <TouchableOpacity*/}
-        {/*        onPress={() => {*/}
-        {/*          // WS.init();*/}
-        {/*          this.props.navigation.navigate('planterScreen', {*/}
-        {/*            item: item,*/}
-        {/*            user_token: this.state.USER_TOKEN,*/}
-        {/*            loadPlanters: this.loadPlanters,*/}
-        {/*          });*/}
-        {/*        }}>*/}
-        {/*        <Image*/}
-        {/*          style={styles.headerImage}*/}
-        {/*          source={require('../../assets/greenhouse.png')}*/}
-        {/*        />*/}
-        {/*      </TouchableOpacity>*/}
-        {/*    );*/}
-        {/*  }}*/}
-        {/*  style={{width: this.state.width / 3 - 5, margin: 1}}*/}
-        {/*  index={item.UUID}*/}
-        {/*  key={item.UUID}>*/}
-        {/*  <TouchableOpacity*/}
-        {/*    onPress={() => {*/}
-        {/*      this.props.navigation.navigate('planterScreen', {*/}
-        {/*        item: item,*/}
-        {/*        user_token: this.state.USER_TOKEN,*/}
-        {/*        loadPlanters: this.loadPlanters,*/}
-        {/*      });*/}
-        {/*    }}>*/}
-        {/*    <Text style={styles.partyText}>{item.name}</Text>*/}
-        {/*  </TouchableOpacity>*/}
-        {/*</Card>*/}
       </View>
     );
   };
 
-
   render() {
-    let logo_width = this.state.width
-    // logo_width = 414
-    if(isIphone7())
-        logo_width = 414
+    let logo_width = this.state.width;
+    if (isIphone7()) logo_width = 414;
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <StatusBar translucent barStyle="dark-content" />
@@ -425,7 +395,7 @@ class MainScreen extends React.Component {
         </PaperCard>
         <PaperCard style={{marginTop: 5, marginBottom: 5}}>
           <Image
-              resizeMode="contain"
+            resizeMode="contain"
             style={{
               height: 100,
               width: logo_width,
@@ -437,8 +407,6 @@ class MainScreen extends React.Component {
           />
           <PaperCard.Actions />
         </PaperCard>
-
-        {/*<Card>*/}
         <PaperCard style={{marginTop: 0, marginBottom: 5}}>
           <View style={styles.header}>
             <Text style={styles.headerText}>My garden</Text>
@@ -455,8 +423,6 @@ class MainScreen extends React.Component {
             }}
           />
         </PaperCard>
-        {/*</Card>*/}
-
         <ScrollView style={styles.data}>
           <FlatList
             scrollEnabled={false}
@@ -546,7 +512,6 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   headerText: {
-    // fontSize: 20,
     marginBottom: 5,
     height: 30,
     fontWeight: 'bold',

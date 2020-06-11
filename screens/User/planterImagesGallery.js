@@ -35,7 +35,7 @@ import {bindActionCreators} from 'redux';
 import {AddAvatarLink, addImage, addUser} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
 import axios from 'axios';
-import {yellow200, yellow500} from 'react-native-paper/src/styles/colors';
+import {Logger} from '../../Logger';
 const plantyColor = '#6f9e04';
 
 class planterImagesGallery extends React.Component {
@@ -61,7 +61,14 @@ class planterImagesGallery extends React.Component {
     if (this.props.navigation.getParam('picWasRemoved')) {
       this.listPicturesData()
         .then()
-        .catch();
+        .catch(e => {
+          Logger.saveLogs(
+            this.props.plantyData.myCognitoUser.username,
+            e.toString(),
+            'planterImagesGallery - didmount',
+          );
+          console.log(e);
+        });
       this.props.navigation.setParams({picWasRemoved: false});
     }
   }
@@ -94,32 +101,15 @@ class planterImagesGallery extends React.Component {
             pictures: [...prevState.pictures, obj],
           }));
         })
-        .catch(error => console.log(error));
+        .catch(e => {
+          Logger.saveLogs(
+            this.props.plantyData.myCognitoUser.username,
+            e.toString(),
+            'preloadImages - gallery',
+          );
+          console.log(e);
+        });
     });
-
-    // await images_array.map(oneImage => {
-    //   if (oneImage.key.endsWith('/')) return;
-    //
-    //   Storage.get(oneImage.key, {
-    //     level: 'public',
-    //     type: 'image/jpg',
-    //   })
-    //     .then(data => {
-    //       let obj = {
-    //         UUID: oneImage.eTag,
-    //         url: data,
-    //         lastModified: oneImage.lastModified,
-    //         size: oneImage.size,
-    //         key: oneImage.key,
-    //       };
-    //       console.log(obj);
-    //
-    //       this.setState(prevState => ({
-    //         pictures: [...prevState.pictures, obj],
-    //       }));
-    //     })
-    //     .catch(error => console.log(error));
-    // });
   }
 
   componentDidMount(): void {
@@ -130,24 +120,6 @@ class planterImagesGallery extends React.Component {
 
   async listPicturesData() {
     this.setState({pictures: []});
-
-    // let bucketUrl =
-    //   this.props.plantyData.myCognitoUser.username +
-    //   '/' +
-    //   this.state.planter.name;
-    //
-    // Storage.list(bucketUrl, {level: 'public'})
-    //   .then(result => {
-    //     let res_arr = [];
-    //     result.map(one => {
-    //       if (one.key === bucketUrl + '/') {
-    //       } else res_arr.push(one);
-    //     });
-    //     this.preloadImages(res_arr)
-    //       .then(r => console.log())
-    //       .catch(error => console.log(error));
-    //   })
-    //   .catch(err => console.log(err));
 
     //dynamoDB
     let USER_TOKEN = this.props.authData.signInUserSession.idToken.jwtToken;
@@ -164,19 +136,21 @@ class planterImagesGallery extends React.Component {
         },
       )
       .then(response => {
-        // console.log(response.data.Items);
         this.dealWithPicsData(response.data.Items);
-        // this.setState({pictures:response.data.Items})
       })
-      .catch(error => {
-        console.log('error ' + error);
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'listPicturesData - gallery',
+        );
+        console.log(e);
       });
   }
 
   dealWithPicsData = pic_array => {
     let sorted_array = [];
     pic_array.map(one => {
-      // console.log(one);
       let planterName = one.image_key.split('/')[1];
       if (planterName === this.state.planter.name) {
         sorted_array.push(one);
@@ -257,21 +231,6 @@ class planterImagesGallery extends React.Component {
         </PaperCard>
       </TouchableOpacity>
     );
-
-    return (
-      <TouchableOpacity
-        onPress={() =>
-          this.props.navigation.navigate('Picture', {
-            picture: item,
-            planterName: this.state.planter.name,
-          })
-        }
-        style={{width: this.state.width / 2, backgroundColor: 'red'}}
-        index={item.UUID}
-        key={item.UUID}>
-        <Image height={100} width={100} source={{uri: item.url}} />
-      </TouchableOpacity>
-    );
   };
 
   render() {
@@ -296,7 +255,6 @@ class planterImagesGallery extends React.Component {
               }
               right={props => (
                 <IconButton
-                  // icon="camera"
                   icon={require('../../assets/icons/camera-outline.png')}
                   color={plantyColor}
                   size={40}
@@ -376,7 +334,6 @@ const styles = StyleSheet.create({
   header: {
     justifyContent: 'center',
     alignItems: 'center',
-    // margin: 5,
     height: 20,
     marginTop: 10,
     flexDirection: 'row',

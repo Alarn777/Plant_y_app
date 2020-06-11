@@ -39,8 +39,7 @@ import {
 } from 'react-native-paper/src/styles/colors';
 import RangeSlider from 'rn-range-slider';
 import WS from '../../websocket';
-import Slider from '@react-native-community/slider';
-
+import {Logger} from '../../Logger';
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
 
@@ -133,14 +132,18 @@ class growthPlan extends React.Component {
       .then(response => {
         this.setState({savingPlan: false});
         WS.sendMessage(
-            'FROM_CLIENT;' +
-            this.state.planter.UUID +
-            ';RELOAD_GROWTH_PLAN',
+          'FROM_CLIENT;' + this.state.planter.UUID + ';RELOAD_GROWTH_PLAN',
         );
         this.loadGrowthPlan();
       })
-      .catch(error => {
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'saveGrowthPlan',
+        );
         this.setState({growthPlan: {}, savingPlan: false});
+        console.log(e);
       });
   }
 
@@ -165,9 +168,14 @@ class growthPlan extends React.Component {
         // console.log(response.data);
         this.setState({growthPlan: response.data, loading: false});
       })
-      .catch(error => {
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'loadGrowthPlan',
+        );
         this.setState({growthPlan: {}, loading: false});
-        console.log('error ' + error);
+        console.log(e);
       });
   }
 
@@ -201,6 +209,11 @@ class growthPlan extends React.Component {
         this.loadAllGrowthPlans()
           .then()
           .catch();
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          error.toString(),
+          'publishPlan',
+        );
       });
   }
 
@@ -228,8 +241,14 @@ class growthPlan extends React.Component {
           }
         }
       })
-      .catch(error => {
-        console.log(error);
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'loadAllGrowthPlans',
+        );
+        this.setState({growthPlan: {}, savingPlan: false});
+        console.log(e);
       });
   }
 
@@ -773,7 +792,6 @@ class growthPlan extends React.Component {
               // mode="outlined"
               loading={this.state.savingPlan}
               onPress={() => {
-
                 this.saveGrowthPlan()
                   .then(
                     this.loadAllGrowthPlans()

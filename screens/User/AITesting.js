@@ -32,6 +32,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Icon} from '@ui-kitten/components';
 import {RNCamera} from 'react-native-camera';
 import {isIphone7} from '../../whatDevice';
+import {Logger} from '../../Logger';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -55,9 +56,6 @@ class AITesting extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // user: this.props.navigation.getParam('user'),
-      // USER_TOKEN: '',
-      // url: this.props.plantyData.avatarUrl,
       fileName: '',
       planter: this.props.navigation.getParam('planter'),
       filePath: null,
@@ -68,7 +66,6 @@ class AITesting extends React.Component {
       buttonMode: 'pick', //pick,upload,
       modalVisible: false,
       height: Dimensions.get('window').height,
-      // loadingActivation:false
       testingPlant: false,
       plant_tested: false,
       testingPlanticon: 'check',
@@ -84,7 +81,6 @@ class AITesting extends React.Component {
         switch (instructions[2]) {
           case 'IMAGE_STATUS_RAND':
             if (instructions[4] === 'FAILED') {
-              // this.setState({plant_tested: false});
               break;
             }
 
@@ -100,10 +96,7 @@ class AITesting extends React.Component {
     });
   }
 
-  componentDidMount(): void {
-    // console.log(this.props.plantyData.myCognitoUser.username);
-    // console.log(this.state.planter.name);
-  }
+  componentDidMount(): void {}
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
@@ -137,7 +130,6 @@ class AITesting extends React.Component {
       plant_tested: true,
       testingPlanticon: 'check',
       testingPlantText: 'Test Successful',
-      // testingPlantDisabled: true,
       buttonMode: 'upload',
     });
     setTimeout(this.changeBack, 5000);
@@ -146,8 +138,6 @@ class AITesting extends React.Component {
   changeBack = () => {
     this.setState({
       plant_tested: false,
-      // fileUri: '',
-      // fileUrl: '',
     });
   };
 
@@ -190,7 +180,6 @@ class AITesting extends React.Component {
             }}
             large
             icon={'clipboard-play-outline'}
-            // icon="cloud-upload-outline"
             label={'Evaluate'}
             onPress={() => {
               this.resize();
@@ -230,9 +219,7 @@ class AITesting extends React.Component {
 
     if (this.camera) {
       const options = {quality: 1, base64: true};
-      // this.setState({buttonMode: 'loading'});
       const response = await this.camera.takePictureAsync(options);
-      // console.log(response);
       this.setState({
         filePath: response,
         fileData: response.data,
@@ -240,6 +227,12 @@ class AITesting extends React.Component {
         buttonMode: 'upload',
         url: response.uri, //showPic
       });
+    } else {
+      Logger.saveLogs(
+        this.props.plantyData.myCognitoUser.username,
+        'Failed to access camera on devise',
+        'takePicture',
+      );
     }
   };
 
@@ -249,11 +242,15 @@ class AITesting extends React.Component {
         this.setState({
           fileUri: uri,
         });
-        // console.log('did resize');
         this.uploadImage();
       })
-      .catch(err => {
-        console.log(err);
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'resize',
+        );
+        console.log(e);
       });
   };
 
@@ -307,8 +304,6 @@ class AITesting extends React.Component {
   uploadImage = () => {
     this.setState({buttonMode: 'loading', iconMode: ''});
 
-    // RNFS.readFile(this.state.fileUri, 'base64')
-
     RNFS.readFile(this.state.fileUri, 'base64')
       .then(fileData => {
         const bufferedImageData = new Buffer.Buffer(fileData, 'base64');
@@ -329,9 +324,23 @@ class AITesting extends React.Component {
             );
             // this.setState({buttonMode: 'upload'});
           })
-          .catch(err => console.log(err));
+          .catch(e => {
+            Logger.saveLogs(
+              this.props.plantyData.myCognitoUser.username,
+              e.toString(),
+              'uploadImage',
+            );
+            console.log(e);
+          });
       })
-      .catch(error => console.log(error));
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'FileReadInUloadImage',
+        );
+        console.log(e);
+      });
   };
 
   render() {
@@ -388,26 +397,39 @@ class AITesting extends React.Component {
   }
 
   cancelFileUpload = () => {
-    // console.log(this.state.filePath.uri);
-
     const filePath = this.state.filePath.uri.split('///').pop();
-    // console.log(filePath);
-
-    RNFS.exists(filePath).then(res => {
-      if (res) {
-        RNFS.unlink(filePath).then(() => {
-          console.log('FILE DELETED');
-          this.setState({
-            filePath: null,
-            fileData: null,
-            fileUri: '',
-            buttonMode: 'pick',
-            url: '',
-            iconMode: '',
-          });
-        });
-      }
-    });
+    try {
+      RNFS.exists(filePath).then(res => {
+        if (res) {
+          RNFS.unlink(filePath)
+            .then(() => {
+              this.setState({
+                filePath: null,
+                fileData: null,
+                fileUri: '',
+                buttonMode: 'pick',
+                url: '',
+                iconMode: '',
+              });
+            })
+            .catch(e => {
+              Logger.saveLogs(
+                this.props.plantyData.myCognitoUser.username,
+                e.toString(),
+                'unlinkFile',
+              );
+              console.log(e);
+            });
+        }
+      });
+    } catch (e) {
+      Logger.saveLogs(
+        this.props.plantyData.myCognitoUser.username,
+        e.toString(),
+        'cancelFileUpload',
+      );
+      console.log(e);
+    }
   };
 }
 

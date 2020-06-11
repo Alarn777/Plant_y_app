@@ -31,6 +31,7 @@ import {HeaderBackButton} from 'react-navigation-stack';
 import {bindActionCreators} from 'redux';
 import {AddAvatarLink, addImage, addUser} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
+import {Logger} from '../../Logger';
 const plantyColor = '#6f9e04';
 
 class AllAvailablePlants extends React.Component {
@@ -92,8 +93,13 @@ class AllAvailablePlants extends React.Component {
       .then(response => {
         this.dealWithPlantsData(response.data);
       })
-      .catch(error => {
-        console.log('error ' + error);
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'getAllAvailablePlants',
+        );
+        console.log(e);
       });
   }
 
@@ -103,7 +109,6 @@ class AllAvailablePlants extends React.Component {
     if (user) {
       const {usernameAttributes = []} = this.props;
       if (usernameAttributes === 'email') {
-        // Email as Username
         this.setState({
           userName: user.attributes ? user.attributes.email : user.username,
         });
@@ -144,8 +149,6 @@ class AllAvailablePlants extends React.Component {
   };
 
   preloadImages = () => {
-    // if (!this.state.preloadImages) return;
-
     let allImages = [
       'mint',
       'potato',
@@ -154,10 +157,10 @@ class AllAvailablePlants extends React.Component {
       'tomato',
       'cucumber',
       'strawberry',
-        'basil',
-        'pepper',
-        'oregano',
-        'melissa'
+      'basil',
+      'pepper',
+      'oregano',
+      'melissa',
     ];
 
     allImages.map(oneImage => {
@@ -168,12 +171,15 @@ class AllAvailablePlants extends React.Component {
         .then(data => {
           this.state.picArray.push({name: oneImage, URL: data});
         })
-        .catch(error => {
-          console.log(error);
+        .catch(e => {
+          Logger.saveLogs(
+            this.props.plantyData.myCognitoUser.username,
+            e.toString(),
+            'preloadImages',
+          );
+          console.log(e);
         });
     });
-
-    // this.setState({preloadImages: true});
   };
 
   onLayout(e) {
@@ -188,15 +194,6 @@ class AllAvailablePlants extends React.Component {
   _renderItem = ({item}) => {
     let url = '';
 
-    // for (let i = 0; i < this.props.plantyData.plantsImages.length; i++) {
-    //   if (
-    //     this.props.plantyData.plantsImages[i].name.toLowerCase() ===
-    //     item.name.toLowerCase()
-    //   ) {
-    //     url = this.props.plantyData.plantsImages[i].URL;
-    //   }
-    // }
-
     for (let i = 0; i < this.state.picArray.length; i++) {
       if (
         this.state.picArray[i].name.toLowerCase() === item.name.toLowerCase()
@@ -206,9 +203,6 @@ class AllAvailablePlants extends React.Component {
     }
 
     item.pic = url;
-
-    // console.log(item);
-
     return (
       <View>
         <PaperCard

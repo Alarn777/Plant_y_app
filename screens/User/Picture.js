@@ -12,6 +12,7 @@ import {bindActionCreators} from 'redux';
 import {AddAvatarLink} from '../../FriendActions';
 import {Storage} from 'aws-amplify';
 import WS from '../../websocket';
+import {Logger} from '../../Logger';
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
 
@@ -42,7 +43,6 @@ class Picture extends React.Component {
         switch (instructions[2]) {
           case 'IMAGE_STATUS':
             if (instructions[4] === 'FAILED') {
-              // this.setState({plant_tested: false});
               break;
             }
 
@@ -56,8 +56,6 @@ class Picture extends React.Component {
             break;
         }
     });
-
-    this.checkPlantHealth = this.checkPlantHealth.bind(this);
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -87,66 +85,12 @@ class Picture extends React.Component {
     };
   };
 
+  //left in case we need to roll back to aws-rekognition
   async checkPlantHealth() {
     this.setState({testingPlantText: 'Testing...'});
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
-
-    // this.setState({healthStatus: 100 - 60});
-    // this.successTesting();
-    // return;
-
-    // console.log(this.props.navigation.getParam('picture').key);
-
-    //socket
-
-    // WS.sendMessage(
-    //   'FROM_CLIENT;' +
-    //     this.state.item.UUID +
-    //     ';CHECK_IMAGE;' +
-    //     this.props.navigation.getParam('picture').key,
-    // );
-
-    return;
-    //ec2
-    await axios
-      .post(
-        Consts.apigatewayRoute + '/testplantpictureec2AI',
-        {
-          image: this.props.navigation.getParam('picture').key,
-        },
-        {
-          headers: {Authorization: AuthStr},
-        },
-      )
-      .then(response => {
-        // If request is good...
-        // console.log(response.data);
-        // console.log(response);
-        // let labels_array = response.data.body.CustomLabels;
-        // console.log(labels_array);
-
-        // console.log(response.data.body);
-
-        let a = JSON.parse(response.data.body);
-
-        // console.log(a['image-status']);
-
-        let sick = 0.0;
-
-        if (a['image-status'] === 'sick') sick = 100;
-        else sick = 0.0;
-        this.setState({healthStatus: 100 - sick});
-
-        this.successTesting();
-      })
-      .catch(error => {
-        this.failureTesting();
-        console.log('error ' + error);
-      });
-
-    return;
 
     //recognition
     await axios
@@ -160,11 +104,7 @@ class Picture extends React.Component {
         },
       )
       .then(response => {
-        // If request is good...
-        // console.log(response.data);
-        // console.log(response);
         let labels_array = response.data.body.CustomLabels;
-        // console.log(labels_array);
 
         let sick = 0.0;
         labels_array.map(one => {
@@ -172,23 +112,24 @@ class Picture extends React.Component {
             sick = parseFloat(one.Confidence);
           }
         });
-        // console.log(100 - sick);
         this.setState({healthStatus: 100 - sick});
 
         this.successTesting();
       })
-      .catch(error => {
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'checkPlantHealth',
+        );
         this.failureTesting();
-        console.log('error ' + error);
+        console.log(e);
       });
   }
 
   async deletePicture() {
     this.setState({deletingPic: true});
     let pictureKey = this.props.navigation.getParam('picture').key;
-    // console.log(
-    //   this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
-    // );
     Storage.remove(pictureKey, {level: 'public'})
       .then(result => {
         //dynamoDB
@@ -209,20 +150,25 @@ class Picture extends React.Component {
             },
           )
           .then(response => {
-            // console.log(response);
-            // this.dealWithPicsData(response.data.Items);
             this.setState({deletingPic: true});
-            // this.setState({pictures:response.data.Items})
           })
-          .catch(error => {
-            console.log('error ' + error);
+          .catch(e => {
+            Logger.saveLogs(
+              this.props.plantyData.myCognitoUser.username,
+              e.toString(),
+              'deletePicture-dynamoDB',
+            );
+            console.log(e);
           });
-
-        // this.setState({deletingPic: true});
       })
-      .catch(err => {
-        console.log(err);
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'deletePicture - s3',
+        );
         this.setState({deletingPic: false});
+        console.log(e);
       });
   }
 
@@ -238,7 +184,6 @@ class Picture extends React.Component {
       plant_tested: true,
       testingPlanticon: 'check',
       testingPlantText: 'Test Successful',
-      // testingPlantDisabled: true,
     });
     setTimeout(this.changeBack, 5000);
   };
@@ -246,7 +191,6 @@ class Picture extends React.Component {
   changeBack = () => {
     this.setState({
       plant_tested: false,
-
       testingPlantText: 'Test',
       testingPlant: false,
       testingPlanticon: 'clipboard-play-outline',

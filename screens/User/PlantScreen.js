@@ -9,6 +9,7 @@ import {connect} from 'react-redux';
 import {HeaderBackButton} from 'react-navigation-stack';
 import {bindActionCreators} from 'redux';
 import {AddAvatarLink} from '../../FriendActions';
+import {Logger} from '../../Logger';
 
 const plantyColor = '#6f9e04';
 
@@ -86,7 +87,11 @@ class PlantScreen extends React.Component {
         this.successDeleting();
       })
       .catch(error => {
-        console.log('error ' + error);
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          error.toString(),
+          'removePlantFromPlanter',
+        );
         this.failureDeleting();
       });
   }
@@ -149,46 +154,6 @@ class PlantScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container}>
-        {/*<Card*/}
-        {/*  header={() => {*/}
-        {/*    return <Text style={styles.mainText}>{item.name}</Text>;*/}
-        {/*  }}*/}
-        {/*  footer={() => {*/}
-        {/*    return (*/}
-        {/*      <Button*/}
-        {/*        icon={this.state.deletingPlanticon}*/}
-        {/*        style={{margin: 10}}*/}
-        {/*        loading={this.state.deletingPlant}*/}
-        {/*        disabled={this.state.addingPlantDisabled}*/}
-        {/*        mode="outlined"*/}
-        {/*        backgroundColor="#6f9e04"*/}
-        {/*        color="#6f9e04"*/}
-        {/*        onPress={() => {*/}
-        {/*          this.removePlantFromPlanter()*/}
-        {/*            .then()*/}
-        {/*            .catch();*/}
-        {/*        }}>*/}
-        {/*        {this.state.deletingPlantText}*/}
-        {/*      </Button>*/}
-        {/*    );*/}
-        {/*  }}>*/}
-        {/*  <Image*/}
-        {/*    style={{height: 300}}*/}
-        {/*    source={{uri: this.props.navigation.getParam('item').pic}}*/}
-        {/*  />*/}
-        {/*  <Text style={styles.mainText}>Description</Text>*/}
-        {/*  <Text>{this.props.navigation.getParam('item').description}</Text>*/}
-        {/*  <Divider />*/}
-        {/*  <Text style={{marginTop: 10, fontWeight: 'bold'}}>*/}
-        {/*    Appropriate soils:*/}
-        {/*    {this.props.navigation.getParam('item').soil.type}*/}
-        {/*  </Text>*/}
-        {/*  <Text style={{marginTop: 10, color: color}}>*/}
-        {/*    Plant status:*/}
-        {/*    {this.props.navigation.getParam('item').plantStatus}*/}
-        {/*  </Text>*/}
-        {/*</Card>*/}
-
         <PaperCard>
           <PaperCard.Title
             title={item.name}

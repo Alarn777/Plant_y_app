@@ -2,40 +2,18 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import {Image, TouchableOpacity, View, Dimensions} from 'react-native';
-import {Auth} from 'aws-amplify';
+import {Image, View, Dimensions} from 'react-native';
 import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart,
-} from 'react-native-chart-kit';
-import {
-  Avatar,
   Card as PaperCard,
-  Card,
-  IconButton,
   Text,
-  Provider,
   Button,
-  TextInput,
   Switch,
-  Badge,
-  Snackbar,
   Divider,
-  ToggleButton,
   FAB,
   Paragraph,
   Dialog,
   Portal,
-  TouchableRipple,
-  Title,
-  Headline,
-  Caption,
   Chip,
-  BottomNavigation,
 } from 'react-native-paper';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Consts from '../../ENV_VARS';
@@ -55,51 +33,6 @@ import AreaGraph from '../../AreaGraph';
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
 
-const data = {
-  labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-  datasets: [
-    {
-      data: [20, 45, 28, 80, 99, 43],
-    },
-  ],
-};
-
-const chartConfig = {
-  backgroundGradientFrom: plantyColor,
-  decimalPlaces: 2, // optional, defaults to 2dp
-  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-};
-
-const dayData = {
-  labels: [
-    '0',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '22',
-  ],
-  datasets: [
-    {
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    },
-  ],
-};
 class AdjustPlanterConditions extends React.Component {
   constructor(props) {
     super(props);
@@ -211,14 +144,12 @@ class AdjustPlanterConditions extends React.Component {
     });
   }
   componentDidMount(): void {
-      // console.log(this.state.item.plots)
-
     this.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
 
     let currentTime = new Date().getTime() / 1000;
-    let activatedTime = this.state.item.TimeActivated;
+    let activatedTime = 0;
+    if (this.state.item) activatedTime = this.state.item.TimeActivated;
     let currentWeek = (currentTime - activatedTime) / 86400;
-    // currentWeek = currentWeek / 24;
     currentWeek = parseInt(currentWeek / 7);
     this.setState({currentWeek: currentWeek});
   }
@@ -485,43 +416,21 @@ class AdjustPlanterConditions extends React.Component {
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               Temperature over this day
             </Paragraph>
-                  <AreaGraph formatter={'C'} data={item.plots.daily.ambientTemperatureCelsius}   y={[-10,60]}/>
-            {/*<LineChart*/}
-            {/*  formatYLabel={val => {*/}
-            {/*    // let val1 = parseFloat(val) * 100;*/}
-            {/*    return Math.floor(val).toString() + ' C';*/}
-            {/*  }}*/}
-            {/*  data={item.plots.daily.ambientTemperatureCelsius}*/}
-            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-            {/*  height={220}*/}
-            {/*  fromZero={true}*/}
-            {/*  // yAxisSuffix="C"*/}
-            {/*  yAxisInterval={1} // optional, defaults to 1*/}
-            {/*  chartConfig={chartConfig}*/}
-            {/*  style={styles.chart}*/}
-            {/*/>*/}
+            <AreaGraph
+              formatter={'C'}
+              data={item.plots.daily.ambientTemperatureCelsius}
+              y={[-10, 60]}
+            />
             <Divider />
             <Paragraph
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               Temperature over the week
             </Paragraph>
-            {/*<BarChart*/}
-            {/*  formatYLabel={val => {*/}
-            {/*    // let val1 = parseFloat(val) * 100;*/}
-            {/*    return Math.floor(val).toString() + ' C';*/}
-            {/*  }}*/}
-            {/*  data={item.plots.weekly.ambientTemperatureCelsius}*/}
-            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-            {/*  height={220}*/}
-            {/*  // yAxisLabel="$"*/}
-            {/*  // yAxisSuffix="C"*/}
-            {/*  fromZero={true}*/}
-            {/*  yAxisInterval={1} // optional, defaults to 1*/}
-            {/*  chartConfig={chartConfig}*/}
-            {/*  bezier*/}
-            {/*  style={styles.chart}*/}
-            {/*/>*/}
-              <StackedAreaGraph data={item.plots.weekly} formatter={'C'} mode={'temp'}/>
+            <StackedAreaGraph
+              data={item.plots.weekly}
+              formatter={'C'}
+              mode={'temp'}
+            />
           </View>
         );
       case 'humidity':
@@ -536,46 +445,21 @@ class AdjustPlanterConditions extends React.Component {
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               Humidity over this day
             </Paragraph>
-              <AreaGraph formatter={'%'} data={item.plots.daily.soilHumidity} y={[0,1]}/>
-            {/*<LineChart*/}
-            {/*  // yLabelsOffset={0}*/}
-            {/*  data={item.plots.daily.soilHumidity}*/}
-            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-            {/*  height={220}*/}
-            {/*  fromZero={true}*/}
-            {/*  // withVerticalLabels={true}*/}
-            {/*  // yAxisSuffix="%"*/}
-            {/*  yAxisInterval={1} // optional, defaults to 1*/}
-            {/*  chartConfig={chartConfig}*/}
-            {/*  style={styles.chart}*/}
-            {/*  segments={2}*/}
-            {/*  formatYLabel={val => {*/}
-            {/*    let val1 = parseFloat(val) * 100;*/}
-            {/*    return val1.toString() + '%';*/}
-            {/*  }}*/}
-            {/*/>*/}
+            <AreaGraph
+              formatter={'%'}
+              data={item.plots.daily.soilHumidity}
+              y={[0, 1]}
+            />
             <Divider />
             <Paragraph
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               Humidity over the week
             </Paragraph>
-            {/*<BarChart*/}
-            {/*  data={item.plots.weekly.soilHumidity}*/}
-            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-            {/*  height={220}*/}
-            {/*  // yAxisLabel="$"*/}
-            {/*  // yAxisSuffix=""*/}
-            {/*  fromZero={true}*/}
-            {/*  yAxisInterval={1} // optional, defaults to 1*/}
-            {/*  chartConfig={chartConfig}*/}
-            {/*  bezier*/}
-            {/*  style={styles.chart}*/}
-            {/*  formatYLabel={val => {*/}
-            {/*    let val1 = parseFloat(val) * 100;*/}
-            {/*    return val1.toString() + '%';*/}
-            {/*  }}*/}
-            {/*/>*/}
-              <StackedAreaGraph data={item.plots.weekly} formatter={''} mode={'humid'}/>
+            <StackedAreaGraph
+              data={item.plots.weekly}
+              formatter={''}
+              mode={'humid'}
+            />
           </View>
         );
       case 'uv':
@@ -590,47 +474,27 @@ class AdjustPlanterConditions extends React.Component {
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               UV over this day
             </Paragraph>
-              <AreaGraph formatter={''} data={item.plots.daily.uvIntensity} y={[0,1000]}/>
-            {/*<LineChart*/}
-            {/*  formatYLabel={val => {*/}
-            {/*    // let val1 = parseFloat(val) * 100;*/}
-            {/*    return Math.floor(val).toString() + '';*/}
-            {/*  }}*/}
-            {/*  data={item.plots.daily.uvIntensity}*/}
-            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-            {/*  height={220}*/}
-            {/*  fromZero={true}*/}
-            {/*  yAxisSuffix=""*/}
-            {/*  yAxisInterval={1} // optional, defaults to 1*/}
-            {/*  chartConfig={chartConfig}*/}
-            {/*  style={styles.chart}*/}
-            {/*/>*/}
+            <AreaGraph
+              formatter={''}
+              data={item.plots.daily.uvIntensity}
+              y={[0, 1000]}
+            />
             <Divider />
             <Paragraph
               style={{fontWeight: 'bold', fontSize: 15, marginTop: 15}}>
               UV over the week
             </Paragraph>
-            {/*<BarChart*/}
-            {/*  data={item.plots.weekly.uvIntensity}*/}
-            {/*  width={Dimensions.get('window').width - 40} // from react-native*/}
-            {/*  height={220}*/}
-            {/*  // yAxisLabel="$"*/}
-            {/*  yAxisSuffix=""*/}
-            {/*  fromZero={true}*/}
-            {/*  yAxisInterval={1} // optional, defaults to 1*/}
-            {/*  chartConfig={chartConfig}*/}
-            {/*  bezier*/}
-            {/*  style={styles.chart}*/}
-            {/*/>*/}
-              <StackedAreaGraph data={item.plots.weekly} formatter={''} mode={'uv'} />
+            <StackedAreaGraph
+              data={item.plots.weekly}
+              formatter={''}
+              mode={'uv'}
+            />
           </View>
         );
     }
   }
 
   render() {
-    // console.log(this.props.plantyData);
-
     if (this.state.manualMode) {
       return (
         <KeyboardAwareScrollView style={{margin: '1%', width: '98%'}}>
@@ -743,7 +607,8 @@ class AdjustPlanterConditions extends React.Component {
                 </Text>
                 <Divider />
                 <Text style={{marginBottom: 10, marginTop: 10}}>
-                  {'Weeks since active: ' + parseInt(this.state.currentWeek + 1)}
+                  {'Weeks since active: ' +
+                    parseInt(this.state.currentWeek + 1)}
                 </Text>
               </PaperCard.Content>
             </PaperCard>

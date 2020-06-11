@@ -17,6 +17,7 @@ import Consts from '../../ENV_VARS';
 import {bindActionCreators} from 'redux';
 import {addAction, AddAvatarLink, sendMessage} from '../../FriendActions';
 import connect from 'react-redux/lib/connect/connect';
+import {Logger} from '../../Logger';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
@@ -77,8 +78,13 @@ class addPlanterScreen extends React.Component {
         }
         this.setState({growthPlansOptions: data1});
       })
-      .catch(error => {
-        console.log(error);
+      .catch(e => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'loadAllGrowthPlans',
+        );
+        console.log(e);
       });
   }
 
@@ -149,9 +155,14 @@ class addPlanterScreen extends React.Component {
       .then(response => {
         this.dealWithUrlData(response.data);
       })
-      .catch(error => {
+      .catch(e => {
         this.failureAdding();
-        console.log('error ' + error);
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'addPlanterToMyGarden',
+        );
+        console.log(e);
       });
   }
 

@@ -53,7 +53,14 @@ export default class ForgotPassword extends AuthPiece {
         logger.debug(data);
         this.setState({delivery: data.CodeDeliveryDetails});
       })
-      .catch(err => this.error(err));
+      .catch(err => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          err.toString(),
+          'ForgotPassword',
+        );
+        this.error(err);
+      });
   }
 
   submit() {
@@ -64,7 +71,14 @@ export default class ForgotPassword extends AuthPiece {
         logger.debug(data);
         this.changeState('signIn');
       })
-      .catch(err => this.error(err));
+      .catch(err => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          err.toString(),
+          'ForgotPasswordSubmit',
+        );
+        this.error(err);
+      });
   }
 
   forgotBody(theme) {

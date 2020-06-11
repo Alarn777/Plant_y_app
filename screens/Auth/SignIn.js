@@ -13,13 +13,14 @@
 
 import React from 'react';
 import {
-    View,
-    TouchableWithoutFeedback,
-    Keyboard,
-    ImageBackground,
-    StatusBar,
-    Image,
-    Dimensions, Alert,
+  View,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ImageBackground,
+  StatusBar,
+  Image,
+  Dimensions,
+  Alert,
 } from 'react-native';
 StatusBar.setBarStyle('light-content', true);
 import {Auth, I18n, Logger, JS} from 'aws-amplify';
@@ -45,18 +46,17 @@ import WS from '../../websocket';
 import {isIphone7, isIphoneX} from '../../whatDevice';
 const logger = new Logger('SignIn');
 import * as Keychain from 'react-native-keychain';
-import TouchID from 'react-native-touch-id'
+import TouchID from 'react-native-touch-id';
 import IconButton from 'react-native-paper/src/components/IconButton';
 
 const optionalConfigObject = {
-    title: "Authentication Required", // Android
-    color: "#e00606", // Android,
-    fallbackLabel: "Show Passcode" // iOS (if empty, then label is hidden)
-}
+  title: 'Authentication Required', // Android
+  color: '#e00606', // Android,
+  fallbackLabel: 'Show Passcode', // iOS (if empty, then label is hidden)
+};
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
-
 
 class SignIn extends AuthPiece {
   constructor(props) {
@@ -69,100 +69,94 @@ class SignIn extends AuthPiece {
       error: null,
       loginigIn: false,
       redFields: false,
-      FaceIDIsOn:false,
-      idIsSupported:false
+      FaceIDIsOn: false,
+      idIsSupported: false,
     };
 
     this.checkContact = this.checkContact.bind(this);
     this.signIn = this.signIn.bind(this);
   }
 
-    async checkIfIdActivated() {
-        try {
-            //retrieve the credentials from keychain if saved.
-            let credentials = await Keychain.getGenericPassword()
-            if (credentials) {
-                this.setState({FaceIDIsOn:true})
-            }
-            else
-                this.setState({FaceIDIsOn:false})
-        }
-        catch(err) {
-            this.setState({FaceIDIsOn:false})
-            // if(err.message !== 'No keychain entry found') //No password exists in the key chain...
-            // else //some other error occurred.
-        }
-
+  async checkIfIdActivated() {
+    try {
+      //retrieve the credentials from keychain if saved.
+      let credentials = await Keychain.getGenericPassword();
+      if (credentials) {
+        this.setState({FaceIDIsOn: true});
+      } else this.setState({FaceIDIsOn: false});
+    } catch (err) {
+      this.setState({FaceIDIsOn: false});
+      // if(err.message !== 'No keychain entry found') //No password exists in the key chain...
+      // else //some other error occurred.
     }
+  }
 
   componentDidMount(): void {
-      // TouchID.authenticate('to demo this react-native component', optionalConfigObject)
-      //     .then(success => {
-      //         Alert.alert('Authenticated Successfully');
-      //     })
-      //     .catch(error => {
-      //         Alert.alert('Authentication Failed');
-      //     });
-      this.checkIftouchFaceIsSupported()
-      this.checkIfIdActivated().then().catch()
-
+    // TouchID.authenticate('to demo this react-native component', optionalConfigObject)
+    //     .then(success => {
+    //         Alert.alert('Authenticated Successfully');
+    //     })
+    //     .catch(error => {
+    //         Alert.alert('Authentication Failed');
+    //     });
+    this.checkIftouchFaceIsSupported();
+    this.checkIfIdActivated()
+      .then()
+      .catch();
   }
 
   checkIftouchFaceIsSupported = () => {
-      TouchID.isSupported()
-          .then(biometryType => {
-              // Success code
-              if (biometryType === 'FaceID') {
-                  // console.log('FaceID is supported.');
-                  this.setState({idIsSupported:true,idIcon:'face'})
+    TouchID.isSupported()
+      .then(biometryType => {
+        // Success code
+        if (biometryType === 'FaceID') {
+          // console.log('FaceID is supported.');
+          this.setState({idIsSupported: true, idIcon: 'face'});
+        } else if (biometryType === 'TouchID') {
+          // console.log('TouchID is supported.');
+          this.setState({idIsSupported: true, idIcon: 'fingerprint'});
+        } else if (biometryType === true) {
+          // Touch ID is supported on Android
+        }
+      })
+      .catch(error => {
+        // Failure code if the user's device does not have touchID or faceID enabled
+        console.log(error);
+      });
+  };
 
-              } else if (biometryType === 'TouchID'){
-                  // console.log('TouchID is supported.');
-                  this.setState({idIsSupported:true,idIcon:'fingerprint'})
-              } else if (biometryType === true) {
-                  // Touch ID is supported on Android
-              }
-          })
-          .catch(error => {
-              // Failure code if the user's device does not have touchID or faceID enabled
-              console.log(error);
-          });
-  }
+  handleTouchIDPress = () => {
+    // User presses the "Login using Touch ID" button
 
+    Keychain.getGenericPassword() // Retrieve the credentials from the keychain
+      .then(credentials => {
+        const {username, password} = credentials;
+        // console.log(username,password)
+        // Prompt the user to authenticate with Touch ID.
+        // You can display the username in the prompt
+        TouchID.authenticate(`to login with username "${username}"`).then(
+          () => {
+            this.setState({username: username, password: password});
+            this.signIn();
 
-    handleTouchIDPress = () => {              // User presses the "Login using Touch ID" button
+            // If Touch ID authentication is successful, call the `login` api
+            // login(username, password)
+            //     .then(() => {
+            //         // Handle login success
+            //     })
+            //     .catch(error => {
+            //         if (error === 'INVALID_CREDENTIALS') {
+            //             // The keychain contained invalid credentials :(
+            //             // We need to clear the keychain and the user will have to sign in manually
+            //             Keychain.resetGenericPassword();
+            //         }
+            //     })
+          },
+        );
+      });
+  };
 
-        Keychain.getGenericPassword()   // Retrieve the credentials from the keychain
-            .then(credentials => {
-                const { username, password } = credentials;
-                // console.log(username,password)
-                // Prompt the user to authenticate with Touch ID.
-                // You can display the username in the prompt
-                TouchID.authenticate(`to login with username "${username}"`)
-                    .then(() => {
-
-                        this.setState({username:username,password:password})
-                        this.signIn()
-
-                        // If Touch ID authentication is successful, call the `login` api
-                        // login(username, password)
-                        //     .then(() => {
-                        //         // Handle login success
-                        //     })
-                        //     .catch(error => {
-                        //         if (error === 'INVALID_CREDENTIALS') {
-                        //             // The keychain contained invalid credentials :(
-                        //             // We need to clear the keychain and the user will have to sign in manually
-                        //             Keychain.resetGenericPassword();
-                        //         }
-                        //     })
-                    });
-            });
-    };
-
-
-
-    signIn() {
+  signIn() {
     this.setState({loginigIn: true});
     const username = this.getUsernameFromInput() || '';
     if (username === '') return;
@@ -202,8 +196,13 @@ class SignIn extends AuthPiece {
             // console.log(response.data);
             // this.dealWithUrlData(response.data);
           })
-          .catch(error => {
-            console.log('error ' + error);
+          .catch(e => {
+            Logger.saveLogs(
+              this.props.plantyData.myCognitoUser.username,
+              e.toString(),
+              'createPlanterPictures',
+            );
+            console.log(e);
           });
 
         //create planter table for user if not exists yet
@@ -217,18 +216,23 @@ class SignIn extends AuthPiece {
               headers: {Authorization: AuthStr},
             },
           )
-          .then(response => {
-            // If request is good...
-            // console.log(response.data);
-            // this.dealWithUrlData(response.data);
-          })
-          .catch(error => {
-            console.log('error ' + error);
+          .then(response => {})
+          .catch(e => {
+            Logger.saveLogs(
+              this.props.plantyData.myCognitoUser.username,
+              e.toString(),
+              'createPlanterTable',
+            );
+            console.log(e);
           });
       })
       .catch(err => {
-        // this.setState({error: true});
-        console.log(err);
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          err.toString(),
+          'authLogin',
+        );
+        console.log(e);
         this.setState({redFields: true});
         this.setState({loginigIn: false});
         this.error(err);
@@ -314,37 +318,40 @@ class SignIn extends AuthPiece {
                   secureTextEntry={true}
                   required={true}
                 />
-                <View style={{
+                <View
+                  style={{
                     flexDirection: 'row',
                     flexWrap: 'wrap',
                     justifyContent: 'space-between',
                     // padding: 8,
-                }}>
-                <Button
-                  loading={this.state.loginigIn}
-                  disabled={
-                    !this.getUsernameFromInput() ||
-                    // !this.state.username ||
-                    !this.state.password
-                  }
-                  mode="contained"
-                  style={{padding: 10,width:'80%',height:55}}
-                  backgroundColor="#6f9e04"
-                  // backgroundColor={''}
-                  color="#6f9e04"
-                  // onPress={() => this.changeState('confirmSignUp', 'LOL')}
-                  onPress={this.signIn}>
-                  {/*{I18n.get('Sign In').toUpperCase()}*/}
+                  }}>
+                  <Button
+                    loading={this.state.loginigIn}
+                    disabled={
+                      !this.getUsernameFromInput() ||
+                      // !this.state.username ||
+                      !this.state.password
+                    }
+                    mode="contained"
+                    style={{padding: 10, width: '80%', height: 55}}
+                    backgroundColor="#6f9e04"
+                    // backgroundColor={''}
+                    color="#6f9e04"
+                    // onPress={() => this.changeState('confirmSignUp', 'LOL')}
+                    onPress={this.signIn}>
+                    {/*{I18n.get('Sign In').toUpperCase()}*/}
                     {'Sign In'.toUpperCase()}
-                </Button>
+                  </Button>
                   <IconButton
-                      // style={{margin:'1%'}}
-                      disabled={!this.state.FaceIDIsOn || !this.state.idIsSupported}
-                      icon={this.state.idIcon}
-                      // color={plantyColor}
-                      color={'white'}
-                      size={30}
-                      onPress={() => this.handleTouchIDPress()}
+                    // style={{margin:'1%'}}
+                    disabled={
+                      !this.state.FaceIDIsOn || !this.state.idIsSupported
+                    }
+                    icon={this.state.idIcon}
+                    // color={plantyColor}
+                    color={'white'}
+                    size={30}
+                    onPress={() => this.handleTouchIDPress()}
                   />
                 </View>
               </View>

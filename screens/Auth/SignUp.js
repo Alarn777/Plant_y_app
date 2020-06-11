@@ -219,7 +219,14 @@ export default class SignUp extends AuthPiece {
       .then(data => {
         this.changeState('confirmSignUp', data.user.username);
       })
-      .catch(err => this.error(err));
+      .catch(err => {
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          err.toString(),
+          'confirmSignUp',
+        );
+        this.error(err);
+      });
   }
 
   showComponent(theme) {
