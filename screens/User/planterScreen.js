@@ -218,17 +218,6 @@ class planterScreen extends React.Component {
         this.props.navigation.getParam('logOut')();
       });
 
-    // console.log(this.props.plantyData.streamUrl);
-
-    // if (
-    //   this.props.plantyData.streamUrl === undefined ||
-    //   this.props.plantyData.streamUrl === null
-    // ) {
-    //   this.loadUrl()
-    //     .then()
-    //     .catch(e => console.log(e));
-    // }
-
     this.loadPlanter()
       .then()
       .catch(e => console.log(e));
@@ -238,9 +227,6 @@ class planterScreen extends React.Component {
       .catch(e => console.log(e));
 
     this.checkStream();
-    // WS.sendMessage(
-    //   'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
-    // );
   }
 
   checkStream = () => {
@@ -251,10 +237,6 @@ class planterScreen extends React.Component {
   };
 
   async loadPlanter() {
-    // console.log('loading plants.');
-
-    // console.log('called reload plants');
-
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -271,9 +253,6 @@ class planterScreen extends React.Component {
         },
       )
       .then(response => {
-        // console.log('planter ' , response.data);
-        // this.dealWithPlantsData(response.data);
-
         this.setState({
           sickPlantDetected: response.data.sickPlantDetected,
           planter: response.data,
@@ -281,6 +260,11 @@ class planterScreen extends React.Component {
       })
       .catch(error => {
         this.fetchUser();
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          error.toString(),
+          'loadPlanter',
+        );
       });
   }
 
@@ -653,6 +637,58 @@ class planterScreen extends React.Component {
       );
     }
 
+    if (this.state.planter.askedToSend === 'sent') {
+      return (
+        <View style={styles.container} onLayout={this.onLayout}>
+          <ImageBackground
+            source={require('../../assets/field_sky_grass_summer.jpg')}
+            style={{width: '100%', height: '100%'}}>
+            <PaperCard>
+              <PaperCard.Title
+                title={'Planter:' + this.state.planter.name}
+                subtitle={'Status: ' + this.state.planter.planterStatus}
+              />
+              <PaperCard.Content>
+                <Text>Plants are on their way to you</Text>
+                <Text style={{marginTop: 10}}>
+                  Name:{' '}
+                  {
+                    <Text style={{fontWeight: 'bold'}}>
+                      {this.state.planter.sendDetails.name}
+                    </Text>
+                  }
+                </Text>
+                <Text style={{marginTop: 10}}>
+                  Phone:{' '}
+                  {
+                    <Text style={{fontWeight: 'bold'}}>
+                      {this.state.planter.sendDetails.phoneNumber}
+                    </Text>
+                  }
+                </Text>
+                <Text style={{marginTop: 10}}>
+                  Address:{' '}
+                  {
+                    <Text style={{fontWeight: 'bold'}}>
+                      {this.state.planter.sendDetails.address}
+                    </Text>
+                  }
+                </Text>
+                <Text style={{marginTop: 10}}>
+                  Instructions:{' '}
+                  {
+                    <Text style={{fontWeight: 'bold'}}>
+                      {this.state.planter.sendDetails.instructions}
+                    </Text>
+                  }
+                </Text>
+              </PaperCard.Content>
+            </PaperCard>
+          </ImageBackground>
+        </View>
+      );
+    }
+
     if (this.state.plants.length > 0) {
       return (
         <View style={styles.container} onLayout={this.onLayout}>
@@ -890,7 +926,7 @@ class planterScreen extends React.Component {
             onPress={() =>
               this.props.navigation.navigate('AdjustPlantConditions', {
                 user_token: this.state.USER_TOKEN,
-                item: this.props.navigation.getParam('item'),
+                item: this.state.planter,
               })
             }
           />
@@ -908,15 +944,11 @@ class planterScreen extends React.Component {
             style={{width: '100%', height: '100%'}}>
             <PaperCard>
               <PaperCard.Title
-                title={'Planter:' + this.props.navigation.getParam('item').name}
-                subtitle={
-                  'Status: ' +
-                  this.props.navigation.getParam('item').planterStatus
-                }
+                title={'Planter:' + this.state.planter.name}
+                subtitle={'Status: ' + this.state.planter.planterStatus}
               />
               <PaperCard.Content>
-                {this.props.navigation.getParam('item').planterStatus ===
-                'pending' ? (
+                {this.state.planter.planterStatus === 'pending' ? (
                   <View>
                     <Text style={{alignSelf: 'center'}}>
                       We are preparing your planter...
@@ -950,16 +982,13 @@ class planterScreen extends React.Component {
                 right: 0,
                 bottom: 10,
               }}
-              disabled={
-                this.props.navigation.getParam('item').planterStatus ===
-                'pending'
-              }
+              disabled={this.state.planter.planterStatus === 'pending'}
               large
               icon="plus"
               onPress={() =>
                 this.props.navigation.navigate('AllAvailablePlants', {
                   user_token: this.state.USER_TOKEN,
-                  planterName: this.props.navigation.getParam('item').name,
+                  planterName: this.state.planter.name,
                   loadPlanters: this.props.navigation.getParam('loadPlanters'),
                 })
               }

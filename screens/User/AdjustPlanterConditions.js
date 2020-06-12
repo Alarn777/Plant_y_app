@@ -655,15 +655,24 @@ class AdjustPlanterConditions extends React.Component {
                 <Button
                   mode="outlined"
                   onPress={() => {
-                    // console.log('history');
-                    // this.props.navigation.navigate('history', {
-                    //   planter: this.state.item,
-                    // });
                     this.props.navigation.navigate('history', {
                       planter: this.state.item,
                     });
                   }}>
                   See history
+                </Button>
+                <Button
+                  style={{marginTop: 10}}
+                  mode="outlined"
+                  icon= {this.state.item.askedToSend === "none"?'':'check'}
+
+                  disabled={this.state.item.askedToSend !== 'none'}
+                  onPress={() => {
+                    this.props.navigation.navigate('SendMyPlanter', {
+                      planter: this.state.item,
+                    });
+                  }}>
+                    {this.state.item.askedToSend === "none"?'Receive my planter':'Requested to send'}
                 </Button>
 
                 <Button
@@ -673,9 +682,6 @@ class AdjustPlanterConditions extends React.Component {
                   loading={this.state.deletingPlanter}
                   onPress={() => {
                     this._showDialog();
-                    // this.deletePlanter()
-                    //   .then(r => this.goBack())
-                    //   .catch(error => console.log(error));
                   }}>
                   Delete planter
                 </Button>

@@ -1,4 +1,5 @@
 import Const from './ENV_VARS';
+import {Logger} from './Logger';
 export default class WS {
   static init() {
     if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
@@ -23,6 +24,7 @@ export default class WS {
 
     this.ws.onerror = function(e) {
       console.log('ERROR');
+      Logger.saveLogs('Test', e.toString(), 'WS ERROR');
     };
 
     this.ws.onclose = function(e) {
@@ -30,6 +32,13 @@ export default class WS {
         'Socket is closed. Reconnect will be attempted in 1 second.',
         e.reason,
       );
+      Logger.saveLogs(
+        'Test',
+        'Socket is closed. Reconnect will be attempted in 1 second.' +
+          e.reason.toString(),
+        'WS ERROR',
+      );
+
       setTimeout(function() {
         this.ws = new WebSocket(Const.apigatewaySocket);
       }, 1000);

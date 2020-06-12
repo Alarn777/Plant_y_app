@@ -9,8 +9,6 @@ export class Logger {
 
     let fileName = 'log_' + dateString;
 
-    console.log(fileName);
-
     Storage.put(
       username + '/Logs/' + fileName + '.json',
       {

@@ -80,14 +80,11 @@ class BarGraph extends React.PureComponent {
                 max:20
             }
         };
-        // console.log(data.datasets[0].data)
 
     }
 
 
     static getDerivedStateFromProps(props, state) {
-        // console.log(props.data)
-
         if (props.data !== state.data) {
             return {
                 data: props.data.datasets[0].data,
@@ -98,17 +95,7 @@ class BarGraph extends React.PureComponent {
     }
 
     componentDidMount(): void {
-
-       // / console.log(this.props.data.datasets[0].data)
         let max = 10
-
-        console.log(this.props.max)
-
-        // this.props.data.datasets[0].data.map(one => {
-        //     if(one > max)
-        //         max = one
-        // } )
-        // console.log(max)
         this.state.xAsixData.data[1] = max +1
         this.state.xAsixData.max = max +1
 

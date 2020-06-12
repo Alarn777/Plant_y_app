@@ -42,12 +42,6 @@ const data = {
   ],
 };
 
-const chartConfig = {
-  backgroundGradientFrom: plantyColor,
-  decimalPlaces: 2, // optional, defaults to 2dp
-  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-};
-
 class UserPage extends React.Component {
   constructor(props) {
     super(props);
@@ -86,9 +80,12 @@ class UserPage extends React.Component {
         this.setState({FaceIDIsOn: true});
       } else this.setState({FaceIDIsOn: false});
     } catch (err) {
+        Logger.saveLogs(
+            this.props.plantyData.myCognitoUser.username,
+            err.toString(),
+            'addToKeyChain',
+        );
       this.setState({FaceIDIsOn: false});
-      // if(err.message !== 'No keychain entry found') //No password exists in the key chain...
-      // else //some other error occurred.
     }
   }
 
@@ -104,11 +101,8 @@ class UserPage extends React.Component {
     let currentTime = new Date().getTime() / 1000;
 
     this.state.planters.map(one => {
-      // console.log(one);
-      // return;
       let activatedTime = one.TimeActivated;
       let currentWeek = (currentTime - activatedTime) / 86400;
-      // currentWeek = currentWeek / 24;
       currentWeek = parseInt(currentWeek / 7);
       newData.labels.push(one.name);
       newData.datasets[0].data.push(currentWeek + 1);
@@ -120,10 +114,15 @@ class UserPage extends React.Component {
   removeFaceIDdetails = () => {
     Keychain.resetGenericPassword()
       .then(r => {
-        console.log(r);
         this.setState({FaceIDIsOn: false, modalVisible: false});
       })
-      .catch(e => console.log(e));
+      .catch(e => {console.log(e)
+          Logger.saveLogs(
+              this.props.plantyData.myCognitoUser.username,
+              e.toString(),
+              'removeFaceId',
+          );
+      });
   };
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -243,7 +242,7 @@ class UserPage extends React.Component {
         console.log('ImagePicker Error: ', response.error);
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
-        alert(response.customButton);
+        // alert(response.customButton);
       } else {
         this.setState({
           filePath: response,
@@ -265,6 +264,12 @@ class UserPage extends React.Component {
         this.uploadImage();
       })
       .catch(err => {
+          Logger.saveLogs(
+              this.props.plantyData.myCognitoUser.username,
+              err.toString(),
+              'resize',
+          );
+
         console.log(err);
       });
   };
@@ -315,7 +320,7 @@ class UserPage extends React.Component {
       .then(user => {
         Keychain.setGenericPassword(username, password)
           .then(val => {
-            console.log(val);
+            // console.log(val);
             this.setState({modalVisible: false, loadingActivation: false});
             this.checkIfIdActivated()
               .then()
@@ -324,6 +329,11 @@ class UserPage extends React.Component {
           })
           .catch(e => {
             console.log(e);
+              Logger.saveLogs(
+                  this.props.plantyData.myCognitoUser.username,
+                  e.toString(),
+                  'addToKeyChain',
+              );
             this.setState({});
             this.setState({
               error: true,
@@ -334,6 +344,11 @@ class UserPage extends React.Component {
       })
       .catch(e => {
         console.log(e);
+          Logger.saveLogs(
+              this.props.plantyData.myCognitoUser.username,
+              e.toString(),
+              'signIn',
+          );
         this.setState({
           error: true,
           loadingActivation: false,
@@ -343,8 +358,6 @@ class UserPage extends React.Component {
   };
 
   render() {
-    // console.log(this.state.user.username)
-    // console.log(this.props.navigation.getParam('user').username)
     return (
       <ScrollView>
         <Card>

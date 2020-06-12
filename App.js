@@ -15,7 +15,7 @@ import planterScreen from './screens/User/planterScreen';
 import History from './screens/User/history';
 import UserPage from './screens/User/UserPage';
 import AITesting from './screens/User/AITesting';
-
+import SendMyPlanter from './screens/User/SendMyPlanter';
 import Amplify, {Auth} from 'aws-amplify';
 import awsConfig from './aws-exports';
 
@@ -130,6 +130,13 @@ const AppNavigator = createStackNavigator(
     AITesting: {
       name: 'AITesting',
       screen: AITesting,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
+    SendMyPlanter: {
+      name: 'SendMyPlanter',
+      screen: SendMyPlanter,
       navigationOptions: {
         gesturesEnabled: false,
       },
