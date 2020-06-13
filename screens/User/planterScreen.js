@@ -116,7 +116,7 @@ class planterScreen extends React.Component {
           case 'STREAM_STARTED':
             setTimeout(() => {
               this.setTimePassed();
-            }, 1000);
+            }, 4000);
             break;
           case 'STREAM_ON':
             this.setState({
@@ -293,7 +293,7 @@ class planterScreen extends React.Component {
             // console.log('SETTING URL');
             // console.log(response.data);
             if (response.data.errorMessage) {
-              this.setState({errorText: response.data.errorMessage});
+              // this.setState({errorText: response.data.errorMessage});
               return;
             }
             this.setState({errorText: ''});
@@ -313,7 +313,7 @@ class planterScreen extends React.Component {
       })
       .catch(error => {
         console.log('error ' + error);
-
+        this.setState({errorText: error.toString()});
         Logger.saveLogs(
           this.props.plantyData.myCognitoUser.username,
           error.toString(),

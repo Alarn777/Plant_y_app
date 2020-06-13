@@ -6,20 +6,10 @@ export default class WS {
       this.ws = new WebSocket(Const.apigatewaySocket);
       this.ws.onopen = function(e) {
         console.log('Socket is connected');
+        WS.sendMessage(
+          'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
+        );
       };
-
-      // let m = JSON.stringify({
-      //   message:
-      //     'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_ON',
-      //   action: 'message',
-      // });
-      // try {
-      //   this.ws.send(m);
-      //   console.log('sent stream on message ', m);
-      // } catch (e) {
-      //   console.log(e);
-      // }
-      // console.log(this.ws);
     }
 
     this.ws.onerror = function(e) {

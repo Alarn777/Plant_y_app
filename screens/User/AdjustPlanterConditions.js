@@ -152,7 +152,13 @@ class AdjustPlanterConditions extends React.Component {
     let currentWeek = (currentTime - activatedTime) / 86400;
     currentWeek = parseInt(currentWeek / 7);
     this.setState({currentWeek: currentWeek});
+    this.getMeasurments();
   }
+
+  getMeasurments = () => {
+    if (WS.ws)
+      WS.sendMessage('FROM_WEB;' + this.state.item.UUID + ';GET_MEASUREMENTS');
+  };
 
   setScrollViewRef = element => {
     this.scrollViewRef = element;
@@ -505,7 +511,8 @@ class AdjustPlanterConditions extends React.Component {
             />
 
             <PaperCard.Content>
-              <Text style={{marginBottom: 10}}>
+              <Divider />
+              <Text style={{marginBottom: 10, marginTop: 10}}>
                 {'Description: ' + this.state.item.description}
               </Text>
               <Divider />
@@ -530,7 +537,7 @@ class AdjustPlanterConditions extends React.Component {
               </Text>
             </PaperCard.Content>
           </PaperCard>
-          <PaperCard style={{marginTop: 5}}>
+          <PaperCard style={{marginTop: 5, height: this.state.height - 380}}>
             <PaperCard.Title title={'Actions'} />
             <PaperCard.Content>
               {this.renderWaterControl()}
@@ -602,7 +609,8 @@ class AdjustPlanterConditions extends React.Component {
                 subtitle={'Climate: ' + this.state.item.climate}
               />
               <PaperCard.Content>
-                <Text style={{marginBottom: 10}}>
+                <Divider />
+                <Text style={{marginBottom: 10, marginTop: 10}}>
                   {'Description: ' + this.state.item.description}
                 </Text>
                 <Divider />
@@ -664,15 +672,16 @@ class AdjustPlanterConditions extends React.Component {
                 <Button
                   style={{marginTop: 10}}
                   mode="outlined"
-                  icon= {this.state.item.askedToSend === "none"?'':'check'}
-
+                  icon={this.state.item.askedToSend === 'none' ? '' : 'check'}
                   disabled={this.state.item.askedToSend !== 'none'}
                   onPress={() => {
                     this.props.navigation.navigate('SendMyPlanter', {
                       planter: this.state.item,
                     });
                   }}>
-                    {this.state.item.askedToSend === "none"?'Receive my planter':'Requested to send'}
+                  {this.state.item.askedToSend === 'none'
+                    ? 'Receive my planter'
+                    : 'Requested to send'}
                 </Button>
 
                 <Button

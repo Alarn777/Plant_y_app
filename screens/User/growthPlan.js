@@ -854,7 +854,7 @@ class growthPlan extends React.Component {
               <List.Section>
                 {Object.keys(this.state.growthPlan).length === 0 &&
                 this.state.growthPlan.constructor === Object ? (
-                  <View />
+                  <ActivityIndicator size="large" color={plantyColor} />
                 ) : (
                   this.state.growthPlan.phases.map(one => this.renderWeeks(one))
                 )}

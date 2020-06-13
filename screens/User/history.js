@@ -338,7 +338,7 @@ class History extends React.Component {
   renderCalendar = () => {
     if (this.state.pickDay) {
       return (
-        <View>
+        <View style={{height: this.state.height - 210}}>
           <Text style={{alignSelf: 'center', margin: 10, fontSize: 20}}>
             Please select a date:
           </Text>

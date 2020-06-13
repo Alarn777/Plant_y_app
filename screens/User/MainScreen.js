@@ -66,7 +66,7 @@ class MainScreen extends React.Component {
       planterWasRemoved: false,
       query: '',
       allPlanters: [],
-      preloadImages: true,
+      preloadImagesFlag: true,
       socket: null,
     };
     this.loadPlanters = this.loadPlanters.bind(this);
@@ -75,10 +75,7 @@ class MainScreen extends React.Component {
     this.fetchUser = this.fetchUser.bind(this);
     this.onLayout = this.onLayout.bind(this);
 
-    // console.log('Websocket: ', WS.ws);
     if (WS.ws === undefined) WS.init();
-    // WS.init();
-    //
     WS.onMessage(data => {
       // console.log('GOT in main screen', data.data);
       let instructions = data.data.split(';');
@@ -90,7 +87,6 @@ class MainScreen extends React.Component {
               .catch();
             break;
           case 'FAILED':
-            // alert('Failed to communicate with server');
             this.forceUpdate();
             break;
         }
@@ -116,37 +112,44 @@ class MainScreen extends React.Component {
   };
 
   preloadImages = () => {
-    if (!this.state.preloadImages) return;
-
-    let allImages = [
-      'mint',
-      'potato',
-      'soy',
-      'sunflower',
-      'tomato',
-      'cucumber',
-      'strawberry',
-      'basil',
-      'pepper',
-      'oregano',
-      'melissa',
-    ];
-
-    allImages.map(oneImage => {
-      Storage.get(oneImage + '_img.jpg', {
-        level: 'public',
-        type: 'image/jpg',
-      })
-        .then(data => {
-          // console.log({name: oneImage, URL: data});
-          this.props.addImage({name: oneImage, URL: data});
-        })
-        .catch(error => {
-          console.log(error);
+    if (!this.state.preloadImagesFlag) return;
+    Storage.list('', {
+      level: 'public',
+      type: 'image/jpg',
+    })
+      .then(result => {
+        result.map(one => {
+          if (one.key.endsWith('.jpg') && !one.key.includes('/')) {
+            Storage.get(one.key, {
+              level: 'public',
+              type: 'image/jpg',
+            })
+              .then(data => {
+                this.props.addImage({
+                  name: one.key.replace('_img.jpg', ''),
+                  URL: data,
+                });
+              })
+              .catch(error => {
+                console.log(error);
+                Logger.saveLogs(
+                  this.props.plantyData.myCognitoUser.username,
+                  error.toString(),
+                  'preloadImages',
+                );
+              });
+          }
         });
-    });
-
-    this.setState({preloadImages: true});
+      })
+      .catch(err => {
+        console.log(err);
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          error.toString(),
+          'preloadImages',
+        );
+      });
+    this.setState({preloadImagesFlag: true});
   };
 
   dealWithData = user => {
@@ -227,7 +230,6 @@ class MainScreen extends React.Component {
     }
     Auth.currentAuthenticatedUser()
       .then()
-      // .then(data => console.log(data))
       .catch(() => this.logOut());
   }
 
@@ -240,8 +242,6 @@ class MainScreen extends React.Component {
         this.props.navigation.setParams({
           userLoggedIn: this.state.userLoggedIn,
         });
-
-        //open socket
       })
       .catch(e => {
         Logger.saveLogs(
@@ -257,7 +257,6 @@ class MainScreen extends React.Component {
     if (user) {
       const {usernameAttributes = []} = this.props;
       if (usernameAttributes === 'email') {
-        // Email as Username
         this.setState({
           username: user.attributes ? user.attributes.email : user.username,
         });
@@ -275,22 +274,14 @@ class MainScreen extends React.Component {
         );
         console.log(e);
       });
-
-    // if (!this.props.plantyData.myCognitoUser) this.props.addUser(user);
-
     this.props.addUser(user);
-
     let userAvatarKey = 'user_avatars/' + user.username + '_avatar.jpeg';
-
     Storage.get(userAvatarKey, {
       level: 'public',
       type: 'image/jpg',
-      // bucket: 'plant-pictures-planty',
-      // region: 'eu',
     })
       .then(data => {
         this.props.AddAvatarLink(data);
-        // this.setState({url: data});
       })
       .catch(e => {
         Logger.saveLogs(

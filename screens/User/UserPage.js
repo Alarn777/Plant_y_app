@@ -18,6 +18,7 @@ import {
   Dialog,
   Paragraph,
   TextInput,
+  Divider,
 } from 'react-native-paper';
 import ImagePicker from 'react-native-image-picker';
 import {Storage} from 'aws-amplify';
@@ -30,6 +31,7 @@ import WS from '../../websocket';
 import BarGraph from '../../BarGraph';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Logger} from '../../Logger';
+import TouchID from 'react-native-touch-id';
 
 const plantyColor = '#6f9e04';
 
@@ -54,6 +56,7 @@ class UserPage extends React.Component {
       filePath: null,
       fileData: null,
       fileUri: '',
+      height: Dimensions.get('window').height,
       fileUrl: '',
       graphData: data,
       buttonMode: 'pick', //pick,upload,
@@ -62,6 +65,7 @@ class UserPage extends React.Component {
       password: '',
       modalVisible: false,
       loadingActivation: false,
+      idString: 'Touch',
     };
   }
 
@@ -70,6 +74,7 @@ class UserPage extends React.Component {
     this.checkIfIdActivated()
       .then()
       .catch();
+    this.checkIftouchFaceIsSupported();
   }
 
   async checkIfIdActivated() {
@@ -80,11 +85,11 @@ class UserPage extends React.Component {
         this.setState({FaceIDIsOn: true});
       } else this.setState({FaceIDIsOn: false});
     } catch (err) {
-        Logger.saveLogs(
-            this.props.plantyData.myCognitoUser.username,
-            err.toString(),
-            'addToKeyChain',
-        );
+      Logger.saveLogs(
+        this.props.plantyData.myCognitoUser.username,
+        err.toString(),
+        'addToKeyChain',
+      );
       this.setState({FaceIDIsOn: false});
     }
   }
@@ -111,17 +116,33 @@ class UserPage extends React.Component {
     this.setState({graphData: newData});
   };
 
+  checkIftouchFaceIsSupported = () => {
+    TouchID.isSupported()
+      .then(biometryType => {
+        if (biometryType === 'FaceID') {
+          this.setState({idIsSupported: true, idString: 'Face'});
+        } else if (biometryType === 'TouchID') {
+          this.setState({idIsSupported: true, idString: 'Touch'});
+        } else if (biometryType === true) {
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   removeFaceIDdetails = () => {
     Keychain.resetGenericPassword()
       .then(r => {
         this.setState({FaceIDIsOn: false, modalVisible: false});
       })
-      .catch(e => {console.log(e)
-          Logger.saveLogs(
-              this.props.plantyData.myCognitoUser.username,
-              e.toString(),
-              'removeFaceId',
-          );
+      .catch(e => {
+        console.log(e);
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'removeFaceId',
+        );
       });
   };
 
@@ -264,11 +285,11 @@ class UserPage extends React.Component {
         this.uploadImage();
       })
       .catch(err => {
-          Logger.saveLogs(
-              this.props.plantyData.myCognitoUser.username,
-              err.toString(),
-              'resize',
-          );
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          err.toString(),
+          'resize',
+        );
 
         console.log(err);
       });
@@ -329,11 +350,11 @@ class UserPage extends React.Component {
           })
           .catch(e => {
             console.log(e);
-              Logger.saveLogs(
-                  this.props.plantyData.myCognitoUser.username,
-                  e.toString(),
-                  'addToKeyChain',
-              );
+            Logger.saveLogs(
+              this.props.plantyData.myCognitoUser.username,
+              e.toString(),
+              'addToKeyChain',
+            );
             this.setState({});
             this.setState({
               error: true,
@@ -344,11 +365,11 @@ class UserPage extends React.Component {
       })
       .catch(e => {
         console.log(e);
-          Logger.saveLogs(
-              this.props.plantyData.myCognitoUser.username,
-              e.toString(),
-              'signIn',
-          );
+        Logger.saveLogs(
+          this.props.plantyData.myCognitoUser.username,
+          e.toString(),
+          'signIn',
+        );
         this.setState({
           error: true,
           loadingActivation: false,
@@ -398,6 +419,7 @@ class UserPage extends React.Component {
             formatter={'W'}
           />
           <Text style={{marginLeft: 7, color: plantyColor}}>*W - Weeks</Text>
+          <Divider style={{marginTop: 10}} />
           <View
             style={{
               // flex:
@@ -405,14 +427,14 @@ class UserPage extends React.Component {
               flexDirection: 'row',
               flexWrap: 'wrap',
               justifyContent: 'space-between',
-              // padding: 8,
             }}>
-            <Text style={styles.actionsText}>Enable FaceID / Touch ID</Text>
+            <Text style={styles.actionsText}>
+              Enable {this.state.idString} ID
+            </Text>
             <Switch
               value={this.state.FaceIDIsOn}
               onValueChange={() => {
                 this.setState({modalVisible: true});
-                // this.setState({FaceIDIsOn: !this.state.FaceIDIsOn});
               }}
             />
           </View>
@@ -422,9 +444,11 @@ class UserPage extends React.Component {
                 visible={this.state.modalVisible}
                 onDismiss={() => this.setState({modalVisible: false})}>
                 <Dialog.Title>
-                  This will disable faceId option for you
+                  This will disable {this.state.idString} ID option
                 </Dialog.Title>
-                <Dialog.Content />
+                <Dialog.Content>
+                  <Text>Are you sure?</Text>
+                </Dialog.Content>
                 <Dialog.Actions>
                   <Button
                     onPress={() => {
@@ -488,11 +512,11 @@ class UserPage extends React.Component {
             onPress={() => {
               Auth.signOut()
                 .then(() => {
-                  this.props.navigation.goBack();
-                  this.props.navigation.getParam('logOut')();
                   WS.sendMessage(
                     'FROM_CLIENT;e0221623-fb88-4fbd-b524-6f0092463c93;VIDEO_STREAM_OFF',
                   );
+                  this.props.navigation.goBack();
+                  this.props.navigation.getParam('logOut')();
                   WS.closeSocket();
                 })
                 .catch(e => {
@@ -506,6 +530,7 @@ class UserPage extends React.Component {
             }}>
             Log Out
           </Button>
+          <View style={{height: 100}} />
         </Card>
       </ScrollView>
     );

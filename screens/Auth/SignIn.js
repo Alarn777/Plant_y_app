@@ -33,15 +33,9 @@ import {
   ErrorRow,
 } from '../AmplifyUI';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-// import SafeAreaView from 'react-native-safe-area-view';
-import SocketIOClient from 'socket.io-client';
-
-import {Button, TextInput} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
-import {bindActionCreators} from 'redux';
-import {addSocket, addUser, loadPlanters} from '../../FriendActions';
-import {connect} from 'react-redux';
 import WS from '../../websocket';
 import {isIphone7, isIphoneX} from '../../whatDevice';
 const logger = new Logger('SignIn');
@@ -86,19 +80,10 @@ class SignIn extends AuthPiece {
       } else this.setState({FaceIDIsOn: false});
     } catch (err) {
       this.setState({FaceIDIsOn: false});
-      // if(err.message !== 'No keychain entry found') //No password exists in the key chain...
-      // else //some other error occurred.
     }
   }
 
   componentDidMount(): void {
-    // TouchID.authenticate('to demo this react-native component', optionalConfigObject)
-    //     .then(success => {
-    //         Alert.alert('Authenticated Successfully');
-    //     })
-    //     .catch(error => {
-    //         Alert.alert('Authentication Failed');
-    //     });
     this.checkIftouchFaceIsSupported();
     this.checkIfIdActivated()
       .then()
@@ -108,19 +93,14 @@ class SignIn extends AuthPiece {
   checkIftouchFaceIsSupported = () => {
     TouchID.isSupported()
       .then(biometryType => {
-        // Success code
         if (biometryType === 'FaceID') {
-          // console.log('FaceID is supported.');
           this.setState({idIsSupported: true, idIcon: 'face'});
         } else if (biometryType === 'TouchID') {
-          // console.log('TouchID is supported.');
           this.setState({idIsSupported: true, idIcon: 'fingerprint'});
         } else if (biometryType === true) {
-          // Touch ID is supported on Android
         }
       })
       .catch(error => {
-        // Failure code if the user's device does not have touchID or faceID enabled
         console.log(error);
       });
   };

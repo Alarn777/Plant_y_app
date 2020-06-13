@@ -273,11 +273,12 @@ class Picture extends React.Component {
                 Date and time: {this.state.plant.timestamp}
               </Text>
               <Text style={styles.metadataText}>
-                Temperature: {this.state.plant.temperature}
+                Temperature: {this.state.plant.temperature}C
               </Text>
               <Text style={styles.metadataText}>UV: {this.state.plant.UV}</Text>
               <Text style={styles.metadataText}>
-                Humidity: {parseFloat(this.state.plant.humidity * 100)}
+                Humidity:{' '}
+                {Math.floor(parseFloat(this.state.plant.humidity * 100))}%
               </Text>
             </View>
             {this.renderTestResults()}

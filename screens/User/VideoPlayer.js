@@ -1,6 +1,10 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
-
+import {
+  green100,
+  green300,
+  green200,
+} from 'react-native-paper/src/styles/colors';
 import Video from 'react-native-video';
 import MediaControls, {PLAYER_STATES} from 'react-native-media-controls';
 class Player extends Component {
@@ -38,7 +42,10 @@ class Player extends Component {
       this.setState({currentTime: data.currentTime});
     }
   };
-  onLoad = data => this.setState({duration: data.duration, isLoading: false});
+  onLoad = data => {
+    console.log('loading');
+    this.setState({duration: data.duration, isLoading: false});
+  };
   onLoadStart = data => this.setState({isLoading: true});
   onEnd = () => this.setState({playerState: PLAYER_STATES.ENDED});
   onError = () => alert('Oh! ', error);
@@ -60,7 +67,6 @@ class Player extends Component {
 
   render() {
     // console.log('url in video', this.props.url);
-
     return (
       <View style={styles.container}>
         <Video
@@ -76,12 +82,12 @@ class Player extends Component {
           source={{uri: this.props.url, type: 'm3u8'}}
           style={styles.mediaPlayer}
           volume={0}
-          minLoadRetryCount={10}
+          minLoadRetryCount={3}
         />
         <MediaControls
           duration={this.state.duration}
           isLoading={this.state.isLoading}
-          mainColor="#333"
+          mainColor={'#fff'}
           onFullScreen={this.onFullScreen}
           onPaused={this.onPaused}
           onReplay={this.onReplay}
@@ -90,6 +96,7 @@ class Player extends Component {
           playerState={this.state.playerState}
           progress={this.state.currentTime}
           toolbar={this.renderToolbar()}
+          style={{backgroundColor: green100, color: green100}}
         />
       </View>
     );
@@ -114,7 +121,6 @@ const styles = StyleSheet.create({
     zIndex: 100,
     width: '100%',
     height: 200,
-    // backgroundColor: '#D3D3D3',
   },
 });
 export default Player;
