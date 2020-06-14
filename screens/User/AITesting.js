@@ -151,7 +151,6 @@ class AITesting extends React.Component {
             backgroundColor: '#6f9e04',
             color: '#6f9e04',
             right: 160,
-            // bottom: -10,
             top: 450,
           }}
           large
@@ -322,7 +321,6 @@ class AITesting extends React.Component {
             WS.sendMessage(
               'FROM_CLIENT;PHONE' + ';CHECK_IMAGE_RAND;' + result.key + ';;',
             );
-            // this.setState({buttonMode: 'upload'});
           })
           .catch(e => {
             Logger.saveLogs(

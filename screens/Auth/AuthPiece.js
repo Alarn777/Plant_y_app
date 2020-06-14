@@ -18,7 +18,6 @@ import {Auth, Logger, JS, I18n} from 'aws-amplify';
 import AmplifyTheme from '../AmplifyTheme';
 import AmplifyMessageMap from '../AmplifyMessageMap';
 import {FormField, PhoneField} from '../AmplifyUI';
-import {View} from 'react-native';
 
 const logger = new Logger('AuthPiece');
 
@@ -58,7 +57,6 @@ export default class AuthPiece extends React.Component {
     if (usernameAttributes === 'email') {
       return (
         <FormField
-          // theme={theme}
           onChangeText={text => this.setState({email: text})}
           label={I18n.get('Email')}
           placeholder={I18n.get('Enter your email')}
@@ -68,7 +66,6 @@ export default class AuthPiece extends React.Component {
     } else if (usernameAttributes === 'phone_number') {
       return (
         <PhoneField
-          // theme={theme}
           key={'phone_number'}
           onChangeText={text => this.setState({phone_number: text})}
           label={I18n.get('Phone Number')}
@@ -79,9 +76,7 @@ export default class AuthPiece extends React.Component {
       );
     } else {
       return (
-        // <View />
         <FormField
-          // theme={theme}
           onChangeText={text => this.setState({username: text})}
           label={I18n.get(this.getUsernameLabel())}
           placeholder={I18n.get('Enter your username')}

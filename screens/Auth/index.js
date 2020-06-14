@@ -94,7 +94,6 @@ export function withAuthenticator(
             />
           );
         }
-        // return <View/>
         return (
           <View style={{flex: 1}}>
             <Greetings

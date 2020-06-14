@@ -12,24 +12,10 @@
  */
 
 import React from 'react';
-import {
-  View,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Text,
-  ImageBackground,
-  Image,
-} from 'react-native';
+import {View, Text, ImageBackground} from 'react-native';
 import {Auth, I18n, Logger} from 'aws-amplify';
-import {
-  FormField,
-  LinkCell,
-  Header,
-  ErrorRow,
-  AmplifyButton,
-} from '../AmplifyUI';
+import {LinkCell, Header, ErrorRow} from '../AmplifyUI';
 import AuthPiece from './AuthPiece';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const logger = new Logger('ConfirmSignUp');
 
@@ -96,19 +82,6 @@ export default class ConfirmSignUp extends AuthPiece {
             </View>
           </View>
           <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
-          {/*<Image*/}
-          {/*  // resizeMode="contain"*/}
-          {/*  resizeMode="stretch"*/}
-          {/*  style={{*/}
-          {/*    backgroundColor: 'white',*/}
-          {/*    borderRadius: 5,*/}
-          {/*    alignSelf: 'center',*/}
-          {/*    height: 250,*/}
-          {/*    width: 200,*/}
-          {/*    marginBottom: 0,*/}
-          {/*  }}*/}
-          {/*  source={require('../../assets/logo.png')}*/}
-          {/*/>*/}
         </View>
       </ImageBackground>
     );

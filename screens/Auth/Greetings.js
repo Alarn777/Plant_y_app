@@ -12,13 +12,11 @@
  */
 
 import React from 'react';
-import {View, Text, Button} from 'react-native';
-import {Auth, I18n, Logger} from 'aws-amplify';
+import {View, Text} from 'react-native';
+import {Auth, I18n} from 'aws-amplify';
 import {AmplifyButton} from '../AmplifyUI';
 import AmplifyTheme from '../AmplifyTheme';
 import AuthPiece from './AuthPiece';
-
-const logger = new Logger('Greetings');
 
 export default class Greetings extends AuthPiece {
   constructor(props) {
@@ -77,19 +75,7 @@ export default class Greetings extends AuthPiece {
       </View>
     ) : (
       <View />
-      // <Text style={theme.greetingMessage}>{message}</Text>
-      // <Text style={{backgroundColor: '#74faf9', color: 'white'}}>
-      //   {message}
-      // </Text>
     );
-
-    // return content;
-
-    // return (
-    //   <View width="100%" style={{backgroundColor: '#74faf9'}}>
-    //     <Text style={{alignSelf: 'center', color: 'black'}}>{message}</Text>
-    //   </View>
-    // );
     return <View />;
   }
 }

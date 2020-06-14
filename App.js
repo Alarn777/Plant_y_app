@@ -6,7 +6,7 @@ import {createStackNavigator} from 'react-navigation-stack';
 import Reducer from './FriendReducer';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import {mapping, light as lightTheme} from '@eva-design/eva';
+import {mapping, light as lightTheme, dark as darkTheme} from '@eva-design/eva';
 import HomeScreenUser from './screens/User/MainScreen';
 import PlantScreen from './screens/User/PlantScreen';
 import AllAvailablePlants from './screens/User/AllAvailablePlants';

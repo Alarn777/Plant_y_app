@@ -13,6 +13,20 @@ const theme = {
   },
 };
 
+const dark_theme = {
+  ...DefaultTheme,
+  roundness: 2,
+  dark: true,
+  colors: {
+    background: '#27323a',
+    surface: '#435055',
+    primary: '#6f9e04',
+    accent: '#6f9d00',
+    text: '#6f9e04',
+    disabled: 'grey',
+  },
+};
+
 export default function Main() {
   return (
     <PaperProvider theme={theme}>

@@ -12,12 +12,7 @@
  */
 
 import React from 'react';
-import {
-  View,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ImageBackground,
-} from 'react-native';
+import {View, ImageBackground} from 'react-native';
 import {Auth, I18n, Logger} from 'aws-amplify';
 import {
   FormField,
@@ -101,26 +96,18 @@ export default class ForgotPassword extends AuthPiece {
       <KeyboardAwareScrollView
         extraScrollHeight={30}
         contentContainerStyle={{
-          // flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          // height:"100%",
           width: '100%',
         }}>
-        {/*<ImageBackground*/}
-        {/*	source={require('../../assets/iphone11Wallpaper.jpg')}*/}
-        {/*	style={{ width: '100%', height: '100%' }}*/}
-        {/*>*/}
         <View style={theme.sectionBody}>
           <FormField
-            // theme={theme}
             onChangeText={text => this.setState({code: text})}
             label={I18n.get('Confirmation Code')}
             placeholder={I18n.get('Enter your confirmation code')}
             required={true}
           />
           <FormField
-            // theme={theme}
             onChangeText={text => this.setState({password: text})}
             label={I18n.get('Password')}
             placeholder={I18n.get('Enter your new password')}
@@ -134,14 +121,11 @@ export default class ForgotPassword extends AuthPiece {
             disabled={!(this.state.code && this.state.password)}
           />
           <View style={theme.sectionFooter}>
-            <LinkCell
-              // theme={theme}
-              onPress={() => this.changeState('signIn')}>
+            <LinkCell onPress={() => this.changeState('signIn')}>
               {I18n.get('Back to Sign In')}
             </LinkCell>
           </View>
         </View>
-        {/*</ImageBackground>*/}
       </KeyboardAwareScrollView>
     );
   }
@@ -166,16 +150,10 @@ export default class ForgotPassword extends AuthPiece {
             <View style={theme.sectionBody}>
               {!this.state.delivery && this.forgotBody(theme)}
               {this.state.delivery && this.submitBody(theme)}
-              <View style={theme.sectionFooter}>
-                {/*<LinkCell theme={theme} onPress={() => this.changeState('signIn')}>*/}
-                {/*	{I18n.get('Back to Sign In')}*/}
-                {/*</LinkCell>*/}
-              </View>
+              <View style={theme.sectionFooter} />
             </View>
             <View style={theme.sectionFooter}>
-              <LinkCell
-                // theme={theme}
-                onPress={() => this.changeState('signIn')}>
+              <LinkCell onPress={() => this.changeState('signIn')}>
                 {I18n.get('Back to Sign In')}
               </LinkCell>
             </View>

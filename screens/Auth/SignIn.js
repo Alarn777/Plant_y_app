@@ -12,26 +12,11 @@
  */
 
 import React from 'react';
-import {
-  View,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ImageBackground,
-  StatusBar,
-  Image,
-  Dimensions,
-  Alert,
-} from 'react-native';
+import {View, ImageBackground, StatusBar, Image} from 'react-native';
 StatusBar.setBarStyle('light-content', true);
 import {Auth, I18n, Logger, JS} from 'aws-amplify';
 import AuthPiece from './AuthPiece';
-import {
-  AmplifyButton,
-  FormField,
-  LinkCell,
-  Header,
-  ErrorRow,
-} from '../AmplifyUI';
+import {FormField, LinkCell, ErrorRow} from '../AmplifyUI';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Button} from 'react-native-paper';
 import axios from 'axios';
@@ -281,9 +266,7 @@ class SignIn extends AuthPiece {
             <View style={theme.section}>
               {this.renderSwitch()}
               <View>
-                {/*{this.renderUsernameField(theme)}*/}
                 <FormField
-                  // theme={theme}
                   onChangeText={text => this.setState({username: text})}
                   label={I18n.get('Username')}
                   placeholder={I18n.get('Enter your username')}
@@ -291,7 +274,6 @@ class SignIn extends AuthPiece {
                   required={true}
                 />
                 <FormField
-                  // theme={theme}
                   onChangeText={text => this.setState({password: text})}
                   label={I18n.get('Password')}
                   placeholder={I18n.get('Enter your password')}
@@ -303,32 +285,24 @@ class SignIn extends AuthPiece {
                     flexDirection: 'row',
                     flexWrap: 'wrap',
                     justifyContent: 'space-between',
-                    // padding: 8,
                   }}>
                   <Button
                     loading={this.state.loginigIn}
                     disabled={
-                      !this.getUsernameFromInput() ||
-                      // !this.state.username ||
-                      !this.state.password
+                      !this.getUsernameFromInput() || !this.state.password
                     }
                     mode="contained"
                     style={{padding: 10, width: '80%', height: 55}}
                     backgroundColor="#6f9e04"
-                    // backgroundColor={''}
                     color="#6f9e04"
-                    // onPress={() => this.changeState('confirmSignUp', 'LOL')}
                     onPress={this.signIn}>
-                    {/*{I18n.get('Sign In').toUpperCase()}*/}
                     {'Sign In'.toUpperCase()}
                   </Button>
                   <IconButton
-                    // style={{margin:'1%'}}
                     disabled={
                       !this.state.FaceIDIsOn || !this.state.idIsSupported
                     }
                     icon={this.state.idIcon}
-                    // color={plantyColor}
                     color={'white'}
                     size={30}
                     onPress={() => this.handleTouchIDPress()}
@@ -337,23 +311,18 @@ class SignIn extends AuthPiece {
               </View>
               <View style={theme.sectionFooter}>
                 <LinkCell
-                  // theme={theme}
                   style={{with: '100%'}}
                   onPress={() => this.changeState('forgotPassword')}>
                   {I18n.get('Forgot Password')}
                 </LinkCell>
-                <LinkCell
-                  // theme={theme}
-                  onPress={() => this.changeState('signUp')}>
+                <LinkCell onPress={() => this.changeState('signUp')}>
                   {I18n.get('Sign Up')}
                 </LinkCell>
               </View>
               <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
             </View>
           </ImageBackground>
-          {/*</SafeAreaView>*/}
         </KeyboardAwareScrollView>
-        {/*/ </SafeAreaView>*/}
       </View>
     );
   }

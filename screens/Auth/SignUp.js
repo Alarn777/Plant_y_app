@@ -12,25 +12,9 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  Keyboard,
-  TextInput,
-  Picker,
-  ScrollView,
-  ImageBackground,
-} from 'react-native';
+import {View, ImageBackground} from 'react-native';
 import {Auth, I18n, Logger} from 'aws-amplify';
-import {
-  FormField,
-  PhoneField,
-  LinkCell,
-  Header,
-  ErrorRow,
-  AmplifyButton,
-} from '../AmplifyUI';
+import {FormField, LinkCell, Header, ErrorRow} from '../AmplifyUI';
 import AuthPiece from './AuthPiece';
 import countryDialCodes from '../CountryDialCodes';
 import {Button} from 'react-native-paper';
@@ -247,7 +231,6 @@ export default class SignUp extends AuthPiece {
         <ImageBackground
           source={require('../../assets/7dEVFqb.jpg')}
           style={{width: '100%', height: '100%'}}>
-          {/*<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>*/}
           <View style={theme.section}>
             <Header theme={theme}>{I18n.get(this.header)}</Header>
             <View style={theme.sectionBody}>
@@ -255,7 +238,6 @@ export default class SignUp extends AuthPiece {
                 return field.key !== 'phone_number' ? (
                   <FormField
                     key={field.key}
-                    // theme={theme}
                     type={field.type}
                     secureTextEntry={field.type === 'password'}
                     onChangeText={text => {
@@ -270,23 +252,8 @@ export default class SignUp extends AuthPiece {
                 ) : (
                   <View />
                 );
-                // :(
-                //
-                // 	<PhoneField
-                // 		theme={theme}
-                // 		key={field.key}
-                // 		onChangeText={text => this.setState({ phone_number: text })}
-                // 		label={I18n.get(field.label)}
-                // 		placeholder={I18n.get(field.placeholder)}
-                // 		keyboardType="phone-pad"
-                // 		required={field.required}
-                // 		defaultDialCode={this.getDefaultDialCode()}
-                // 	/>
-                // );
               })}
               <Button
-                // icon={this.state.addingPlanticon}
-                // style={{margin: 10}}
                 loading={this.state.loginigIn}
                 disabled={
                   !this.state.username ||
@@ -300,26 +267,12 @@ export default class SignUp extends AuthPiece {
                 onPress={this.signUp}>
                 {I18n.get('Sign Up').toUpperCase()}
               </Button>
-
-              {/*<AmplifyButton*/}
-              {/*  text={I18n.get('Sign Up').toUpperCase()}*/}
-              {/*  // theme={theme}*/}
-              {/*  style={() => {*/}
-              {/*    if (!(this.state.username && this.state.password))*/}
-              {/*      return {color: '#6f9e04'};*/}
-              {/*    else return {color: '#93a272'};*/}
-              {/*  }}*/}
-              {/*  onPress={this.signUp}*/}
-              {/*  // disabled={!this.isValid}*/}
-              {/*  disabled={!(this.state.username && this.state.password)}*/}
-              {/*/>*/}
             </View>
             <View style={theme.sectionFooter}>
               <LinkCell
                 theme={theme.button}
-                onPress={() => this.changeState('confirmSignUp')}>
-                {/*{I18n.get('Confirm a Code')}*/}
-              </LinkCell>
+                onPress={() => this.changeState('confirmSignUp')}
+              />
               <LinkCell
                 style={{color: '#6f9e04', alignContent: 'center'}}
                 onPress={() => this.changeState('signIn')}>
@@ -328,7 +281,6 @@ export default class SignUp extends AuthPiece {
             </View>
             <ErrorRow theme={theme}>{this.state.error}</ErrorRow>
           </View>
-          {/*</TouchableWithoutFeedback>*/}
         </ImageBackground>
       </KeyboardAwareScrollView>
     );

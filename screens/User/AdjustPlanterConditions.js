@@ -106,7 +106,6 @@ class AdjustPlanterConditions extends React.Component {
             break;
           case 'FAILED':
             console.log('Failed to communicate with server');
-            // this.forceUpdate();
             break;
           case 'MEASUREMENTS':
             if (this.state.item.UUID === instructions[1]) {
@@ -192,8 +191,6 @@ class AdjustPlanterConditions extends React.Component {
 
   async deletePlanter() {
     this.setState({deletingPlanter: true});
-
-    // console.log('In deleting Planter');
     const AuthStr = 'Bearer '.concat(
       this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
     );
@@ -203,7 +200,6 @@ class AdjustPlanterConditions extends React.Component {
         Consts.apigatewayRoute + '/changeStatusOfPlanter',
         {
           username: this.props.plantyData.myCognitoUser.username,
-          // planterName: this.state.item.name,
           planterUUID: this.state.item.UUID,
           planterStatus: 'inactive',
         },
@@ -212,7 +208,6 @@ class AdjustPlanterConditions extends React.Component {
         },
       )
       .then(response => {
-        // console.log(response);
         this.successDeleting();
       })
       .catch(error => {
@@ -253,11 +248,9 @@ class AdjustPlanterConditions extends React.Component {
     return (
       <View
         style={{
-          // flex:
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'space-between',
-          // padding: 8,
         }}>
         <Text style={styles.actionsText}>Manual controls</Text>
         <Switch
@@ -277,7 +270,6 @@ class AdjustPlanterConditions extends React.Component {
     return (
       <View
         style={{
-          // flex:
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'space-between',
@@ -627,9 +619,6 @@ class AdjustPlanterConditions extends React.Component {
               <PaperCard.Title title={'Conditions'} />
               <PaperCard.Content>
                 <Carousel
-                  // ref={c => {
-                  //   this._carousel = c;
-                  // }}
                   loop={true}
                   autoplay={true}
                   autoplayDelay={0}
@@ -642,9 +631,7 @@ class AdjustPlanterConditions extends React.Component {
                 />
                 <Pagination
                   dotsLength={3}
-                  // onSnapToItem={index => this.setState({activeSlide: index})}
                   activeDotIndex={this.state.activeSlide}
-                  // containerStyle={{backgroundColor: 'rgba(0, 0, 0, 0.75)'}}
                   dotStyle={{
                     width: 10,
                     height: 10,
@@ -652,11 +639,7 @@ class AdjustPlanterConditions extends React.Component {
                     marginHorizontal: 8,
                     backgroundColor: plantyColor,
                   }}
-                  inactiveDotStyle={
-                    {
-                      // Define styles for inactive dots here
-                    }
-                  }
+                  inactiveDotStyle={{}}
                   inactiveDotOpacity={0.4}
                   inactiveDotScale={0.6}
                 />

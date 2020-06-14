@@ -11,7 +11,13 @@ import {Auth} from 'aws-amplify';
 import PropTypes from 'prop-types';
 import {StyleSheet} from 'react-native';
 import {Text} from '@ui-kitten/components';
-import {FAB, Card as PaperCard, Avatar, IconButton} from 'react-native-paper';
+import {
+  FAB,
+  Card as PaperCard,
+  Avatar,
+  IconButton,
+  ActivityIndicator,
+} from 'react-native-paper';
 import {withAuthenticator} from 'aws-amplify-react-native';
 import {
   ConfirmSignIn,
@@ -415,13 +421,24 @@ class MainScreen extends React.Component {
           />
         </PaperCard>
         <ScrollView style={styles.data}>
-          <FlatList
-            scrollEnabled={false}
-            numColumns={3}
-            data={this.state.planters}
-            keyExtractor={this._keyExtractor}
-            renderItem={this._renderItem}
-          />
+          {this.state.planters.length === 0 ? (
+            <ActivityIndicator
+              size="large"
+              color={plantyColor}
+              style={{
+                alignItems: 'center',
+                marginLeft: this.state.width / 2 - 40,
+              }}
+            />
+          ) : (
+            <FlatList
+              scrollEnabled={false}
+              numColumns={3}
+              data={this.state.planters}
+              keyExtractor={this._keyExtractor}
+              renderItem={this._renderItem}
+            />
+          )}
         </ScrollView>
         <FAB
           style={{

@@ -66,7 +66,6 @@ class Player extends Component {
   onSeeking = currentTime => this.setState({currentTime});
 
   render() {
-    // console.log('url in video', this.props.url);
     return (
       <View style={styles.container}>
         <Video

@@ -23,7 +23,6 @@ import {
 import {I18n} from 'aws-amplify';
 import AmplifyTheme, {linkUnderlayColor, errorIconColor} from './AmplifyTheme';
 import {Icon} from 'react-native-elements';
-// import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import countryDialCodes from './CountryDialCodes';
 
 export const FormField = props => {
@@ -146,7 +145,6 @@ export const ErrorRow = props => {
         backgroundColor: errorIconColor,
         flexDirection: 'row',
         justifyContent: 'center',
-        // width: '99%',
       }}>
       <Icon name="warning" color={'white'} />
       <Text style={{margin: 3, color: 'white'}}>{props.children}</Text>

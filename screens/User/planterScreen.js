@@ -209,7 +209,6 @@ class planterScreen extends React.Component {
   };
 
   componentDidMount(): void {
-    // console.log(this.state);
     Auth.currentAuthenticatedUser()
       .then()
       .then()
@@ -274,8 +273,6 @@ class planterScreen extends React.Component {
       this.props.plantyData.streamUrl === null
     ) {
     }
-
-    // console.log('fetching url');
     let USER_TOKEN = this.props.plantyData.myCognitoUser.signInUserSession
       .idToken.jwtToken;
     const AuthStr = 'Bearer '.concat(USER_TOKEN);
@@ -290,22 +287,16 @@ class planterScreen extends React.Component {
             this.props.plantyData.streamUrl === undefined ||
             this.props.plantyData.streamUrl === null
           ) {
-            // console.log('SETTING URL');
-            // console.log(response.data);
             if (response.data.errorMessage) {
-              // this.setState({errorText: response.data.errorMessage});
               return;
             }
             this.setState({errorText: ''});
             this.addUrl(response.data.HLSStreamingSessionURL);
           } else {
-            // console.log(response.data);
-            // console.log('NOT SETTING URL');
             this.setState({errorText: ''});
             this.setState({streamUrl: this.props.plantyData.streamUrl});
           }
         } else {
-          // console.log(response.data);
           this.setState({errorText: 'Reload the app'});
           console.log('No stream data URL');
           console.log(response);
@@ -739,7 +730,6 @@ class planterScreen extends React.Component {
               <Text style={styles.mainText}>Camera Controllers</Text>
               <View
                 style={{
-                  // flex:
                   flexDirection: 'row',
                   flexWrap: 'wrap',
                   justifyContent: 'space-between',
@@ -805,7 +795,6 @@ class planterScreen extends React.Component {
                       ? 'reload'
                       : require('../../assets/icons/arrow-ios-forward-outline.png')
                   }
-                  // icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
                   size={isIphoneX() ? 30 : 40}
                   disabled={
@@ -826,7 +815,6 @@ class planterScreen extends React.Component {
                       ? 'reload'
                       : require('../../assets/icons/arrowhead-right-outline.png')
                   }
-                  // icon={this.state.loadingActions ? 'reload' : 'arrow-right'}
                   color={plantyColor}
                   size={isIphoneX() ? 30 : 40}
                   disabled={

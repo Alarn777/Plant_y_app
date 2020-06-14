@@ -91,7 +91,6 @@ class growthPlan extends React.Component {
     //validations
 
     if (Object.keys(this.state.growthPlan).length === 0) {
-      //if no growthPlan
       if (this.state.growthPlanName === '') {
         this.setState({errorInName: true, errorText: 'Name must not be empty'});
       } else {
@@ -165,7 +164,6 @@ class growthPlan extends React.Component {
         },
       )
       .then(response => {
-        // console.log(response.data);
         this.setState({growthPlan: response.data, loading: false});
       })
       .catch(e => {
@@ -411,12 +409,10 @@ class growthPlan extends React.Component {
 
     if (oneWeek.phaseName.replace('Week ', '').length > 1) {
     } else icon = 'numeric-' + oneWeek.phaseName.replace('Week ', '');
-    // console.log(parseInt(oneWeek.phaseName.replace('Week ', '')));
     if (
       parseInt(oneWeek.phaseName.replace('Week ', '')) ===
       this.state.currentWeek
     ) {
-      // console.log('got ya');
     }
     return (
       <List.Accordion
@@ -477,9 +473,7 @@ class growthPlan extends React.Component {
               labelBackgroundColor={plantyColor}
               labelBorderColor={plantyColor}
               onValueChanged={(low, high, fromUser) => {
-                // console.log(low);
                 oneWeek.subPhases[0].uvIntensity.min = low;
-                // oneWeek.subPhases[0].uvIntensity.max = high;
                 this.forceUpdate();
               }}
             />
@@ -542,7 +536,6 @@ class growthPlan extends React.Component {
             <Text style={{marginTop: 20}}>0</Text>
             <RangeSlider
               style={{width: '85%', height: 80}}
-              // gravity={'center'}
               min={0}
               max={400}
               step={10}
@@ -556,7 +549,6 @@ class growthPlan extends React.Component {
               labelBorderColor={plantyColor}
               onValueChanged={(low, high, fromUser) => {
                 oneWeek.subPhases[1].uvIntensity.min = low;
-                // oneWeek.subPhases[1].uvIntensity.max = high;
                 this.forceUpdate();
               }}
             />
@@ -619,7 +611,6 @@ class growthPlan extends React.Component {
             <Text style={{marginTop: 20}}>0</Text>
             <RangeSlider
               style={{width: '85%', height: 80}}
-              // gravity={'center'}
               min={0}
               max={400}
               step={10}
@@ -633,7 +624,6 @@ class growthPlan extends React.Component {
               labelBorderColor={plantyColor}
               onValueChanged={(low, high, fromUser) => {
                 oneWeek.subPhases[2].uvIntensity.min = low;
-                // oneWeek.subPhases[2].uvIntensity.max = high;
                 this.forceUpdate();
               }}
             />
@@ -696,7 +686,6 @@ class growthPlan extends React.Component {
             <Text style={{marginTop: 20}}>0</Text>
             <RangeSlider
               style={{width: '85%', height: 80}}
-              // gravity={'center'}
               min={0}
               max={400}
               step={10}
@@ -710,7 +699,6 @@ class growthPlan extends React.Component {
               labelBorderColor={plantyColor}
               onValueChanged={(low, high, fromUser) => {
                 oneWeek.subPhases[3].uvIntensity.min = low;
-                // oneWeek.subPhases[3].uvIntensity.max = high;
                 this.forceUpdate();
               }}
             />
@@ -789,7 +777,6 @@ class growthPlan extends React.Component {
                 backgroundColor: plantyColor,
               }}
               color={'white'}
-              // mode="outlined"
               loading={this.state.savingPlan}
               onPress={() => {
                 this.saveGrowthPlan()
@@ -836,7 +823,6 @@ class growthPlan extends React.Component {
                 label="Description"
                 mode="outlined"
                 multiline={true}
-                // error={this.state.errorInName}
                 value={
                   Object.keys(this.state.growthPlan).length === 0 &&
                   this.state.growthPlan.constructor === Object
@@ -948,7 +934,6 @@ const styles = StyleSheet.create({
   header: {
     justifyContent: 'center',
     alignItems: 'center',
-    // margin: 5,
     height: 20,
     marginTop: 10,
     flexDirection: 'row',
