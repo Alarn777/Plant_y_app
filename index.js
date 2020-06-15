@@ -16,6 +16,7 @@ const theme = {
 const dark_theme = {
   ...DefaultTheme,
   roundness: 2,
+  a: 1,
   dark: true,
   colors: {
     background: '#27323a',
