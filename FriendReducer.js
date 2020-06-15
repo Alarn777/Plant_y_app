@@ -8,6 +8,7 @@ const INITIAL_STATE = {
   plantsImages: [],
   avatarUrl: '',
   socket: null,
+  theme: 'light',
   myCognitoUser: null,
   controls: {
     waterEnabled: false,
@@ -27,17 +28,35 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
     streamUrl,
     socket,
     controls,
+    theme,
     lightStatus,
     socketActions,
   } = state;
 
   switch (action.type) {
+    case 'CHANGE_THEME':
+      return {
+        streamUrl: streamUrl,
+        plantsImages: plantsImages,
+        avatarUrl: avatarUrl,
+        socket: socket,
+        theme: action.payload,
+        myCognitoUser: myCognitoUser,
+        controls: {
+          waterEnabled: controls.waterEnabled,
+          lightEnabled: controls.lightEnabled,
+          temperatureIncreased: controls.temperatureIncreased,
+          temperatureDecreased: controls.temperatureDecreased,
+        },
+        socketActions: socketActions,
+      };
     case 'CLEAN_STATE':
       return {
         streamUrl: null,
         plantsImages: [],
         avatarUrl: '',
         socket: null,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: false,
@@ -65,6 +84,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         avatarUrl: avatarUrl,
         socket: new_socket,
         myCognitoUser: myCognitoUser,
+        theme: theme,
         controls: {
           waterEnabled: controls.waterEnabled,
           lightEnabled: controls.lightEnabled,
@@ -84,6 +104,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: null,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: controls.waterEnabled,
@@ -104,6 +125,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: socket,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: controls.waterEnabled,
@@ -122,6 +144,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: socket,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: controls.waterEnabled,
@@ -138,6 +161,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: action.payload,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: controls.waterEnabled,
@@ -154,6 +178,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: socket,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: controls.waterEnabled,
@@ -175,6 +200,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         socketActions: socketActions,
 
         streamUrl: streamUrl,
+        theme: theme,
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: socket,
@@ -188,6 +214,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         newArr.push(action.payload);
         return {
           streamUrl: streamUrl,
+          theme: theme,
           plantsImages: newArr,
           avatarUrl: avatarUrl,
           socket: socket,
@@ -211,6 +238,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: newArr,
         avatarUrl: avatarUrl,
         socket: socket,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: controls.waterEnabled,
@@ -228,6 +256,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: socket,
+        theme: theme,
         myCognitoUser: action.payload,
         controls: {
           waterEnabled: controls.waterEnabled,
@@ -244,6 +273,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: plantsImages,
         avatarUrl: action.payload,
         socket: socket,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: controls.waterEnabled,
@@ -259,6 +289,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
       return {
         streamUrl: streamUrl,
         socket: socket,
+        theme: theme,
         planters: action.payload.Items,
         myCognitoUser: action.payload,
       };
@@ -277,6 +308,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
           plantsImages: plantsImages,
           avatarUrl: avatarUrl,
           socket: socket,
+          theme: theme,
           myCognitoUser: myCognitoUser,
           controls: {
             waterEnabled: controls.waterEnabled,
@@ -295,6 +327,7 @@ const cleanerReducer = (state = INITIAL_STATE, action) => {
         plantsImages: plantsImages,
         avatarUrl: avatarUrl,
         socket: socket,
+        theme: theme,
         myCognitoUser: myCognitoUser,
         controls: {
           waterEnabled: controls.waterEnabled,

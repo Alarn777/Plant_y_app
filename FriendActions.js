@@ -38,6 +38,11 @@ export const loadPlanters = user => ({
   payload: user,
 });
 
+export const changeTheme = theme => ({
+  type: 'CHANGE_THEME',
+  payload: theme,
+});
+
 export const AddAvatarLink = link => ({
   type: 'ADD_AVATAR_LINK',
   payload: link,
