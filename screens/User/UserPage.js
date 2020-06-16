@@ -1,9 +1,15 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
-import {Image, View, Dimensions, StyleSheet, ScrollView} from 'react-native';
+import {
+  Image,
+  View,
+  Dimensions,
+  StyleSheet,
+  ScrollView,
+  AsyncStorage,
+} from 'react-native';
 import {Auth} from 'aws-amplify';
-import {BarChart, LineChart} from 'react-native-chart-kit';
 import * as Keychain from 'react-native-keychain';
 import {
   Avatar,
@@ -29,7 +35,6 @@ import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import WS from '../../websocket';
 import BarGraph from '../../BarGraph';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Logger} from '../../Logger';
 import TouchID from 'react-native-touch-id';
 
@@ -401,6 +406,15 @@ class UserPage extends React.Component {
       });
   };
 
+  _storeData = async theme => {
+    try {
+      await AsyncStorage.setItem('theme', theme);
+    } catch (error) {
+      // Error saving data
+      console.log(error);
+    }
+  };
+
   render() {
     return (
       <ScrollView
@@ -477,6 +491,11 @@ class UserPage extends React.Component {
             <Switch
               value={this.props.plantyData.theme !== 'light'}
               onValueChange={() => {
+                this._storeData(
+                  this.props.plantyData.theme === 'light' ? 'dark' : 'light',
+                )
+                  .then()
+                  .catch();
                 this.props.changeTheme(
                   this.props.plantyData.theme === 'light' ? 'dark' : 'light',
                 );

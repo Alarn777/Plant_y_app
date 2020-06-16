@@ -12,7 +12,13 @@
  */
 
 import React from 'react';
-import {View, ImageBackground, StatusBar, Image} from 'react-native';
+import {
+  View,
+  ImageBackground,
+  StatusBar,
+  Image,
+  AsyncStorage,
+} from 'react-native';
 StatusBar.setBarStyle('light-content', true);
 import {Auth, I18n, Logger, JS} from 'aws-amplify';
 import AuthPiece from './AuthPiece';
@@ -50,6 +56,7 @@ class SignIn extends AuthPiece {
       redFields: false,
       FaceIDIsOn: false,
       idIsSupported: false,
+      theme: 'light',
     };
 
     this.checkContact = this.checkContact.bind(this);
@@ -73,7 +80,22 @@ class SignIn extends AuthPiece {
     this.checkIfIdActivated()
       .then()
       .catch();
+
+    this._retrieveData()
+      .then()
+      .catch();
   }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('theme');
+      if (value !== null) {
+        this.setState({theme: value});
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   checkIftouchFaceIsSupported = () => {
     TouchID.isSupported()
@@ -103,19 +125,6 @@ class SignIn extends AuthPiece {
           () => {
             this.setState({username: username, password: password});
             this.signIn();
-
-            // If Touch ID authentication is successful, call the `login` api
-            // login(username, password)
-            //     .then(() => {
-            //         // Handle login success
-            //     })
-            //     .catch(error => {
-            //         if (error === 'INVALID_CREDENTIALS') {
-            //             // The keychain contained invalid credentials :(
-            //             // We need to clear the keychain and the user will have to sign in manually
-            //             Keychain.resetGenericPassword();
-            //         }
-            //     })
           },
         );
       });
@@ -140,7 +149,6 @@ class SignIn extends AuthPiece {
           this.checkContact(user);
         }
         //create table for user
-        // console.log(user.signInUserSession.idToken.jwtToken);
         const AuthStr = 'Bearer '.concat(
           user.signInUserSession.idToken.jwtToken,
         );
@@ -156,11 +164,7 @@ class SignIn extends AuthPiece {
               headers: {Authorization: AuthStr},
             },
           )
-          .then(response => {
-            // If request is good...
-            // console.log(response.data);
-            // this.dealWithUrlData(response.data);
-          })
+          .then(response => {})
           .catch(e => {
             Logger.saveLogs(
               this.props.plantyData.myCognitoUser.username,
@@ -261,12 +265,17 @@ class SignIn extends AuthPiece {
             width: '100%',
           }}>
           <ImageBackground
-            source={require('../../assets/7dEVFqb.jpg')}
+            source={
+              this.state.theme === 'light'
+                ? require('../../assets/7dEVFqb.jpg')
+                : require('../../assets/dark_background.jpg')
+            }
             style={{width: '100%', height: '100%'}}>
             <View style={theme.section}>
               {this.renderSwitch()}
               <View>
                 <FormField
+                  my_theme={this.state.theme}
                   onChangeText={text => this.setState({username: text})}
                   label={I18n.get('Username')}
                   placeholder={I18n.get('Enter your username')}
@@ -274,6 +283,7 @@ class SignIn extends AuthPiece {
                   required={true}
                 />
                 <FormField
+                  my_theme={this.state.theme}
                   onChangeText={text => this.setState({password: text})}
                   label={I18n.get('Password')}
                   placeholder={I18n.get('Enter your password')}
@@ -329,82 +339,3 @@ class SignIn extends AuthPiece {
 }
 
 export default SignIn;
-//
-// 'use strict';
-// import React, {Component} from 'react';
-// import {Alert, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
-//
-// import TouchID from 'react-native-touch-id';
-//
-// export default class FingerPrint extends Component<{}> {
-//   constructor() {
-//     super();
-//
-//     this.state = {
-//       biometryType: null,
-//     };
-//   }
-//
-//   componentDidMount() {
-//     TouchID.isSupported().then(biometryType => {
-//       this.setState({biometryType});
-//     });
-//   }
-//
-//   render() {
-//     return (
-//       <View style={styles.container}>
-//         <TouchableHighlight
-//           style={styles.btn}
-//           onPress={this.clickHandler}
-//           underlayColor="#0380BE"
-//           activeOpacity={1}>
-//           <Text
-//             style={{
-//               color: '#fff',
-//               fontWeight: '600',
-//             }}>
-//             {`Authenticate with ${this.state.biometryType}`}
-//           </Text>
-//         </TouchableHighlight>
-//       </View>
-//     );
-//   }
-//
-//   clickHandler() {
-//     TouchID.isSupported()
-//       .then(authenticate)
-//       .catch(error => {
-//         Alert.alert('TouchID not supported');
-//       });
-//   }
-// }
-//
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#F5FCFF',
-//   },
-//   btn: {
-//     borderRadius: 3,
-//     marginTop: 200,
-//     paddingTop: 15,
-//     paddingBottom: 15,
-//     paddingLeft: 15,
-//     paddingRight: 15,
-//     backgroundColor: '#0391D7',
-//   },
-// });
-//
-// function authenticate() {
-//   return TouchID.authenticate()
-//     .then(success => {
-//       Alert.alert('Authenticated Successfully');
-//     })
-//     .catch(error => {
-//       console.log(error);
-//       Alert.alert(error.message);
-//     });
-// }

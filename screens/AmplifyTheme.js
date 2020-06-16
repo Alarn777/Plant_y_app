@@ -118,6 +118,14 @@ export default StyleSheet.create({
     borderColor: plantyColor,
     backgroundColor: 'white',
   },
+  input_dark: {
+    color: 'white',
+    padding: 16,
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: 'white',
+    backgroundColor: '#435055',
+  },
   inputLabel: {
     color: 'white',
     fontSize: 14,

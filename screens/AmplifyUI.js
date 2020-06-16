@@ -27,13 +27,15 @@ import countryDialCodes from './CountryDialCodes';
 
 export const FormField = props => {
   const theme = props.theme || AmplifyTheme;
+  console.log(props);
+
   return (
     <View style={theme.formField}>
       <Text style={theme.inputLabel}>
         {props.label} {props.required ? '*' : ''}
       </Text>
       <TextInput
-        style={theme.input}
+        style={props.my_theme === 'light' ? theme.input : theme.input_dark}
         autoCapitalize="none"
         autoCorrect={false}
         {...props}

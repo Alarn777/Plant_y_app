@@ -18,7 +18,7 @@ import AITesting from './screens/User/AITesting';
 import SendMyPlanter from './screens/User/SendMyPlanter';
 import Amplify, {Auth} from 'aws-amplify';
 import awsConfig from './aws-exports';
-import {StatusBar} from 'react-native';
+import {AsyncStorage, StatusBar} from 'react-native';
 
 Amplify.configure(awsConfig);
 
@@ -184,6 +184,28 @@ class App extends React.Component {
       },
     };
   }
+
+  componentDidMount(): void {
+    this._retrieveData()
+      .then()
+      .catch();
+  }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('theme');
+      if (value !== null) {
+        // Our data is fetched successfully
+        console.log(value);
+
+        this.setState({status_bar: value + '-content', current_theme: value});
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log(error);
+    }
+  };
+
   static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
     return {
@@ -204,6 +226,8 @@ class App extends React.Component {
   };
 
   changeTheme = theme => {
+    console.log('changeTheme', theme);
+
     this.setState({
       current_theme: theme,
       status_bar:

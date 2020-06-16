@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import {View, ImageBackground} from 'react-native';
+import {View, ImageBackground, AsyncStorage} from 'react-native';
 import {Auth, I18n, Logger} from 'aws-amplify';
 import {FormField, LinkCell, Header, ErrorRow} from '../AmplifyUI';
 import AuthPiece from './AuthPiece';
@@ -30,7 +30,9 @@ export default class SignUp extends AuthPiece {
     super(props);
 
     this._validAuthStates = ['signUp'];
-    this.state = {};
+    this.state = {
+      theme: 'light',
+    };
     this.signUp = this.signUp.bind(this);
     this.sortFields = this.sortFields.bind(this);
     this.getDefaultDialCode = this.getDefaultDialCode.bind(this);
@@ -50,7 +52,6 @@ export default class SignUp extends AuthPiece {
       this.defaultSignUpFields = signUpWithUsernameFields;
     }
   }
-
   isValid() {
     for (const el in this.signUpFields) {
       if (el.required && !this.state[el.key]) return false;
@@ -212,6 +213,22 @@ export default class SignUp extends AuthPiece {
         this.error(err);
       });
   }
+  componentDidMount(): void {
+    this._retrieveData()
+      .then()
+      .catch();
+  }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('theme');
+      if (value !== null) {
+        this.setState({theme: value});
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   showComponent(theme) {
     if (this.checkCustomSignUpFields()) {
@@ -229,14 +246,24 @@ export default class SignUp extends AuthPiece {
           width: '100%',
         }}>
         <ImageBackground
-          source={require('../../assets/7dEVFqb.jpg')}
+          source={
+            this.state.theme === 'light'
+              ? require('../../assets/7dEVFqb.jpg')
+              : require('../../assets/dark_background.jpg')
+          }
           style={{width: '100%', height: '100%'}}>
           <View style={theme.section}>
-            <Header theme={theme}>{I18n.get(this.header)}</Header>
+            <Header
+              style={{
+                textColor: this.state.theme === 'light' ? 'black' : 'white',
+              }}>
+              {this.header}
+            </Header>
             <View style={theme.sectionBody}>
               {this.signUpFields.map(field => {
                 return field.key !== 'phone_number' ? (
                   <FormField
+                    my_theme={this.state.theme}
                     key={field.key}
                     type={field.type}
                     secureTextEntry={field.type === 'password'}

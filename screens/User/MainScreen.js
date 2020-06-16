@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
   StatusBar,
+  AsyncStorage,
 } from 'react-native';
 import {Auth} from 'aws-amplify';
 import PropTypes from 'prop-types';
@@ -41,6 +42,7 @@ import {
   addAction,
   dealWithMessage,
   cleanReduxState,
+  changeTheme,
 } from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import WS from '../../websocket';
@@ -254,6 +256,9 @@ class MainScreen extends React.Component {
   }
 
   componentDidMount(): void {
+    this._retrieveData()
+      .then()
+      .catch();
     this.onLayout();
     this.fetchUser()
       .then(() => {
@@ -337,6 +342,19 @@ class MainScreen extends React.Component {
       height: Dimensions.get('window').height,
     });
   }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('theme');
+      if (value !== null) {
+        console.log('_retrieveData ', value);
+        this.props.changeTheme(value);
+        this.props.screenProps.func(value);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   _keyExtractor = item => item.UUID;
 
@@ -519,6 +537,7 @@ const mapDispatchToProps = dispatch =>
       dealWithMessage,
       connectWS,
       addAction,
+      changeTheme,
     },
     dispatch,
   );
