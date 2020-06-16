@@ -343,7 +343,11 @@ class AdjustPlanterConditions extends React.Component {
         <Button
           icon={'lightbulb'}
           color={
-            !this.props.plantyData.controls.lightEnabled ? 'gray' : '#ffea00'
+            !this.props.plantyData.controls.lightEnabled
+              ? this.props.plantyData.theme === 'light'
+                ? 'grey'
+                : 'white'
+              : '#ffea00'
           }
           loading={this.state.loadingLightTurnedOn}
           onPress={() => {
@@ -409,7 +413,8 @@ class AdjustPlanterConditions extends React.Component {
             style={{
               padding: 10,
               fontWeight: 'bold',
-              color: 'gray',
+              color: this.props.plantyData.theme === 'light' ? 'grey' : 'white',
+
               fontSize: 15,
             }}>
             {this.state.currTemperature}
@@ -487,6 +492,9 @@ class AdjustPlanterConditions extends React.Component {
               Humidity over this day
             </Paragraph>
             <AreaGraph
+              color={
+                this.props.plantyData.theme === 'light' ? 'black' : 'white'
+              }
               formatter={'%'}
               data={item.plots.daily.soilHumidity}
               y={[0, 1]}
@@ -497,6 +505,9 @@ class AdjustPlanterConditions extends React.Component {
               Humidity over the week
             </Paragraph>
             <StackedAreaGraph
+              color={
+                this.props.plantyData.theme === 'light' ? 'black' : 'white'
+              }
               data={item.plots.weekly}
               formatter={''}
               mode={'humid'}
@@ -516,6 +527,9 @@ class AdjustPlanterConditions extends React.Component {
               UV over this day
             </Paragraph>
             <AreaGraph
+              color={
+                this.props.plantyData.theme === 'light' ? 'black' : 'white'
+              }
               formatter={''}
               data={item.plots.daily.uvIntensity}
               y={[0, 1000]}
@@ -526,6 +540,9 @@ class AdjustPlanterConditions extends React.Component {
               UV over the week
             </Paragraph>
             <StackedAreaGraph
+              color={
+                this.props.plantyData.theme === 'light' ? 'black' : 'white'
+              }
               data={item.plots.weekly}
               formatter={''}
               mode={'uv'}

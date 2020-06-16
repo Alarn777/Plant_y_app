@@ -473,8 +473,9 @@ class UserPage extends React.Component {
               flexWrap: 'wrap',
               justifyContent: 'space-between',
             }}>
-            <Text style={styles.actionsText}>Toggle theme</Text>
+            <Text style={styles.actionsText}>Enable dark mode</Text>
             <Switch
+              value={this.props.plantyData.theme !== 'light'}
               onValueChange={() => {
                 this.props.changeTheme(
                   this.props.plantyData.theme === 'light' ? 'dark' : 'light',

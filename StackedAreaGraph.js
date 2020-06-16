@@ -176,10 +176,10 @@ class StackedAreaGraph extends React.Component {
           />
         </View>
         <View style={styles.legend}>
-          <Text style={{marginRight: 10}}>
+          <Text style={{marginRight: 10, color: this.props.color}}>
             Min <View style={styles.legendCube} />
           </Text>
-          <Text style={{marginRight: 10}}>
+          <Text style={{marginRight: 10, color: this.props.color}}>
             Avg{' '}
             <View
               style={{
@@ -190,7 +190,7 @@ class StackedAreaGraph extends React.Component {
               }}
             />
           </Text>
-          <Text style={{marginRight: 10}}>
+          <Text style={{marginRight: 10, color: this.props.color}}>
             Max{' '}
             <View
               style={{

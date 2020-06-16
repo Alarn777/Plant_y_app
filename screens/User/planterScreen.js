@@ -636,8 +636,6 @@ class planterScreen extends React.Component {
   };
 
   render() {
-    console.log(this.props.plantyData.theme);
-
     if (this.state.loading) {
       return (
         <View

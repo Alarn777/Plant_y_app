@@ -6,7 +6,7 @@ import {createStackNavigator} from 'react-navigation-stack';
 import Reducer from './FriendReducer';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import {mapping, light as lightTheme, dark as darkTheme} from '@eva-design/eva';
+import {mapping, light as lightTheme} from '@eva-design/eva';
 import HomeScreenUser from './screens/User/MainScreen';
 import PlantScreen from './screens/User/PlantScreen';
 import AllAvailablePlants from './screens/User/AllAvailablePlants';
@@ -164,9 +164,9 @@ class App extends React.Component {
         colors: {
           background: '#27323a',
           surface: '#435055',
-          primary: 'white',
+          primary: '#6f9e04',
           accent: '#6f9d00',
-          text: '#6f9e04',
+          text: 'white',
           disabled: 'white',
         },
       },
