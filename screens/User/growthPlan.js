@@ -66,6 +66,22 @@ class growthPlan extends React.Component {
     this.onLayout = this.onLayout.bind(this);
   }
 
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
+
   componentDidMount(): void {
     this.loadGrowthPlan()
       .then(
@@ -81,6 +97,11 @@ class growthPlan extends React.Component {
     currentWeek = parseInt(currentWeek / 7);
 
     this.setState({currentWeek: currentWeek + 1});
+
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
   }
 
   _showDialog = () => this.setState({visible: true});
@@ -267,7 +288,9 @@ class growthPlan extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -745,16 +768,23 @@ class growthPlan extends React.Component {
     }
 
     return (
-      <View style={styles.container} onLayout={this.onLayout}>
-        <PaperCard>
-          <View style={{}}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}
+        onLayout={this.onLayout}>
+        <PaperCard style={{margin: 3}}>
+          <View>
             <PaperCard.Title
               title={'Growth Plan'}
               subtitle={'Planter:' + this.state.planter.name}
             />
           </View>
         </PaperCard>
-        <PaperCard style={{marginTop: 2}}>
+        <PaperCard style={{margin: 3}}>
           <PaperCard.Content>
             <Button
               mode="outlined"
@@ -795,7 +825,13 @@ class growthPlan extends React.Component {
           </PaperCard.Content>
         </PaperCard>
         <ScrollView
-          style={styles.data}
+          style={{
+            flexWrap: 'wrap',
+            flex: 1,
+            margin: 3,
+            width: '100%',
+            flexDirection: 'row',
+          }}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}>
           <PaperCard style={{width: this.state.width - 2}}>

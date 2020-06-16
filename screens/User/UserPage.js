@@ -24,7 +24,7 @@ import ImagePicker from 'react-native-image-picker';
 import {Storage} from 'aws-amplify';
 import Buffer from 'buffer';
 import connect from 'react-redux/lib/connect/connect';
-import {AddAvatarLink, cleanReduxState} from '../../FriendActions';
+import {AddAvatarLink, changeTheme, cleanReduxState} from '../../FriendActions';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import WS from '../../websocket';
@@ -68,8 +68,28 @@ class UserPage extends React.Component {
       idString: 'Touch',
     };
   }
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
 
   componentDidMount(): void {
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
     this.loadGraphData();
     this.checkIfIdActivated()
       .then()
@@ -163,7 +183,10 @@ class UserPage extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
+      headerTintColor: params.headerColor,
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -380,8 +403,12 @@ class UserPage extends React.Component {
 
   render() {
     return (
-      <ScrollView>
-        <Card>
+      <ScrollView
+        style={{
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+        }}>
+        <Card style={{margin: 2}}>
           <PaperCard.Title
             title={
               this.state.user.username === 'Test'
@@ -402,7 +429,7 @@ class UserPage extends React.Component {
           />
           {this.renderAvatarButton()}
         </Card>
-        <Card>
+        <Card style={{margin: 2}}>
           <Text
             style={{
               marginLeft: 5,
@@ -414,6 +441,7 @@ class UserPage extends React.Component {
             Planter Lifetimes
           </Text>
           <BarGraph
+            color={this.props.plantyData.theme === 'light' ? 'black' : 'white'}
             data={this.state.graphData}
             max={Math.max(...this.state.graphData.datasets[0].data)}
             formatter={'W'}
@@ -435,6 +463,25 @@ class UserPage extends React.Component {
               value={this.state.FaceIDIsOn}
               onValueChange={() => {
                 this.setState({modalVisible: true});
+              }}
+            />
+          </View>
+          <View
+            style={{
+              margin: 10,
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+            }}>
+            <Text style={styles.actionsText}>Toggle theme</Text>
+            <Switch
+              onValueChange={() => {
+                this.props.changeTheme(
+                  this.props.plantyData.theme === 'light' ? 'dark' : 'light',
+                );
+                this.props.navigation.getParam('theme')(
+                  this.props.plantyData.theme === 'light' ? 'dark' : 'light',
+                );
               }}
             />
           </View>
@@ -574,6 +621,7 @@ const mapDispatchToProps = dispatch =>
     {
       AddAvatarLink,
       cleanReduxState,
+      changeTheme,
     },
     dispatch,
   );

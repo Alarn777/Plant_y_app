@@ -38,6 +38,7 @@ import addPlanterScreen from './screens/User/addPlanterScreen';
 import planterImagesGallery from './screens/User/planterImagesGallery';
 import Picture from './screens/User/Picture';
 import GrowthPlan from './screens/User/growthPlan';
+import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 
 const store = createStore(Reducer);
 
@@ -84,6 +85,7 @@ const AppNavigator = createStackNavigator(
       navigationOptions: {
         gesturesEnabled: false,
       },
+      waitForRender: true,
     },
     AdjustPlantConditions: {
       name: 'Adjust Plant Conditions Screen',
@@ -144,6 +146,7 @@ const AppNavigator = createStackNavigator(
   },
   {
     initialRouteName: 'HomeScreenUser',
+    cardStyle: {background: 'transparent', backgroundColor: '#263238'},
   },
 );
 
@@ -152,7 +155,31 @@ const AppContainer = createAppContainer(AppNavigator);
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      current_theme: 'light',
+      dark_theme: {
+        ...DefaultTheme,
+        roundness: 2,
+        dark: true,
+        colors: {
+          background: '#27323a',
+          surface: '#435055',
+          primary: 'white',
+          accent: '#6f9d00',
+          text: '#6f9e04',
+          disabled: 'white',
+        },
+      },
+      theme: {
+        ...DefaultTheme,
+        roundness: 2,
+        colors: {
+          ...DefaultTheme.colors,
+          primary: '#6f9e04',
+          accent: '#6f9d00',
+        },
+      },
+    };
   }
   static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
@@ -173,6 +200,10 @@ class App extends React.Component {
     };
   };
 
+  changeTheme = theme => {
+    this.setState({current_theme: theme});
+  };
+
   logOut = async () => {
     await Auth.signOut()
       .then(data => console.log(data))
@@ -182,10 +213,17 @@ class App extends React.Component {
   render() {
     return (
       <Provider store={store}>
-        <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider mapping={mapping} theme={lightTheme}>
-          <AppContainer screenProps={() => this.logOut} />
-        </ApplicationProvider>
+        <PaperProvider
+          theme={
+            this.state.current_theme === 'light'
+              ? this.state.theme
+              : this.state.dark_theme
+          }>
+          <IconRegistry icons={EvaIconsPack} />
+          <ApplicationProvider mapping={mapping} theme={lightTheme}>
+            <AppContainer screenProps={{func: this.changeTheme.bind(this)}} />
+          </ApplicationProvider>
+        </PaperProvider>
       </Provider>
     );
   }

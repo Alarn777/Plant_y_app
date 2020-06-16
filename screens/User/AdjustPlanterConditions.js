@@ -152,6 +152,26 @@ class AdjustPlanterConditions extends React.Component {
     currentWeek = parseInt(currentWeek / 7);
     this.setState({currentWeek: currentWeek});
     this.getMeasurments();
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
   }
 
   getMeasurments = () => {
@@ -180,7 +200,9 @@ class AdjustPlanterConditions extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -276,7 +298,12 @@ class AdjustPlanterConditions extends React.Component {
           marginBottom: 10,
           marginTop: 10,
         }}>
-        <Chip style={{backgroundColor: 'white'}} icon="water-pump">
+        <Chip
+          style={{
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#435055',
+          }}
+          icon="water-pump">
           Add water to the planter
         </Chip>
         <Button
@@ -305,7 +332,12 @@ class AdjustPlanterConditions extends React.Component {
           marginBottom: 10,
           marginTop: 10,
         }}>
-        <Chip style={{backgroundColor: 'white'}} icon="ceiling-light">
+        <Chip
+          style={{
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#435055',
+          }}
+          icon="ceiling-light">
           Toggle light
         </Chip>
         <Button
@@ -343,7 +375,12 @@ class AdjustPlanterConditions extends React.Component {
           marginTop: 10,
         }}>
         <Chip
-          style={{paddingTop: 10, paddingBottom: 5, backgroundColor: 'white'}}
+          style={{
+            paddingTop: 10,
+            paddingBottom: 5,
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#435055',
+          }}
           icon="temperature-celsius">
           Adjust temperature
         </Chip>
@@ -394,7 +431,7 @@ class AdjustPlanterConditions extends React.Component {
     );
   };
 
-  _renderCarouselItem({item, index}) {
+  _renderCarouselItem({item, index, textColor}) {
     let temp = item.currTemperature;
     temp = Math.floor(parseFloat(temp));
 
@@ -416,6 +453,9 @@ class AdjustPlanterConditions extends React.Component {
             </Paragraph>
             <AreaGraph
               formatter={'C'}
+              color={
+                this.props.plantyData.theme === 'light' ? 'black' : 'white'
+              }
               data={item.plots.daily.ambientTemperatureCelsius}
               y={[-10, 60]}
             />
@@ -425,6 +465,9 @@ class AdjustPlanterConditions extends React.Component {
               Temperature over the week
             </Paragraph>
             <StackedAreaGraph
+              color={
+                this.props.plantyData.theme === 'light' ? 'black' : 'white'
+              }
               data={item.plots.weekly}
               formatter={'C'}
               mode={'temp'}
@@ -495,8 +538,12 @@ class AdjustPlanterConditions extends React.Component {
   render() {
     if (this.state.manualMode) {
       return (
-        <KeyboardAwareScrollView style={{margin: '1%', width: '98%'}}>
-          <PaperCard>
+        <KeyboardAwareScrollView
+          style={{
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          }}>
+          <PaperCard style={{margin: 3}}>
             <PaperCard.Title
               title={'Planter: ' + this.state.item.name}
               subtitle={'Climate: ' + this.state.item.climate}
@@ -513,7 +560,7 @@ class AdjustPlanterConditions extends React.Component {
               </Text>
             </PaperCard.Content>
           </PaperCard>
-          <PaperCard style={{marginTop: 5}}>
+          <PaperCard style={{margin: 3}}>
             <PaperCard.Content>
               {this.renderAutomation()}
               <Text
@@ -529,7 +576,7 @@ class AdjustPlanterConditions extends React.Component {
               </Text>
             </PaperCard.Content>
           </PaperCard>
-          <PaperCard style={{marginTop: 5, height: this.state.height - 380}}>
+          <PaperCard style={{margin: 3, height: this.state.height - 380}}>
             <PaperCard.Title title={'Actions'} />
             <PaperCard.Content>
               {this.renderWaterControl()}
@@ -591,11 +638,15 @@ class AdjustPlanterConditions extends React.Component {
       );
     } else {
       return (
-        <View style={{margin: '1%', width: '98%'}}>
+        <View
+          style={{
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          }}>
           <KeyboardAwareScrollView
             innerRef={this.setScrollViewRef}
             extraScrollHeight={30}>
-            <PaperCard>
+            <PaperCard style={{margin: 3}}>
               <PaperCard.Title
                 title={'Planter: ' + this.state.item.name}
                 subtitle={'Climate: ' + this.state.item.climate}
@@ -612,19 +663,20 @@ class AdjustPlanterConditions extends React.Component {
                 </Text>
               </PaperCard.Content>
             </PaperCard>
-            <PaperCard style={{marginTop: 5}}>
+            <PaperCard style={{margin: 3}}>
               <PaperCard.Content>{this.renderAutomation()}</PaperCard.Content>
             </PaperCard>
-            <PaperCard style={{marginTop: 5}}>
+            <PaperCard style={{margin: 3}}>
               <PaperCard.Title title={'Conditions'} />
               <PaperCard.Content>
                 <Carousel
                   loop={true}
                   autoplay={true}
                   autoplayDelay={0}
+                  lol={'aaaa'}
                   autoplayInterval={10000}
                   data={this.state.entries}
-                  renderItem={this._renderCarouselItem}
+                  renderItem={this._renderCarouselItem.bind(this)}
                   sliderWidth={Dimensions.get('window').width - 40}
                   itemWidth={Dimensions.get('window').width - 40}
                   onSnapToItem={index => this.setState({activeSlide: index})}

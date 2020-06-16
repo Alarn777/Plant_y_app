@@ -103,6 +103,23 @@ class AllAvailablePlants extends React.Component {
       });
   }
 
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
+
   componentDidMount(): void {
     const {authState, authData} = this.props;
     const user = authData;
@@ -120,6 +137,10 @@ class AllAvailablePlants extends React.Component {
       .catch(e => console.log(e));
 
     this.preloadImages();
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -139,7 +160,9 @@ class AllAvailablePlants extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -226,18 +249,46 @@ class AllAvailablePlants extends React.Component {
   render() {
     if (this.state.loading) {
       return (
-        <ActivityIndicator
-          size="large"
-          color={plantyColor}
-          style={{top: this.state.height / 2 - 50}}
-        />
+        <View
+          style={{
+            height: this.state.height,
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+          }}>
+          <ActivityIndicator
+            size="large"
+            color={plantyColor}
+            style={{top: this.state.height / 2 - 50}}
+          />
+        </View>
       );
     }
 
     return (
-      <View style={styles.container} onLayout={this.onLayout}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+          position: 'relative',
+        }}
+        onLayout={this.onLayout}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>All Available Plants</Text>
+          <Text
+            style={{
+              height: 50,
+              fontSize: 20,
+              fontWeight: 'bold',
+              padding: 10,
+              marginBottom: 10,
+              marginTop: 20,
+              color:
+                this.props.plantyData.theme === 'light'
+                  ? '#263238'
+                  : plantyColor,
+            }}>
+            All Available Plants
+          </Text>
         </View>
         <ScrollView style={styles.data}>
           <FlatList

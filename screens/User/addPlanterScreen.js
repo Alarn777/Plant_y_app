@@ -1,8 +1,6 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import {Layout, Select, Text} from '@ui-kitten/components';
-
-import InputValidation from 'react-native-input-validation';
+import {Select, Text} from '@ui-kitten/components';
 const data = [
   {text: 'Tropical'},
   {text: 'Humid'},
@@ -54,6 +52,26 @@ class addPlanterScreen extends React.Component {
     this.loadAllGrowthPlans()
       .then()
       .catch();
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
   }
 
   async loadAllGrowthPlans() {
@@ -89,6 +107,7 @@ class addPlanterScreen extends React.Component {
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
+    const params = navigation.state.params || {};
     return {
       headerTitle: (
         <Image
@@ -104,7 +123,9 @@ class addPlanterScreen extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -242,7 +263,13 @@ class addPlanterScreen extends React.Component {
     let loading = this.state.addingPlanter;
     let allActionsDisabled = this.state.allActions;
     return (
-      <View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}>
         <PaperCard style={{margin: '1%', width: '98%'}}>
           <PaperCard.Title title={'Create Planter'} />
           <PaperCard.Content>
@@ -277,6 +304,7 @@ class addPlanterScreen extends React.Component {
                   borderWidth: 0.5,
                   margin: 10,
                   borderColor: plantyColor,
+                  container: {backgroundColor: 'black'},
                 }}
                 data={data}
                 selectedOption={this.state.selectedOption}
