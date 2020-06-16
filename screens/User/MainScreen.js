@@ -453,7 +453,7 @@ class MainScreen extends React.Component {
               color={plantyColor}
               style={{
                 alignItems: 'center',
-                marginLeft: this.state.width / 2 - 40,
+                marginLeft: this.state.width / 2 - 30,
               }}
             />
           ) : (

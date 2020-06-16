@@ -5,6 +5,7 @@ import {
   ScrollView,
   Dimensions,
   ImageBackground,
+  Text as TextNative,
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {Auth} from 'aws-amplify';
@@ -888,7 +889,9 @@ class planterScreen extends React.Component {
                     .catch();
                 },
               }}>
-              We detected a sick plant in your garden,please tend to it!
+              <TextNative style={{color: 'white'}}>
+                We detected a sick plant in your garden,please tend to it!
+              </TextNative>
             </Snackbar>
           </Portal>
           <Portal>

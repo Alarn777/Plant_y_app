@@ -6,7 +6,7 @@ import {createStackNavigator} from 'react-navigation-stack';
 import Reducer from './FriendReducer';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import {mapping, light as lightTheme} from '@eva-design/eva';
+import {mapping, light as lightTheme, dark as darkTheme} from '@eva-design/eva';
 import HomeScreenUser from './screens/User/MainScreen';
 import PlantScreen from './screens/User/PlantScreen';
 import AllAvailablePlants from './screens/User/AllAvailablePlants';
@@ -157,7 +157,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      status_bar: 'default',
+      styleTypes: ['default', 'dark-content', 'light-content'],
+      status_bar: 'dark-content',
       current_theme: 'light',
       dark_theme: {
         ...DefaultTheme,
@@ -206,7 +207,9 @@ class App extends React.Component {
     this.setState({
       current_theme: theme,
       status_bar:
-        this.state.status_bar === 'default' ? 'light-content' : 'default',
+        this.state.status_bar === 'dark-content'
+          ? 'light-content'
+          : 'dark-content',
     });
   };
 
@@ -227,7 +230,11 @@ class App extends React.Component {
               : this.state.dark_theme
           }>
           <IconRegistry icons={EvaIconsPack} />
-          <ApplicationProvider mapping={mapping} theme={lightTheme}>
+          <ApplicationProvider
+            mapping={mapping}
+            theme={
+              this.state.current_theme === 'light' ? lightTheme : darkTheme
+            }>
             <AppContainer screenProps={{func: this.changeTheme.bind(this)}} />
           </ApplicationProvider>
         </PaperProvider>
