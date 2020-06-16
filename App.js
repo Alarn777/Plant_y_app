@@ -18,6 +18,7 @@ import AITesting from './screens/User/AITesting';
 import SendMyPlanter from './screens/User/SendMyPlanter';
 import Amplify, {Auth} from 'aws-amplify';
 import awsConfig from './aws-exports';
+import {StatusBar} from 'react-native';
 
 Amplify.configure(awsConfig);
 
@@ -156,6 +157,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      status_bar: 'default',
       current_theme: 'light',
       dark_theme: {
         ...DefaultTheme,
@@ -201,7 +203,11 @@ class App extends React.Component {
   };
 
   changeTheme = theme => {
-    this.setState({current_theme: theme});
+    this.setState({
+      current_theme: theme,
+      status_bar:
+        this.state.status_bar === 'default' ? 'light-content' : 'default',
+    });
   };
 
   logOut = async () => {
@@ -211,6 +217,7 @@ class App extends React.Component {
   };
 
   render() {
+    StatusBar.setBarStyle(this.state.status_bar, true);
     return (
       <Provider store={store}>
         <PaperProvider
