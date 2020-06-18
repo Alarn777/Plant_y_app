@@ -196,7 +196,7 @@ class App extends React.Component {
       const value = await AsyncStorage.getItem('theme');
       if (value !== null) {
         // Our data is fetched successfully
-        console.log(value);
+        // console.log(value);
 
         this.setState({status_bar: value + '-content', current_theme: value});
       }
@@ -226,7 +226,7 @@ class App extends React.Component {
   };
 
   changeTheme = theme => {
-    console.log('changeTheme', theme);
+    // console.log('changeTheme', theme);
 
     this.setState({
       current_theme: theme,

@@ -291,12 +291,24 @@ class planterImagesGallery extends React.Component {
           </View>
         </PaperCard>
         <ScrollView style={styles.data}>
-          <FlatList
-            numColumns={2}
-            data={this.state.pictures}
-            keyExtractor={this._keyExtractor}
-            renderItem={this._renderItem}
-          />
+          {this.state.pictures.length === 0 ? (
+            <ActivityIndicator
+              size="large"
+              color={plantyColor}
+              style={{
+                marginTop: 5,
+                alignItems: 'center',
+                marginLeft: this.state.width / 2 - 30,
+              }}
+            />
+          ) : (
+            <FlatList
+              numColumns={2}
+              data={this.state.pictures}
+              keyExtractor={this._keyExtractor}
+              renderItem={this._renderItem}
+            />
+          )}
         </ScrollView>
         <Image
           style={{position: 'absolute', bottom: -1, zIndex: -10}}

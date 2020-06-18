@@ -27,7 +27,7 @@ import countryDialCodes from './CountryDialCodes';
 
 export const FormField = props => {
   const theme = props.theme || AmplifyTheme;
-  console.log(props);
+  // console.log(props);
 
   return (
     <View style={theme.formField}>
