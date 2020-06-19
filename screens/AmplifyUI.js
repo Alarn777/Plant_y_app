@@ -33,6 +33,7 @@ export const FormField = props => {
         {props.label} {props.required ? '*' : ''}
       </Text>
       <TextInput
+        editable={!props.disabled}
         style={theme.input}
         autoCapitalize="none"
         autoCorrect={false}

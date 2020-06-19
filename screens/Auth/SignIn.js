@@ -122,9 +122,12 @@ class SignIn extends AuthPiece {
   };
 
   signIn() {
-    this.setState({loginigIn: true});
+    this.setState({loginigIn: true, tryingLogin: true});
     const username = this.getUsernameFromInput() || '';
-    if (username === '') return;
+    if (username === '') {
+      this.setState({tryingLogin: false});
+      return;
+    }
     const {password} = this.state;
     logger.debug('Sign In for ' + username);
     Auth.signIn(username, password)
@@ -167,6 +170,7 @@ class SignIn extends AuthPiece {
               e.toString(),
               'createPlanterPictures',
             );
+            this.setState({tryingLogin: false});
             console.log(e);
           });
 
@@ -267,6 +271,7 @@ class SignIn extends AuthPiece {
               {this.renderSwitch()}
               <View>
                 <FormField
+                  disabled={this.state.tryingLogin}
                   onChangeText={text => this.setState({username: text})}
                   label={I18n.get('Username')}
                   placeholder={I18n.get('Enter your username')}
@@ -274,6 +279,7 @@ class SignIn extends AuthPiece {
                   required={true}
                 />
                 <FormField
+                  disabled={this.state.tryingLogin}
                   onChangeText={text => this.setState({password: text})}
                   label={I18n.get('Password')}
                   placeholder={I18n.get('Enter your password')}

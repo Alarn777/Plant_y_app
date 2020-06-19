@@ -29,9 +29,14 @@ export default class WS {
         'WS ERROR',
       );
 
-      setTimeout(function() {
-        this.ws = new WebSocket(Const.apigatewaySocket);
-      }, 1000);
+      if (e.reason.toString() === 'Stream end encountered') {
+        console.log('User closed the app');
+      } else {
+        setTimeout(function() {
+          WS.init();
+          // this.ws = new WebSocket(Const.apigatewaySocket);
+        }, 1000);
+      }
     };
   }
 
@@ -59,3 +64,13 @@ export default class WS {
     }
   }
 }
+//
+// (function() {
+//   Element.prototype._addEventListener = Element.prototype.addEventListener;
+//   Element.prototype.addEventListener = function(a, b, c) {
+//     this._addEventListener(a, b, c);
+//     if (!this.eventListenerList) this.eventListenerList = {};
+//     if (!this.eventListenerList[a]) this.eventListenerList[a] = [];
+//     this.eventListenerList[a].push(b);
+//   };
+// })();
