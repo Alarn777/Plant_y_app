@@ -34,7 +34,7 @@ export const FormField = props => {
       </Text>
       <TextInput
         editable={!props.disabled}
-        style={theme.input}
+        style={props.my_theme === 'light' ? theme.input : theme.input_dark}
         autoCapitalize="none"
         autoCorrect={false}
         {...props}

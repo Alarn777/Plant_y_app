@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
 import {Select, Text} from '@ui-kitten/components';
 
 import InputValidation from 'react-native-input-validation';
@@ -33,6 +33,7 @@ class SendMyPlanter extends React.Component {
       visible: false,
       nameError: false,
       checked: 'first',
+      height: Dimensions.get('window').height,
       planter: this.props.navigation.getParam('planter'),
       loadBuffering: false,
       addingPlanter: false,
@@ -54,9 +55,15 @@ class SendMyPlanter extends React.Component {
       instructions: '',
     };
   }
-  componentDidMount(): void {}
+  componentDidMount(): void {
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+  }
 
   static navigationOptions = ({navigation, screenProps}) => {
+    const params = navigation.state.params || {};
     return {
       headerTitle: (
         <Image
@@ -72,7 +79,9 @@ class SendMyPlanter extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -81,23 +90,28 @@ class SendMyPlanter extends React.Component {
     };
   };
 
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
+
   async submitOrder() {
     this.setState({addingPlanter: true});
-    //
-    // console.log(this.state.planter.UUID);
-    // console.log(this.state.userFullName);
-    // console.log(this.state.phoneNumber);
-    // console.log(this.state.address);
-    // console.log(this.state.instructions);
-    // console.log(this.props.plantyData.myCognitoUser.username);
-
     const AuthStr = 'Bearer '.concat(
       this.props.plantyData.myCognitoUser.signInUserSession.idToken.jwtToken,
     );
-
-    // console.log(AuthStr);
-
-    // return;
     await axios
       .post(
         Consts.apigatewayRoute + '/sendingPlanter',
@@ -130,8 +144,6 @@ class SendMyPlanter extends React.Component {
 
   dealWithUrlData = url => {
     this.successAdding();
-    // this.forceUpdate();
-    // this.props.navigation.getParam('loadPlanters')();
   };
 
   successAdding = () => {
@@ -215,7 +227,12 @@ class SendMyPlanter extends React.Component {
     let loading = this.state.addingPlanter;
     let allActionsDisabled = this.state.allActions;
     return (
-      <View>
+      <View
+        style={{
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          height: this.state.height,
+        }}>
         <PaperCard style={{margin: '1%', width: '98%'}}>
           <PaperCard.Title
             title={'Send planter to your home'}

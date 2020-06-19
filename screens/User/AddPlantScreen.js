@@ -1,16 +1,10 @@
 import React from 'react';
-import {Image, View, StyleSheet, ScrollView} from 'react-native';
-import {Text, Card} from '@ui-kitten/components';
+import {Image, StyleSheet, ScrollView} from 'react-native';
+import {Text} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 
-import {
-  Button,
-  Divider,
-  Card as PaperCard,
-  Paragraph,
-  Title,
-} from 'react-native-paper';
+import {Button, Card as PaperCard} from 'react-native-paper';
 
 //redux
 import {connect} from 'react-redux';
@@ -37,8 +31,29 @@ class AddPlantScreen extends React.Component {
     this.addPlantToMyGarden = this.addPlantToMyGarden.bind(this);
   }
 
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
+
   componentDidMount(): void {
     this.setState({plant: this.props.navigation.getParam('item')});
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
@@ -58,7 +73,9 @@ class AddPlantScreen extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -128,7 +145,11 @@ class AddPlantScreen extends React.Component {
     const {navigation} = this.props;
     let item = navigation.getParam('item');
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={{
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+        }}>
         <PaperCard>
           <PaperCard.Title
             title={item.name}

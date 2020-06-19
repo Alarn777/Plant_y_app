@@ -75,6 +75,27 @@ class History extends React.Component {
     this.listPicturesData()
       .then()
       .catch();
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
   }
 
   async preloadImages(images_array) {
@@ -177,7 +198,9 @@ class History extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -363,14 +386,18 @@ class History extends React.Component {
               marginBottom: 10,
             }}
             theme={{
-              backgroundColor: '#ffffff',
-              calendarBackground: '#ffffff',
+              backgroundColor:
+                this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+              calendarBackground:
+                this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
               textSectionTitleColor: green200,
               selectedDayBackgroundColor: plantyColor,
               selectedDayTextColor: '#ffffff',
               todayTextColor: plantyColor,
-              dayTextColor: '#2d4150',
-              textDisabledColor: '#d9e1e8',
+              dayTextColor:
+                this.props.plantyData.theme === 'light' ? '#2d4150' : 'white',
+              textDisabledColor:
+                this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
               dotColor: '#00adf5',
               selectedDotColor: '#ffffff',
               arrowColor: plantyColor,
@@ -511,6 +538,7 @@ class History extends React.Component {
         </Text>
         <AreaGraph
           formatter={''}
+          color={this.props.plantyData.theme === 'light' ? 'black' : 'white'}
           data={this.state.plots.ambientTemperatureCelsius}
           y={[-10, 60]}
         />
@@ -521,6 +549,7 @@ class History extends React.Component {
 
         <AreaGraph
           formatter={''}
+          color={this.props.plantyData.theme === 'light' ? 'black' : 'white'}
           data={this.state.plots.uvIntensity}
           y={[0, 1000]}
         />
@@ -531,6 +560,7 @@ class History extends React.Component {
         </Text>
         <AreaGraph
           formatter={''}
+          color={this.props.plantyData.theme === 'light' ? 'black' : 'white'}
           data={this.state.plots.soilHumidity}
           y={[0, 1]}
         />
@@ -570,11 +600,16 @@ class History extends React.Component {
   render() {
     if (this.state.loadingGraphs) {
       return (
-        <View style={{flex: 1}}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          }}>
           <PaperCard style={{height: this.state.height}}>
             <Image
               style={{height: 300, width: 300, alignSelf: 'center'}}
-              source={require('../../assets/plant.gif')}
+              source={require('../../assets/plant-1.gif')}
             />
             <Text
               style={{
@@ -591,8 +626,13 @@ class History extends React.Component {
     }
 
     return (
-      <ScrollView style={styles.container}>
-        <PaperCard>
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+        }}>
+        <PaperCard style={{margin: 3}}>
           <PaperCard.Title
             title={'History for the planter ' + this.state.planter.name}
             subtitle={'Choose a day to see history'}

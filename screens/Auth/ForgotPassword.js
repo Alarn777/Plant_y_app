@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import {View, ImageBackground} from 'react-native';
+import {View, ImageBackground, AsyncStorage} from 'react-native';
 import {Auth, I18n, Logger} from 'aws-amplify';
 import {
   FormField,
@@ -31,7 +31,7 @@ export default class ForgotPassword extends AuthPiece {
     super(props);
 
     this._validAuthStates = ['forgotPassword'];
-    this.state = {delivery: null};
+    this.state = {delivery: null, theme: 'light'};
 
     this.send = this.send.bind(this);
     this.submit = this.submit.bind(this);
@@ -76,10 +76,10 @@ export default class ForgotPassword extends AuthPiece {
       });
   }
 
-  forgotBody(theme) {
+  forgotBody(theme, my_theme) {
     return (
       <View style={theme.sectionBody}>
-        {this.renderUsernameField(theme)}
+        {this.renderUsernameField(theme, my_theme)}
         <AmplifyButton
           text={I18n.get('Send').toUpperCase()}
           // theme={theme}
@@ -102,12 +102,14 @@ export default class ForgotPassword extends AuthPiece {
         }}>
         <View style={theme.sectionBody}>
           <FormField
+            my_theme={this.state.theme}
             onChangeText={text => this.setState({code: text})}
             label={I18n.get('Confirmation Code')}
             placeholder={I18n.get('Enter your confirmation code')}
             required={true}
           />
           <FormField
+            my_theme={this.state.theme}
             onChangeText={text => this.setState({password: text})}
             label={I18n.get('Password')}
             placeholder={I18n.get('Enter your new password')}
@@ -130,9 +132,25 @@ export default class ForgotPassword extends AuthPiece {
     );
   }
 
+  componentDidMount(): void {
+    this._retrieveData()
+      .then()
+      .catch();
+  }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('theme');
+      if (value !== null) {
+        this.setState({theme: value});
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   showComponent(theme) {
     return (
-      // <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAwareScrollView
         extraScrollHeight={30}
         contentContainerStyle={{
@@ -143,12 +161,16 @@ export default class ForgotPassword extends AuthPiece {
           width: '100%',
         }}>
         <ImageBackground
-          source={require('../../assets/7dEVFqb.jpg')}
+          source={
+            this.state.theme === 'light'
+              ? require('../../assets/7dEVFqb.jpg')
+              : require('../../assets/dark_background.jpg')
+          }
           style={{width: '100%', height: '100%'}}>
           <View style={theme.section}>
             <Header theme={theme}>{I18n.get('Forgot Password')}</Header>
             <View style={theme.sectionBody}>
-              {!this.state.delivery && this.forgotBody(theme)}
+              {!this.state.delivery && this.forgotBody(theme, this.state.theme)}
               {this.state.delivery && this.submitBody(theme)}
               <View style={theme.sectionFooter} />
             </View>
@@ -161,7 +183,6 @@ export default class ForgotPassword extends AuthPiece {
           </View>
         </ImageBackground>
       </KeyboardAwareScrollView>
-      // </TouchableWithoutFeedback>
     );
   }
 }

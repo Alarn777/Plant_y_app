@@ -2,33 +2,19 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {HeaderBackButton} from 'react-navigation-stack';
 import {Image, View, Dimensions, StyleSheet, ScrollView} from 'react-native';
-import {Auth} from 'aws-amplify';
-import {BarChart, LineChart} from 'react-native-chart-kit';
-import * as Keychain from 'react-native-keychain';
 import {
-  Avatar,
   Card as PaperCard,
   Card,
-  Button,
   FAB,
   Text,
   ActivityIndicator,
-  Switch,
-  Portal,
-  Dialog,
-  Paragraph,
-  TextInput,
 } from 'react-native-paper';
-import ImagePicker from 'react-native-image-picker';
 import {Storage} from 'aws-amplify';
 import Buffer from 'buffer';
 import connect from 'react-redux/lib/connect/connect';
-import {AddAvatarLink, cleanReduxState} from '../../FriendActions';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import WS from '../../websocket';
-import BarGraph from '../../BarGraph';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Icon} from '@ui-kitten/components';
 import {RNCamera} from 'react-native-camera';
 import {isIphone7} from '../../whatDevice';
@@ -44,12 +30,6 @@ const data = {
       data: [3, 5, 3],
     },
   ],
-};
-
-const chartConfig = {
-  backgroundGradientFrom: plantyColor,
-  decimalPlaces: 2, // optional, defaults to 2dp
-  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
 };
 
 class AITesting extends React.Component {
@@ -96,7 +76,28 @@ class AITesting extends React.Component {
     });
   }
 
-  componentDidMount(): void {}
+  componentDidMount(): void {
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
 
   static navigationOptions = ({navigation, screenProps}) => {
     const params = navigation.state.params || {};
@@ -115,7 +116,9 @@ class AITesting extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -343,7 +346,12 @@ class AITesting extends React.Component {
 
   render() {
     return (
-      <ScrollView>
+      <ScrollView
+        style={{
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}>
         <Card style={{height: this.state.height - 60}}>
           <PaperCard.Title
             title={'Test your plants'}

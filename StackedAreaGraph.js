@@ -155,19 +155,17 @@ class StackedAreaGraph extends React.Component {
             contentInset={{top: 0, bottom: 0}}
             svg={{
               fontSize: 8,
-              fill: 'white',
-              stroke: 'black',
+              fill: this.props.color,
               strokeWidth: 0.3,
               alignmentBaseline: 'baseline',
               baselineShift: '3',
             }}
-            // formatLabel={(value) => value + }
             formatLabel={value => `${value} ${this.state.formatter}`}
           />
           <XAxis
             data={this.state.data}
             svg={{
-              fill: 'grey',
+              fill: this.props.color,
               fontSize: 10,
             }}
             style={{marginTop: 10}}
@@ -178,10 +176,10 @@ class StackedAreaGraph extends React.Component {
           />
         </View>
         <View style={styles.legend}>
-          <Text style={{marginRight: 10}}>
+          <Text style={{marginRight: 10, color: this.props.color}}>
             Min <View style={styles.legendCube} />
           </Text>
-          <Text style={{marginRight: 10}}>
+          <Text style={{marginRight: 10, color: this.props.color}}>
             Avg{' '}
             <View
               style={{
@@ -192,7 +190,7 @@ class StackedAreaGraph extends React.Component {
               }}
             />
           </Text>
-          <Text style={{marginRight: 10}}>
+          <Text style={{marginRight: 10, color: this.props.color}}>
             Max{' '}
             <View
               style={{

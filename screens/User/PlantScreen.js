@@ -52,7 +52,9 @@ class PlantScreen extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -61,7 +63,27 @@ class PlantScreen extends React.Component {
     };
   };
 
-  componentDidMount(): void {}
+  componentDidMount(): void {
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+  }
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
 
   async removePlantFromPlanter() {
     this.setState({deletingPlant: true});
@@ -153,7 +175,13 @@ class PlantScreen extends React.Component {
     );
 
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}>
         <PaperCard>
           <PaperCard.Title
             title={item.name}

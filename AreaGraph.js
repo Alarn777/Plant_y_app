@@ -81,8 +81,7 @@ class AreaGraph extends React.PureComponent {
           data={this.props.y}
           svg={{
             fontSize: 8,
-            fill: 'white',
-            stroke: 'black',
+            fill: this.props.color,
             strokeWidth: 0.3,
             alignmentBaseline: 'baseline',
             baselineShift: '3',
@@ -94,7 +93,7 @@ class AreaGraph extends React.PureComponent {
         <XAxis
           data={this.state.data}
           svg={{
-            fill: 'grey',
+            fill: this.props.color,
             fontSize: 10,
           }}
           contentInset={{left: 30, right: 10}}

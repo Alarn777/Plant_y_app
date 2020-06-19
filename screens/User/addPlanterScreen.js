@@ -1,8 +1,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import {Layout, Select, Text} from '@ui-kitten/components';
-
-import InputValidation from 'react-native-input-validation';
+import {Select, Text} from '@ui-kitten/components';
+import RNPickerSelect from 'react-native-picker-select';
 const data = [
   {text: 'Tropical'},
   {text: 'Humid'},
@@ -28,8 +27,8 @@ class addPlanterScreen extends React.Component {
     this.state = {
       planterName: '',
       planterDescription: '',
-      selectedOption: {text: 'Humid'},
-      selectedGrowthPlanOption: {text: ''},
+      selectedOption: {value: 'Humid'},
+      selectedGrowthPlanOption: {value: ''},
       visible: false,
       nameError: false,
       checked: 'first',
@@ -54,6 +53,26 @@ class addPlanterScreen extends React.Component {
     this.loadAllGrowthPlans()
       .then()
       .catch();
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
   }
 
   async loadAllGrowthPlans() {
@@ -74,7 +93,10 @@ class addPlanterScreen extends React.Component {
         // console.log(response.data.Items);
         let data1 = [];
         for (let i = 0; i < response.data.Items.length; i++) {
-          data1.push({text: response.data.Items[i].growthPlanGroup});
+          data1.push({
+            value: response.data.Items[i].growthPlanGroup,
+            label: response.data.Items[i].growthPlanGroup,
+          });
         }
         this.setState({growthPlansOptions: data1});
       })
@@ -89,6 +111,7 @@ class addPlanterScreen extends React.Component {
   }
 
   static navigationOptions = ({navigation, screenProps}) => {
+    const params = navigation.state.params || {};
     return {
       headerTitle: (
         <Image
@@ -104,7 +127,9 @@ class addPlanterScreen extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -117,7 +142,7 @@ class addPlanterScreen extends React.Component {
     // console.log(val);
 
     this.state.growthPlans.map(one => {
-      if (one.growthPlanGroup === val.text) {
+      if (one.growthPlanGroup === val) {
         this.setState({currentPlanSelected: one});
       }
     });
@@ -128,11 +153,12 @@ class addPlanterScreen extends React.Component {
   setSelectedOption = val => {
     this.setState({selectedOption: val});
   };
+
   async addPlanterToMyGarden() {
     this.setState({addingPlanter: true});
     let growthPlan = {};
     this.state.growthPlans.map(one => {
-      if (one.growthPlanGroup === this.state.selectedGrowthPlanOption.text) {
+      if (one.growthPlanGroup === this.state.selectedGrowthPlanOption) {
         growthPlan = one;
       }
     });
@@ -145,7 +171,7 @@ class addPlanterScreen extends React.Component {
           username: this.props.navigation.getParam('user').username,
           planterName: this.state.planterName,
           planterDescription: this.state.planterDescription,
-          planterClimate: this.state.selectedOption['text'],
+          planterClimate: this.state.selectedOption,
           growthPlan: growthPlan,
         },
         {
@@ -207,7 +233,7 @@ class addPlanterScreen extends React.Component {
       // return false;
     }
 
-    if (this.state.selectedGrowthPlanOption.text === '') {
+    if (this.state.selectedGrowthPlanOption.value === '') {
       this.setState({planError: true});
       return true;
     } else this.setState({planError: false});
@@ -241,8 +267,20 @@ class addPlanterScreen extends React.Component {
   render() {
     let loading = this.state.addingPlanter;
     let allActionsDisabled = this.state.allActions;
+
+    let selectBackground =
+      this.props.plantyData.theme === 'light' ? 'white' : '#27323a';
+    let selectTest =
+      this.props.plantyData.theme === 'light' ? 'black' : 'white';
+
     return (
-      <View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}>
         <PaperCard style={{margin: '1%', width: '98%'}}>
           <PaperCard.Title title={'Create Planter'} />
           <PaperCard.Content>
@@ -270,34 +308,98 @@ class addPlanterScreen extends React.Component {
             />
             <Text style={styles.simpleText}>Climate</Text>
             <View style={styles.controlContainer}>
-              <Select
-                disabled={allActionsDisabled}
-                style={{
-                  borderRadius: 4,
-                  borderWidth: 0.5,
-                  margin: 10,
-                  borderColor: plantyColor,
+              <RNPickerSelect
+                placeholder={{
+                  label: 'Select a climate...',
+                  value: '',
+                  color: '#9EA0A4',
                 }}
-                data={data}
-                selectedOption={this.state.selectedOption}
-                onSelect={this.setSelectedOption}
+                items={[
+                  {label: 'Tropical', value: 'Tropical'},
+                  {label: 'Humid', value: 'Humid'},
+                  {label: 'Subarctic', value: 'Subarctic'},
+                  {label: 'Highland', value: 'Highland'},
+                ]}
+                onValueChange={value => {
+                  this.setSelectedOption(value);
+                }}
+                style={{
+                  inputIOS: {
+                    margin: 10,
+                    fontSize: 16,
+                    paddingVertical: 12,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: plantyColor,
+                    borderRadius: 4,
+                    backgroundColor: selectBackground,
+                    color: selectTest,
+                    paddingRight: 30, // to ensure the text is never behind the icon
+                  },
+                }}
+                value={this.state.selectedOption}
+                disabled={allActionsDisabled}
               />
+
+              {/*<Select*/}
+              {/*  disabled={allActionsDisabled}*/}
+              {/*  style={{*/}
+              {/*    borderRadius: 4,*/}
+              {/*    borderWidth: 0.5,*/}
+              {/*    margin: 10,*/}
+              {/*    borderColor: plantyColor,*/}
+              {/*    container: {backgroundColor: 'black'},*/}
+              {/*  }}*/}
+              {/*  data={data}*/}
+              {/*  selectedOption={this.state.selectedOption}*/}
+              {/*  onSelect={this.setSelectedOption}*/}
+              {/*/>*/}
             </View>
             <Text style={styles.simpleText}>Growth Plan</Text>
             <View style={styles.controlContainer}>
-              <Select
+              <RNPickerSelect
+                placeholder={{
+                  label: 'Select a growth plan...',
+                  value: '',
+                  color: '#9EA0A4',
+                }}
+                items={this.state.growthPlansOptions}
+                onValueChange={value => {
+                  this.setSelectedGrowthPlanOption(value);
+                }}
+                style={{
+                  inputIOS: {
+                    margin: 10,
+                    fontSize: 16,
+                    paddingVertical: 12,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: this.state.planError
+                      ? errorColor
+                      : plantyColor,
+                    borderRadius: 4,
+                    backgroundColor: selectBackground,
+                    color: selectTest,
+                    paddingRight: 30, // to ensure the text is never behind the icon
+                  },
+                }}
                 disabled={allActionsDisabled}
                 error={this.state.planError}
-                style={{
-                  borderRadius: 4,
-                  borderWidth: 0.5,
-                  margin: 10,
-                  borderColor: this.state.planError ? errorColor : plantyColor,
-                }}
-                data={this.state.growthPlansOptions}
-                selectedOption={this.state.selectedGrowthPlanOption}
-                onSelect={this.setSelectedGrowthPlanOption}
+                value={this.state.selectedGrowthPlanOption}
               />
+              {/*<Select*/}
+              {/*  disabled={allActionsDisabled}*/}
+              {/*  error={this.state.planError}*/}
+              {/*  style={{*/}
+              {/*    borderRadius: 4,*/}
+              {/*    borderWidth: 0.5,*/}
+              {/*    margin: 10,*/}
+              {/*    borderColor: this.state.planError ? errorColor : plantyColor,*/}
+              {/*  }}*/}
+              {/*  data={this.state.growthPlansOptions}*/}
+              {/*  selectedOption={this.state.selectedGrowthPlanOption}*/}
+              {/*  onSelect={this.setSelectedGrowthPlanOption}*/}
+              {/*/>*/}
               {this.renderPlanErrorMsg()}
             </View>
             <Text style={{marginLeft: 10, marginBottom: 10}}>

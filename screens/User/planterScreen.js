@@ -5,6 +5,7 @@ import {
   ScrollView,
   Dimensions,
   ImageBackground,
+  Text as TextNative,
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {Auth} from 'aws-amplify';
@@ -48,6 +49,7 @@ import {Logger} from '../../Logger';
 
 const plantyColor = '#6f9e04';
 const errorColor = '#ee3e34';
+const surfaceColor = '#435055';
 
 class planterScreen extends React.Component {
   constructor(props) {
@@ -176,6 +178,9 @@ class planterScreen extends React.Component {
         textAlign: 'center',
         alignSelf: 'center',
       },
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerLeft: (
         <HeaderBackButton
           title="My Garden"
@@ -202,6 +207,15 @@ class planterScreen extends React.Component {
       this.props.navigation.setParams({plantWasAdded: false});
       this.props.navigation.setParams({plantWasRemoved: false});
     }
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
   }
 
   handleRefresh = () => {
@@ -209,6 +223,11 @@ class planterScreen extends React.Component {
   };
 
   componentDidMount(): void {
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+
     Auth.currentAuthenticatedUser()
       .then()
       .then()
@@ -620,17 +639,32 @@ class planterScreen extends React.Component {
   render() {
     if (this.state.loading) {
       return (
-        <ActivityIndicator
-          size="large"
-          color={plantyColor}
-          style={{top: this.state.height / 2 - 50}}
-        />
+        <View
+          style={{
+            height: this.state.height,
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+          }}>
+          <ActivityIndicator
+            size="large"
+            color={plantyColor}
+            style={{
+              top: this.state.height / 2 - 50,
+            }}
+          />
+        </View>
       );
     }
 
     if (this.state.planter.askedToSend === 'sent') {
       return (
-        <View style={styles.container} onLayout={this.onLayout}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+          }}
+          onLayout={this.onLayout}>
           <ImageBackground
             source={require('../../assets/field_sky_grass_summer.jpg')}
             style={{width: '100%', height: '100%'}}>
@@ -682,7 +716,13 @@ class planterScreen extends React.Component {
 
     if (this.state.plants.length > 0) {
       return (
-        <View style={styles.container} onLayout={this.onLayout}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+          }}
+          onLayout={this.onLayout}>
           <PaperCard>
             <View>
               <PaperCard.Title
@@ -849,11 +889,17 @@ class planterScreen extends React.Component {
                     .catch();
                 },
               }}>
-              We detected a sick plant in your garden,please tend to it!
+              <TextNative style={{color: 'white'}}>
+                We detected a sick plant in your garden,please tend to it!
+              </TextNative>
             </Snackbar>
           </Portal>
           <Portal>
             <Dialog
+              style={{
+                backgroundColor:
+                  this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+              }}
               visible={this.state.pictureAlertIsOn}
               onDismiss={() => this.setState({pictureAlertIsOn: false})}>
               <Dialog.Title>{this.state.pictureAlertText}</Dialog.Title>
@@ -865,8 +911,14 @@ class planterScreen extends React.Component {
               </Dialog.Actions>
             </Dialog>
           </Portal>
-
-          <ScrollView style={styles.data}>
+          <ScrollView
+            style={{
+              flexWrap: 'wrap',
+              flex: 1,
+              flexDirection: 'row',
+              backgroundColor:
+                this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+            }}>
             <FlatList
               vertical={true}
               scrollEnabled={false}
@@ -882,10 +934,14 @@ class planterScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              backgroundColor: 'white',
+              backgroundColor:
+                this.props.plantyData.theme === 'light'
+                  ? 'white'
+                  : surfaceColor,
               color: '#6f9e04',
               right: 0,
               bottom: 10,
+              zIndex: 1,
             }}
             color={plantyColor}
             large
@@ -902,9 +958,13 @@ class planterScreen extends React.Component {
             style={{
               position: 'absolute',
               margin: 16,
-              backgroundColor: 'white',
+              backgroundColor:
+                this.props.plantyData.theme === 'light'
+                  ? 'white'
+                  : surfaceColor,
               color: '#6f9e04',
               left: 0,
+              zIndex: 1,
               bottom: 14,
             }}
             label="Manage planter"
@@ -919,17 +979,29 @@ class planterScreen extends React.Component {
             }
           />
           <Image
-            style={{position: 'absolute', bottom: -1, zIndex: -10}}
+            style={{position: 'absolute', bottom: -1, zIndex: 0}}
             source={require('../../assets/grass.png')}
           />
         </View>
       );
     } else {
       return (
-        <View style={styles.container} onLayout={this.onLayout}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+          }}
+          // onLayout={this.onLayout}
+        >
           <ImageBackground
             source={require('../../assets/field_sky_grass_summer.jpg')}
-            style={{width: '100%', height: '100%'}}>
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor:
+                this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+            }}>
             <PaperCard>
               <PaperCard.Title
                 title={'Planter:' + this.state.planter.name}
@@ -968,6 +1040,7 @@ class planterScreen extends React.Component {
                 backgroundColor: plantyColor,
                 color: plantyColor,
                 right: 0,
+                zIndex: 1,
                 bottom: 10,
               }}
               disabled={this.state.planter.planterStatus === 'pending'}

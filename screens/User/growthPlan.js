@@ -66,6 +66,22 @@ class growthPlan extends React.Component {
     this.onLayout = this.onLayout.bind(this);
   }
 
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
+
   componentDidMount(): void {
     this.loadGrowthPlan()
       .then(
@@ -81,6 +97,11 @@ class growthPlan extends React.Component {
     currentWeek = parseInt(currentWeek / 7);
 
     this.setState({currentWeek: currentWeek + 1});
+
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
   }
 
   _showDialog = () => this.setState({visible: true});
@@ -267,7 +288,9 @@ class growthPlan extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -405,6 +428,29 @@ class growthPlan extends React.Component {
   };
 
   renderWeeks(oneWeek) {
+    let week = {
+      backgroundColor:
+        this.props.plantyData.theme === 'light' ? lightGreen100 : '#27323a',
+      borderRadius: 5,
+      padding: -30,
+      margin: 1,
+    };
+    let weekActive = {
+      backgroundColor:
+        this.props.plantyData.theme === 'light' ? lightGreen200 : '#29a19c',
+      borderRadius: 5,
+      padding: -30,
+      margin: 1,
+    };
+
+    let dayTime = {
+      backgroundColor:
+        this.props.plantyData.theme === 'light' ? lightGreen200 : '#37474f',
+      borderRadius: 5,
+      padding: -30,
+      margin: 1,
+    };
+
     let icon = 'numeric 0';
 
     if (oneWeek.phaseName.replace('Week ', '').length > 1) {
@@ -420,8 +466,8 @@ class growthPlan extends React.Component {
         style={
           parseInt(oneWeek.phaseName.replace('Week ', '')) ===
           this.state.currentWeek
-            ? styles.weekActive
-            : styles.week
+            ? weekActive
+            : week
         }
         title={
           parseInt(oneWeek.phaseName.replace('Week ', '')) ===
@@ -430,7 +476,7 @@ class growthPlan extends React.Component {
             : oneWeek.phaseName
         }>
         <List.Accordion
-          style={styles.dayTime}
+          style={dayTime}
           title="Morning"
           key={oneWeek.name + 'Morning'}>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
@@ -504,10 +550,7 @@ class growthPlan extends React.Component {
             <Text style={{marginTop: 20}}>100</Text>
           </View>
         </List.Accordion>
-        <List.Accordion
-          style={styles.dayTime}
-          title="Day"
-          key={oneWeek.name + 'Day'}>
+        <List.Accordion style={dayTime} title="Day" key={oneWeek.name + 'Day'}>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
           <View style={styles.slider}>
             <Text style={{marginTop: 20}}>15</Text>
@@ -580,7 +623,7 @@ class growthPlan extends React.Component {
           </View>
         </List.Accordion>
         <List.Accordion
-          style={styles.dayTime}
+          style={dayTime}
           title="Evening"
           key={oneWeek.name + 'Evening'}>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
@@ -655,7 +698,7 @@ class growthPlan extends React.Component {
           </View>
         </List.Accordion>
         <List.Accordion
-          style={styles.dayTime}
+          style={dayTime}
           title="Night"
           key={oneWeek.name + 'Night'}>
           <Text style={{fontWeight: 'bold', marginTop: 20}}>Temperature</Text>
@@ -745,16 +788,23 @@ class growthPlan extends React.Component {
     }
 
     return (
-      <View style={styles.container} onLayout={this.onLayout}>
-        <PaperCard>
-          <View style={{}}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}
+        onLayout={this.onLayout}>
+        <PaperCard style={{margin: 3}}>
+          <View>
             <PaperCard.Title
               title={'Growth Plan'}
               subtitle={'Planter:' + this.state.planter.name}
             />
           </View>
         </PaperCard>
-        <PaperCard style={{marginTop: 2}}>
+        <PaperCard style={{margin: 3}}>
           <PaperCard.Content>
             <Button
               mode="outlined"
@@ -795,7 +845,13 @@ class growthPlan extends React.Component {
           </PaperCard.Content>
         </PaperCard>
         <ScrollView
-          style={styles.data}
+          style={{
+            flexWrap: 'wrap',
+            flex: 1,
+            margin: 3,
+            width: '100%',
+            flexDirection: 'row',
+          }}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}>
           <PaperCard style={{width: this.state.width - 2}}>

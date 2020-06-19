@@ -82,6 +82,7 @@ class BarGraph extends React.PureComponent {
       return {
         data: props.data.datasets[0].data,
         label_data: props.data.labels,
+        color: props.color,
       };
     }
     return null;
@@ -122,8 +123,8 @@ class BarGraph extends React.PureComponent {
           data={this.state.xAsixData.data}
           svg={{
             fontSize: 8,
-            fill: 'white',
-            stroke: 'black',
+            fill: this.props.color,
+            stroke: this.props.color,
             strokeWidth: 0.3,
             alignmentBaseline: 'baseline',
             baselineShift: '3',
@@ -135,7 +136,7 @@ class BarGraph extends React.PureComponent {
         <XAxis
           data={this.state.data}
           svg={{
-            fill: 'black',
+            fill: this.props.color,
             fontSize: 14,
           }}
           scale={scale.scaleBand}

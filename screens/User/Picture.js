@@ -76,7 +76,9 @@ class Picture extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -84,6 +86,29 @@ class Picture extends React.Component {
       },
     };
   };
+
+  componentDidMount(): void {
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<P>,
+    prevState: Readonly<S>,
+    snapshot: SS,
+  ): void {
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
+  }
 
   //left in case we need to roll back to aws-rekognition
   async checkPlantHealth() {
@@ -257,8 +282,14 @@ class Picture extends React.Component {
 
   render() {
     return (
-      <ScrollView style={styles.container}>
-        <PaperCard style={{height: this.state.height}}>
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}>
+        <PaperCard style={{height: this.state.height, margin: '1%'}}>
           <PaperCard.Content style={{marginTop: 10}}>
             <Image
               style={{

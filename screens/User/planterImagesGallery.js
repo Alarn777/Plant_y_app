@@ -71,6 +71,15 @@ class planterImagesGallery extends React.Component {
         });
       this.props.navigation.setParams({picWasRemoved: false});
     }
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
   }
 
   async preloadImages(images_array) {
@@ -116,6 +125,10 @@ class planterImagesGallery extends React.Component {
     this.listPicturesData()
       .then()
       .catch();
+    this.props.navigation.setParams({
+      headerColor:
+        this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+    });
   }
 
   async listPicturesData() {
@@ -179,7 +192,9 @@ class planterImagesGallery extends React.Component {
           }}
         />
       ),
-
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -245,7 +260,14 @@ class planterImagesGallery extends React.Component {
     }
 
     return (
-      <View style={styles.container} onLayout={this.onLayout}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}
+        onLayout={this.onLayout}>
         <PaperCard>
           <View style={{}}>
             <PaperCard.Title
@@ -269,12 +291,24 @@ class planterImagesGallery extends React.Component {
           </View>
         </PaperCard>
         <ScrollView style={styles.data}>
-          <FlatList
-            numColumns={2}
-            data={this.state.pictures}
-            keyExtractor={this._keyExtractor}
-            renderItem={this._renderItem}
-          />
+          {this.state.pictures.length === 0 ? (
+            <ActivityIndicator
+              size="large"
+              color={plantyColor}
+              style={{
+                marginTop: 5,
+                alignItems: 'center',
+                marginLeft: this.state.width / 2 - 30,
+              }}
+            />
+          ) : (
+            <FlatList
+              numColumns={2}
+              data={this.state.pictures}
+              keyExtractor={this._keyExtractor}
+              renderItem={this._renderItem}
+            />
+          )}
         </ScrollView>
         <Image
           style={{position: 'absolute', bottom: -1, zIndex: -10}}

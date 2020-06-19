@@ -18,6 +18,7 @@ import AITesting from './screens/User/AITesting';
 import SendMyPlanter from './screens/User/SendMyPlanter';
 import Amplify, {Auth} from 'aws-amplify';
 import awsConfig from './aws-exports';
+import {AsyncStorage, StatusBar} from 'react-native';
 
 Amplify.configure(awsConfig);
 
@@ -38,6 +39,7 @@ import addPlanterScreen from './screens/User/addPlanterScreen';
 import planterImagesGallery from './screens/User/planterImagesGallery';
 import Picture from './screens/User/Picture';
 import GrowthPlan from './screens/User/growthPlan';
+import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 
 const store = createStore(Reducer);
 
@@ -84,6 +86,7 @@ const AppNavigator = createStackNavigator(
       navigationOptions: {
         gesturesEnabled: false,
       },
+      waitForRender: true,
     },
     AdjustPlantConditions: {
       name: 'Adjust Plant Conditions Screen',
@@ -144,6 +147,7 @@ const AppNavigator = createStackNavigator(
   },
   {
     initialRouteName: 'HomeScreenUser',
+    cardStyle: {background: 'transparent', backgroundColor: '#263238'},
   },
 );
 
@@ -152,8 +156,56 @@ const AppContainer = createAppContainer(AppNavigator);
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      styleTypes: ['default', 'dark-content', 'light-content'],
+      status_bar: 'dark-content',
+      current_theme: 'light',
+      dark_theme: {
+        ...DefaultTheme,
+        roundness: 2,
+        dark: true,
+        colors: {
+          background: '#27323a',
+          surface: '#435055',
+          primary: '#6f9e04',
+          accent: '#6f9d00',
+          text: 'white',
+          disabled: 'white',
+        },
+      },
+      theme: {
+        ...DefaultTheme,
+        roundness: 2,
+        colors: {
+          ...DefaultTheme.colors,
+          primary: '#6f9e04',
+          accent: '#6f9d00',
+        },
+      },
+    };
   }
+
+  componentDidMount(): void {
+    this._retrieveData()
+      .then()
+      .catch();
+  }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('theme');
+      if (value !== null) {
+        // Our data is fetched successfully
+        // console.log(value);
+
+        this.setState({status_bar: value + '-content', current_theme: value});
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log(error);
+    }
+  };
+
   static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
     return {
@@ -173,6 +225,18 @@ class App extends React.Component {
     };
   };
 
+  changeTheme = theme => {
+    // console.log('changeTheme', theme);
+
+    this.setState({
+      current_theme: theme,
+      status_bar:
+        this.state.status_bar === 'dark-content'
+          ? 'light-content'
+          : 'dark-content',
+    });
+  };
+
   logOut = async () => {
     await Auth.signOut()
       .then(data => console.log(data))
@@ -180,12 +244,24 @@ class App extends React.Component {
   };
 
   render() {
+    StatusBar.setBarStyle(this.state.status_bar, true);
     return (
       <Provider store={store}>
-        <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider mapping={mapping} theme={lightTheme}>
-          <AppContainer screenProps={() => this.logOut} />
-        </ApplicationProvider>
+        <PaperProvider
+          theme={
+            this.state.current_theme === 'light'
+              ? this.state.theme
+              : this.state.dark_theme
+          }>
+          <IconRegistry icons={EvaIconsPack} />
+          <ApplicationProvider
+            mapping={mapping}
+            theme={
+              this.state.current_theme === 'light' ? lightTheme : darkTheme
+            }>
+            <AppContainer screenProps={{func: this.changeTheme.bind(this)}} />
+          </ApplicationProvider>
+        </PaperProvider>
       </Provider>
     );
   }

@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
   StatusBar,
+  AsyncStorage,
 } from 'react-native';
 import {Auth} from 'aws-amplify';
 import PropTypes from 'prop-types';
@@ -41,6 +42,7 @@ import {
   addAction,
   dealWithMessage,
   cleanReduxState,
+  changeTheme,
 } from '../../FriendActions';
 import {bindActionCreators} from 'redux';
 import WS from '../../websocket';
@@ -49,6 +51,7 @@ import {isIphone7} from '../../whatDevice';
 import {Logger} from '../../Logger';
 
 const plantyColor = '#6f9e04';
+const surfaceColor = '#435055';
 
 class MainScreen extends React.Component {
   constructor(props) {
@@ -109,6 +112,9 @@ class MainScreen extends React.Component {
           source={require('../../assets/logo.png')}
         />
       ),
+      headerStyle: {
+        backgroundColor: params.headerColor,
+      },
       headerTitleStyle: {
         flex: 1,
         textAlign: 'center',
@@ -237,9 +243,22 @@ class MainScreen extends React.Component {
     Auth.currentAuthenticatedUser()
       .then()
       .catch(() => this.logOut());
+
+    let condition =
+      this.props.navigation.getParam('headerColor') === 'white'
+        ? 'light'
+        : 'dark';
+    if (this.props.plantyData.theme !== condition)
+      this.props.navigation.setParams({
+        headerColor:
+          this.props.plantyData.theme === 'light' ? 'white' : '#263238',
+      });
   }
 
   componentDidMount(): void {
+    this._retrieveData()
+      .then()
+      .catch();
     this.onLayout();
     this.fetchUser()
       .then(() => {
@@ -324,6 +343,19 @@ class MainScreen extends React.Component {
     });
   }
 
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('theme');
+      if (value !== null) {
+        console.log('_retrieveData ', value);
+        this.props.changeTheme(value);
+        this.props.screenProps.func(value);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   _keyExtractor = item => item.UUID;
 
   _renderItem = ({item}) => {
@@ -341,7 +373,7 @@ class MainScreen extends React.Component {
               loadPlanters: this.loadPlanters,
             })
           }
-          style={{width: this.state.width / 3 - 9, margin: 3, borderRadius: 5}}
+          style={{width: this.state.width / 3 - 6, margin: 3, borderRadius: 5}}
           index={item.UUID}
           key={item.UUID}>
           <Image
@@ -358,9 +390,15 @@ class MainScreen extends React.Component {
     let logo_width = this.state.width;
     if (isIphone7()) logo_width = 414;
     return (
-      <View style={styles.container} onLayout={this.onLayout}>
-        <StatusBar translucent barStyle="dark-content" />
-        <PaperCard>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor:
+            this.props.plantyData.theme === 'light' ? 'white' : '#27323a',
+          position: 'relative',
+        }}
+        onLayout={this.onLayout}>
+        <PaperCard style={{margin: 5}}>
           <PaperCard.Title
             title={
               this.state.username === 'Test'
@@ -376,13 +414,19 @@ class MainScreen extends React.Component {
             right={props => (
               <IconButton
                 {...props}
-                style={{backgroundColor: 'white'}}
+                style={{
+                  backgroundColor:
+                    this.props.plantyData.theme === 'light'
+                      ? 'white'
+                      : '#27323a',
+                }}
                 icon={require('../../assets/icons/settings-2-outline.png')}
                 color={plantyColor}
                 onPress={() =>
                   this.props.navigation.navigate('UserPage', {
                     user: this.state.user,
                     logOut: this.logOut,
+                    theme: this.props.screenProps.func,
                     planters: this.state.planters,
                   })
                 }
@@ -390,7 +434,7 @@ class MainScreen extends React.Component {
             )}
           />
         </PaperCard>
-        <PaperCard style={{marginTop: 5, marginBottom: 5}}>
+        <PaperCard style={{margin: 5}}>
           <Image
             resizeMode="contain"
             style={{
@@ -404,7 +448,7 @@ class MainScreen extends React.Component {
           />
           <PaperCard.Actions />
         </PaperCard>
-        <PaperCard style={{marginTop: 0, marginBottom: 5}}>
+        <PaperCard style={{margin: 5}}>
           <View style={styles.header}>
             <Text style={styles.headerText}>My garden</Text>
           </View>
@@ -427,7 +471,7 @@ class MainScreen extends React.Component {
               color={plantyColor}
               style={{
                 alignItems: 'center',
-                marginLeft: this.state.width / 2 - 40,
+                marginLeft: this.state.width / 2 - 30,
               }}
             />
           ) : (
@@ -444,8 +488,10 @@ class MainScreen extends React.Component {
           style={{
             position: 'absolute',
             margin: 16,
-            backgroundColor: 'white',
+            backgroundColor:
+              this.props.plantyData.theme === 'light' ? 'white' : surfaceColor,
             color: plantyColor,
+
             right: 0,
             bottom: 10,
           }}
@@ -491,6 +537,7 @@ const mapDispatchToProps = dispatch =>
       dealWithMessage,
       connectWS,
       addAction,
+      changeTheme,
     },
     dispatch,
   );
