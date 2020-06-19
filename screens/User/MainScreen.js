@@ -473,7 +473,7 @@ MainScreen.propTypes = {
   navigation: PropTypes.any,
   addEvent: PropTypes.func,
 };
-
+//
 const mapStateToProps = state => {
   const {plantyData} = state;
 
