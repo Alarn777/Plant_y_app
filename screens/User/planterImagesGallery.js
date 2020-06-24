@@ -82,8 +82,19 @@ class planterImagesGallery extends React.Component {
       });
   }
 
+  compare_timestamp(a, b) {
+    if (parseFloat(a.timestamp) > parseFloat(b.timestamp)) {
+      return -1;
+    } else if (parseFloat(a.timestamp) < parseFloat(b.timestamp)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
   async preloadImages(images_array) {
-    await images_array.map(oneImage => {
+    let sorted_by_date_images_array = images_array.sort(this.compare_timestamp);
+    await sorted_by_date_images_array.map(oneImage => {
       Storage.get(oneImage.image_key, {
         level: 'public',
         type: 'image/jpg',

@@ -6,12 +6,11 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
-  TouchableOpacity,
 } from 'react-native';
 import {Auth, Storage} from 'aws-amplify';
 
 import PropTypes from 'prop-types';
-import {Text, Card} from '@ui-kitten/components';
+import {Text} from '@ui-kitten/components';
 import {ActivityIndicator, Card as PaperCard} from 'react-native-paper';
 
 import {withAuthenticator} from 'aws-amplify-react-native';

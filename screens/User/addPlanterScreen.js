@@ -1,13 +1,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import {Select, Text} from '@ui-kitten/components';
+import {Text} from '@ui-kitten/components';
 import RNPickerSelect from 'react-native-picker-select';
-const data = [
-  {text: 'Tropical'},
-  {text: 'Humid'},
-  {text: 'Subarctic'},
-  {text: 'Highland'},
-];
 import {HeaderBackButton} from 'react-navigation-stack';
 import {Image, View} from 'react-native';
 import {Card as PaperCard, TextInput, Button} from 'react-native-paper';
@@ -139,8 +133,6 @@ class addPlanterScreen extends React.Component {
   };
 
   setSelectedGrowthPlanOption = val => {
-    // console.log(val);
-
     this.state.growthPlans.map(one => {
       if (one.growthPlanGroup === val) {
         this.setState({currentPlanSelected: one});
@@ -220,8 +212,6 @@ class addPlanterScreen extends React.Component {
 
   validateText() {
     const expr = /^[a-zA-Z0-9_.-]*$/;
-    const expr1 = /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{6,}$/g;
-    let name = this.state.planterName;
     if (
       !expr.test(String(this.state.planterName).toLowerCase()) ||
       this.state.planterName.length === 0
@@ -340,20 +330,6 @@ class addPlanterScreen extends React.Component {
                 value={this.state.selectedOption}
                 disabled={allActionsDisabled}
               />
-
-              {/*<Select*/}
-              {/*  disabled={allActionsDisabled}*/}
-              {/*  style={{*/}
-              {/*    borderRadius: 4,*/}
-              {/*    borderWidth: 0.5,*/}
-              {/*    margin: 10,*/}
-              {/*    borderColor: plantyColor,*/}
-              {/*    container: {backgroundColor: 'black'},*/}
-              {/*  }}*/}
-              {/*  data={data}*/}
-              {/*  selectedOption={this.state.selectedOption}*/}
-              {/*  onSelect={this.setSelectedOption}*/}
-              {/*/>*/}
             </View>
             <Text style={styles.simpleText}>Growth Plan</Text>
             <View style={styles.controlContainer}>
@@ -387,19 +363,6 @@ class addPlanterScreen extends React.Component {
                 error={this.state.planError}
                 value={this.state.selectedGrowthPlanOption}
               />
-              {/*<Select*/}
-              {/*  disabled={allActionsDisabled}*/}
-              {/*  error={this.state.planError}*/}
-              {/*  style={{*/}
-              {/*    borderRadius: 4,*/}
-              {/*    borderWidth: 0.5,*/}
-              {/*    margin: 10,*/}
-              {/*    borderColor: this.state.planError ? errorColor : plantyColor,*/}
-              {/*  }}*/}
-              {/*  data={this.state.growthPlansOptions}*/}
-              {/*  selectedOption={this.state.selectedGrowthPlanOption}*/}
-              {/*  onSelect={this.setSelectedGrowthPlanOption}*/}
-              {/*/>*/}
               {this.renderPlanErrorMsg()}
             </View>
             <Text style={{marginLeft: 10, marginBottom: 10}}>

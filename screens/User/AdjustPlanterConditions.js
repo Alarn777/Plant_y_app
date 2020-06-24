@@ -144,7 +144,6 @@ class AdjustPlanterConditions extends React.Component {
   }
   componentDidMount(): void {
     this.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
-
     let currentTime = new Date().getTime() / 1000;
     let activatedTime = 0;
     if (this.state.item) activatedTime = this.state.item.TimeActivated;

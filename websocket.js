@@ -28,9 +28,7 @@ export default class WS {
           e.reason.toString(),
         'WS ERROR',
       );
-
       if (e.reason.toString() === 'Stream end encountered') {
-        console.log('User closed the app');
       } else {
         setTimeout(function() {
           WS.init();
@@ -44,8 +42,9 @@ export default class WS {
     this.ws.addEventListener('message', handler);
   }
 
-  static closeSocket() {
-    this.ws.close();
+  static closeSocket(reason) {
+    let code = 1001;
+    this.ws.close(code, reason.toString());
   }
 
   static onClose(handler) {
@@ -64,13 +63,3 @@ export default class WS {
     }
   }
 }
-//
-// (function() {
-//   Element.prototype._addEventListener = Element.prototype.addEventListener;
-//   Element.prototype.addEventListener = function(a, b, c) {
-//     this._addEventListener(a, b, c);
-//     if (!this.eventListenerList) this.eventListenerList = {};
-//     if (!this.eventListenerList[a]) this.eventListenerList[a] = [];
-//     this.eventListenerList[a].push(b);
-//   };
-// })();

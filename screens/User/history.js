@@ -12,7 +12,6 @@ import {Text} from '@ui-kitten/components';
 import axios from 'axios';
 import Consts from '../../ENV_VARS';
 import {
-  ActivityIndicator,
   Button,
   Card as PaperCard,
   Dialog,
@@ -422,7 +421,7 @@ class History extends React.Component {
           backgroundColor="#6f9e04"
           color="#6f9e04"
           onPress={() => {
-            this.setState({pickDay: true, loading: true});
+            this.setState({pickDay: true, loading: true, error: false});
           }}>
           Choose a day
         </Button>

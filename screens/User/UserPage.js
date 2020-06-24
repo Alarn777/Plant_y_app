@@ -22,7 +22,6 @@ import {
   Switch,
   Portal,
   Dialog,
-  Paragraph,
   TextInput,
   Divider,
 } from 'react-native-paper';
@@ -457,7 +456,7 @@ class UserPage extends React.Component {
           <BarGraph
             color={this.props.plantyData.theme === 'light' ? 'black' : 'white'}
             data={this.state.graphData}
-            max={Math.max(...this.state.graphData.datasets[0].data)}
+            // max={Math.max(...this.state.graphData.datasets[0].data)}
             formatter={'W'}
           />
           <Text style={{marginLeft: 7, color: plantyColor}}>*W - Weeks</Text>
@@ -584,7 +583,7 @@ class UserPage extends React.Component {
                   );
                   this.props.navigation.goBack();
                   this.props.navigation.getParam('logOut')();
-                  WS.closeSocket();
+                  WS.closeSocket('logOut');
                 })
                 .catch(e => {
                   Logger.saveLogs(

@@ -74,33 +74,50 @@ class BarGraph extends React.PureComponent {
         data: [0, 20],
         max: 20,
       },
+      max: 0,
     };
   }
 
   static getDerivedStateFromProps(props, state) {
     if (props.data !== state.data) {
+      let max = props.data.datasets[0].data.reduce(function(a, b) {
+        return Math.max(a, b);
+      });
+
       return {
         data: props.data.datasets[0].data,
         label_data: props.data.labels,
         color: props.color,
+        max: max,
       };
     }
     return null;
   }
 
   componentDidMount(): void {
-    let max = 10;
-    this.state.xAsixData.data[1] = max + 1;
-    this.state.xAsixData.max = max + 1;
-    this.forceUpdate();
     this.setState({
       label_data: this.props.data.labels,
       data: this.props.data.datasets[0].data,
       formatter: this.props.formatter,
     });
+    setTimeout(this.delay, 100);
   }
 
+  delay = () => {
+    let max = this.props.data.datasets[0].data.reduce(function(a, b) {
+      return Math.max(a, b);
+    });
+    this.setState({
+      xAsixData: {
+        data: [0, max + 1],
+        max: max + 1,
+      },
+    });
+    this.forceUpdate();
+  };
+
   render() {
+    // console.log(this.state.data);
     return (
       <View style={{padding: 5}}>
         <BarChart
@@ -114,7 +131,7 @@ class BarGraph extends React.PureComponent {
           gridMin={0}
           svg={{fill: plantyColor}}
           yMin={0}
-          yMax={this.state.xAsixData.max}>
+          yMax={this.state.xAsixData.max + 1}>
           <Grid />
           <Gradient />
         </BarChart>
