@@ -451,7 +451,7 @@ class UserPage extends React.Component {
               alignSelf: 'center',
               // fontWeight: 'bold',
             }}>
-            Planter Lifetimes
+            Planter's Lifespan
           </Text>
           <BarGraph
             color={this.props.plantyData.theme === 'light' ? 'black' : 'white'}
