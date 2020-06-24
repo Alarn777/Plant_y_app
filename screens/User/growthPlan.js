@@ -209,6 +209,7 @@ class growthPlan extends React.Component {
         {
           growthPlanGroup: this.state.growthPlan.growthPlanGroup,
           phases: this.state.growthPlan.phases,
+          growthPlanDescription: this.state.growthPlan.growthPlanDescription,
         },
         {
           headers: {Authorization: AuthStr},
