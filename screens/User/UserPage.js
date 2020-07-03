@@ -43,7 +43,7 @@ const data = {
   labels: ['Test', 'Test', 'Test'],
   datasets: [
     {
-      data: [3, 5, 3],
+      data: [0, 0, 0],
     },
   ],
 };
@@ -136,7 +136,6 @@ class UserPage extends React.Component {
       newData.labels.push(one.name);
       newData.datasets[0].data.push(currentWeek + 1);
     });
-
     this.setState({graphData: newData});
   };
 

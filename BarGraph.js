@@ -97,7 +97,7 @@ class BarGraph extends React.PureComponent {
   componentDidMount(): void {
     this.setState({
       label_data: this.props.data.labels,
-      data: this.props.data.datasets[0].data,
+      data: data,
       formatter: this.props.formatter,
     });
     setTimeout(this.delay, 100);
@@ -113,6 +113,10 @@ class BarGraph extends React.PureComponent {
         max: max + 1,
       },
     });
+    let data = this.props.data.datasets[0].data;
+    for (let i = 0; i < data.length; i++) {
+      data[i]++;
+    }
     this.forceUpdate();
   };
 

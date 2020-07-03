@@ -99,9 +99,11 @@ class AdjustPlanterConditions extends React.Component {
             break;
 
           case 'LAMP_IS_OFF':
+            this.props.toggleLight(false);
             this.setState({lightTurnedOn: false});
             break;
           case 'LAMP_IS_ON':
+            this.props.toggleLight(true);
             this.setState({lightTurnedOn: true});
             break;
           case 'FAILED':
